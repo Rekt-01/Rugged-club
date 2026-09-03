@@ -70,7 +70,7 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
-    /* Cleaned up Laptop Hotspot: Only displays the live price text matching the style */
+    /* Laptop Hotspot: Displays only price, no green tooltip card popping up on hover */
     .laptop-hotspot {
       position: absolute;
       top: 50.3%;
@@ -85,14 +85,13 @@
       border: 2px solid #00ff66;
       box-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
       z-index: 2;
-      text-decoration: none;
+      cursor: pointer;
       font-family: monospace;
     }
     .laptop-hotspot:hover, .laptop-hotspot:active {
       background: rgba(0, 255, 102, 0.15);
       box-shadow: 0 0 18px rgba(0, 255, 102, 0.8);
     }
-    .laptop-hotspot::after { content: 'DEXSCREENER CHART'; background: #00ff66; color: #000; }
 
     .laptop-price-text {
       font-size: 0.75rem;
@@ -100,6 +99,7 @@
       color: #fff;
       text-shadow: 0 0 6px #00ff66;
       white-space: nowrap;
+      pointer-events: none;
     }
 
     .sofa-hotspot { top: 60.5%; left: 24%; width: 52%; height: 12%; }
@@ -237,6 +237,7 @@
 
     .modal-content.pacman-style { border-color: #ffe600; box-shadow: 0 0 25px #ffe600; }
     .modal-content.opensea-style { border-color: #2081e2; box-shadow: 0 0 25px #2081e2; }
+    .modal-content.dex-dashboard-style { border-color: #00ff66; box-shadow: 0 0 30px rgba(0,255,102,0.6); width: 90vw; max-width: 440px; padding: 22px; }
 
     .close-btn {
       position: absolute; top: -40px; right: 0; color: #fff;
@@ -302,6 +303,37 @@
       background: #1868b7;
       transform: scale(1.03);
     }
+
+    /* Dex Dashboard Modal Styling */
+    .dex-dash-header {
+      font-size: 1.1rem; font-weight: bold; color: #00ff66; text-align: center;
+      margin-bottom: 15px; letter-spacing: 1.5px; font-family: monospace;
+    }
+    .dex-dash-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; width: 100%;
+    }
+    .dex-dash-box {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(0,255,102,0.3);
+      border-radius: 8px; padding: 12px; text-align: center;
+    }
+    .dex-dash-box-title { font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 6px; font-family: monospace; }
+    .dex-dash-box-val { font-size: 0.95rem; font-weight: bold; color: #fff; font-family: monospace; }
+    .radio-player-box {
+      background: rgba(0,255,102,0.08); border: 1px solid #00ff66; border-radius: 8px;
+      padding: 12px; text-align: center; width: 100%; margin-bottom: 18px;
+    }
+    .radio-title { font-size: 0.75rem; color: #00ff66; font-weight: bold; margin-bottom: 8px; font-family: monospace; }
+    .radio-controls { display: flex; justify-content: center; gap: 10px; align-items: center; }
+    .radio-btn {
+      background: #00ff66; color: #000; border: none; padding: 6px 14px;
+      border-radius: 15px; font-weight: bold; font-size: 0.8rem; cursor: pointer;
+    }
+    .dex-link-btn {
+      display: block; width: 100%; text-align: center; background: #00ff66; color: #000;
+      font-weight: bold; text-decoration: none; padding: 10px; border-radius: 20px;
+      font-size: 0.9rem; font-family: monospace; box-shadow: 0 0 10px rgba(0,255,102,0.4);
+    }
+    .dex-link-btn:hover { background: #00cc52; }
   </style>
 </head>
 <body>
@@ -313,20 +345,23 @@
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
       
-      <a href="https://dexscreener.com/apechain" target="_blank" class="laptop-hotspot">
+      <!-- Laptop Hotspot clicking to open the custom popup dashboard -->
+      <div class="laptop-hotspot" onclick="openDexDashboard()">
         <span class="laptop-price-text" id="laptopApePrice">...</span>
-      </a>
+      </div>
 
       <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
+    <!-- Top Door Ape Price Badge -->
     <a href="https://dexscreener.com/apechain" target="_blank" class="door-ape-sign">
       <span class="sign-label">$APE PRICE:</span>
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v6</div>
+    <!-- Version Tag Updated to v7 -->
+    <div class="door-version">v7</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -335,11 +370,39 @@
     </div>
   </div>
 
+  <!-- Game / Utility Modal Container -->
   <div class="modal" id="gameModal">
     <div class="modal-content" id="modalContent">
       <span class="close-btn" onclick="closeGame()">&times;</span>
       <canvas id="gameCanvas" width="320" height="320"></canvas>
       <div class="mobile-controls" id="controlsContainer"></div>
+    </div>
+  </div>
+
+  <!-- Custom Dex / Location / Radio Dashboard Modal -->
+  <div class="modal" id="dexDashboardModal">
+    <div class="modal-content dex-dashboard-style">
+      <span class="close-btn" onclick="closeDexDashboard()">&times;</span>
+      <div class="dex-dash-header">🌐 RUGGED BAR TERMINAL</div>
+      <div class="dex-dash-grid">
+        <div class="dex-dash-box">
+          <div class="dex-dash-box-title">📍 Your Location</div>
+          <div class="dex-dash-box-val" id="dashLocation">Detecting IP...</div>
+        </div>
+        <div class="dex-dash-box">
+          <div class="dex-dash-box-title">⛅ Local Weather</div>
+          <div class="dex-dash-box-val" id="dashWeather">Loading...</div>
+        </div>
+      </div>
+      <div class="radio-player-box">
+        <div class="radio-title" id="radioStationTitle">📻 Local Station: Scanning...</div>
+        <div class="radio-controls">
+          <button class="radio-btn" id="radioPlayBtn" onclick="toggleRadio()">▶ PLAY</button>
+          <span style="font-size:0.75rem; color:#aaa;" id="radioStatus">Paused</span>
+        </div>
+        <audio id="localRadioAudio" preload="none"></audio>
+      </div>
+      <a href="https://dexscreener.com/apechain" target="_blank" class="dex-link-btn">OPEN FULL DEXSCREENER CHART 📈</a>
     </div>
   </div>
 
@@ -389,6 +452,94 @@
     }
     updateApePrice();
     setInterval(updateApePrice, 30000);
+
+    /* Dynamic IP Location, Weather, and Radio Stream Integration */
+    let radioPlaying = false;
+    async function openDexDashboard() {
+      document.getElementById('dexDashboardModal').style.display = 'flex';
+      try {
+        const ipRes = await fetch('https://ipapi.co/json/');
+        const ipData = await ipRes.json();
+        const city = ipData.city || 'Unknown City';
+        const country = ipData.country_name || '';
+        document.getElementById('dashLocation').innerText = `${city}, ${country}`;
+
+        // Get Weather based on coordinates if available
+        if (ipData.latitude && ipData.longitude) {
+          const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${ipData.latitude}&longitude=${ipData.longitude}&current_weather=true`);
+          const weatherData = await weatherRes.json();
+          if (weatherData && weatherData.current_weather) {
+            const temp = weatherData.current_weather.temperature;
+            document.getElementById('dashWeather').innerText = `${temp}°C`;
+          } else {
+            document.getElementById('dashWeather').innerText = '18°C (Clear)';
+          }
+        } else {
+          document.getElementById('dashWeather').innerText = '18°C (Clear)';
+        }
+
+        // Setup local radio stream based on country/region fallback to public global/regional radio streams
+        setupRadioStation(ipData.country_code);
+      } catch (e) {
+        document.getElementById('dashLocation').innerText = 'Global Node';
+        document.getElementById('dashWeather').innerText = '20°C';
+        setupRadioStation('US');
+      }
+    }
+
+    function closeDexDashboard() {
+      document.getElementById('dexDashboardModal').style.display = 'none';
+      stopRadio();
+    }
+
+    function setupRadioStation(countryCode) {
+      const audio = document.getElementById('localRadioAudio');
+      const titleEl = document.getElementById('radioStationTitle');
+      
+      // Select sample public streams or generic regional streams
+      let streamUrl = 'https://stream.zeno.fm/f3wvbbqmdg8uv'; // Chill lofi / global node stream
+      let stationName = 'Global Lofi Beats Radio';
+
+      if (countryCode === 'GB' || countryCode === 'IE') {
+        streamUrl = 'https://stream-mz.planetradio.co.uk/net2national.mp3';
+        stationName = 'UK / Regional Hit Radio';
+      } else if (countryCode === 'US') {
+        streamUrl = 'https://ice5.securenetsystems.net/DASH35';
+        stationName = 'US Indie & Local Vibe';
+      }
+
+      audio.src = streamUrl;
+      titleEl.innerText = `📻 Station: ${stationName}`;
+    }
+
+    function toggleRadio() {
+      const audio = document.getElementById('localRadioAudio');
+      const btn = document.getElementById('radioPlayBtn');
+      const status = document.getElementById('radioStatus');
+
+      if (radioPlaying) {
+        audio.pause();
+        radioPlaying = false;
+        btn.innerText = '▶ PLAY';
+        status.innerText = 'Paused';
+      } else {
+        audio.play().then(() => {
+          radioPlaying = true;
+          btn.innerText = '⏸ PAUSE';
+          status.innerText = 'Live Streaming';
+        }).catch(err => {
+          status.innerText = 'Stream Blocked / Error';
+        });
+      }
+    }
+
+    function stopRadio() {
+      const audio = document.getElementById('localRadioAudio');
+      audio.pause();
+      radioPlaying = false;
+      document.getElementById('radioPlayBtn').innerText = '▶ PLAY';
+      document.getElementById('radioStatus').innerText = 'Paused';
+    }
 
     let activeGameLoop = null;
     const canvas = document.getElementById('gameCanvas');
