@@ -40,35 +40,22 @@
       z-index: 1;
     }
 
-    /* Interactive Arcade Hotspot */
-    .arcade-hotspot {
+    /* Interactive Hotspots General Style */
+    .hotspot {
       position: absolute;
-      top: 42%;
-      left: 51%;
-      width: 6%;
-      height: 18%;
       z-index: 2;
       cursor: pointer;
       display: none; /* Hidden until doors open */
-      border: 2px dashed rgba(255, 230, 0, 0);
-      border-radius: 8px;
+      border: 2px dashed rgba(255, 255, 255, 0);
+      border-radius: 6px;
       transition: all 0.3s ease;
     }
 
-    .arcade-hotspot:hover {
-      border-color: #ffe600;
-      box-shadow: 0 0 15px #ffe600;
-      background: rgba(255, 230, 0, 0.15);
-    }
-
-    .arcade-hotspot::after {
-      content: 'PLAY PAC-MAN';
+    .hotspot::after {
       position: absolute;
       top: -30px;
       left: 50%;
       transform: translateX(-50%);
-      background: #ffe600;
-      color: #000;
       font-weight: bold;
       font-size: 0.75rem;
       padding: 4px 8px;
@@ -79,8 +66,91 @@
       pointer-events: none;
     }
 
-    .arcade-hotspot:hover::after {
+    .hotspot:hover::after {
       opacity: 1;
+    }
+
+    /* Arcade Cabinet Hotspot */
+    .arcade-hotspot {
+      top: 42%;
+      left: 51%;
+      width: 6%;
+      height: 18%;
+    }
+
+    .arcade-hotspot:hover {
+      border-color: #ffe600;
+      box-shadow: 0 0 15px #ffe600;
+      background: rgba(255, 230, 0, 0.15);
+    }
+
+    .arcade-hotspot::after {
+      content: 'PLAY PAC-MAN';
+      background: #ffe600;
+      color: #000;
+    }
+
+    /* Sofa Hotspot (Discord Link) */
+    .sofa-hotspot {
+      top: 64%;
+      left: 28%;
+      width: 38%;
+      height: 25%;
+    }
+
+    .sofa-hotspot:hover {
+      border-color: #5865F2;
+      box-shadow: 0 0 15px #5865F2;
+      background: rgba(88, 101, 242, 0.2);
+    }
+
+    .sofa-hotspot::after {
+      content: 'JOIN DISCORD';
+      background: #5865F2;
+      color: #fff;
+    }
+
+    /* Pool Table Hotspot */
+    .pool-hotspot {
+      top: 52%;
+      left: 55%;
+      width: 12%;
+      height: 15%;
+    }
+
+    .pool-hotspot:hover {
+      border-color: #00ff66;
+      box-shadow: 0 0 15px #00ff66;
+      background: rgba(0, 255, 102, 0.15);
+    }
+
+    .pool-hotspot::after {
+      content: 'PLAY POOL';
+      background: #00ff66;
+      color: #000;
+    }
+
+    /* Framed Wall Poster Hotspot (OpenSea Link) */
+    .opensea-poster {
+      top: 27%;
+      left: 71.5%;
+      width: 5%;
+      height: 12%;
+      background: url('nft.png') center/cover no-repeat;
+      border: 2px solid #2081e2;
+      box-shadow: 0 0 8px rgba(32, 129, 226, 0.5);
+    }
+
+    .opensea-poster:hover {
+      border-color: #2081e2;
+      box-shadow: 0 0 18px #2081e2;
+      transform: scale(1.05);
+    }
+
+    .opensea-poster::after {
+      content: 'VIEW OPENSEA COLLECTION';
+      background: #2081e2;
+      color: #fff;
     }
 
     /* Doors & Entrance Setup */
@@ -158,7 +228,7 @@
     .viewport.open .clubhouse-bg { transform: scale(1.15); }
     .viewport.open .enter-prompt { opacity: 0; }
     .viewport.open .doors-container { pointer-events: none; }
-    .viewport.open .arcade-hotspot { display: block; }
+    .viewport.open .hotspot { display: block; }
 
     /* Game Modal Window */
     .modal {
@@ -178,13 +248,20 @@
     .modal-content {
       position: relative;
       width: 90%;
+      max-width: 800px;
+      height: 500px;
+      background: #000;
+      border: 4px solid #00ff66;
+      border-radius: 12px;
+      box-shadow: 0 0 25px #00ff66;
+      overflow: hidden;
+    }
+
+    .modal-content.pacman-style {
       max-width: 480px;
       height: 600px;
-      background: #000;
-      border: 4px solid #ffe600;
-      border-radius: 12px;
+      border-color: #ffe600;
       box-shadow: 0 0 25px #ffe600;
-      overflow: hidden;
     }
 
     .close-btn {
@@ -210,7 +287,12 @@
   <div class="viewport" id="scene">
     <div class="clubhouse-bg"></div>
     
-    <div class="arcade-hotspot" onclick="openGame()"></div>
+    <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
+    <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
+    
+    <a href="https://opensea.io/collection/legods" target="_blank" class="hotspot opensea-poster"></a>
+
+    <a href="https://discord.gg/your-invite-code" target="_blank" class="hotspot sofa-hotspot"></a>
 
     <div class="enter-prompt">Click to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -225,8 +307,8 @@
 
   <div class="modal" id="gameModal">
     <span class="close-btn" onclick="closeGame()">&times;</span>
-    <div class="modal-content">
-      <iframe src="https://pacman.place" title="Pac-Man Game"></iframe>
+    <div class="modal-content" id="modalContent">
+      <iframe id="gameFrame" src="" title="Interactive Game"></iframe>
     </div>
   </div>
 
@@ -235,12 +317,27 @@
       document.getElementById('scene').classList.add('open');
     }
 
-    function openGame() {
-      document.getElementById('gameModal').style.display = 'flex';
+    function openGame(gameType) {
+      const modal = document.getElementById('gameModal');
+      const modalContent = document.getElementById('modalContent');
+      const gameFrame = document.getElementById('gameFrame');
+
+      if (gameType === 'pacman') {
+        modalContent.className = 'modal-content pacman-style';
+        gameFrame.src = 'https://pacman.place';
+      } else if (gameType === 'pool') {
+        modalContent.className = 'modal-content';
+        gameFrame.src = 'https://html5.gamedistribution.com/rvvAS3083656/?gd_sdk_referrer_url=https://gamedistribution.com/games/8-ball-pool-1';
+      }
+
+      modal.style.display = 'flex';
     }
 
     function closeGame() {
-      document.getElementById('gameModal').style.display = 'none';
+      const modal = document.getElementById('gameModal');
+      const gameFrame = document.getElementById('gameFrame');
+      modal.style.display = 'none';
+      gameFrame.src = '';
     }
   </script>
 
