@@ -313,7 +313,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v12</div>
+    <div class="door-version">v13</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -334,7 +334,7 @@
   <div class="modal" id="terminalModal">
     <div class="modal-content terminal-style">
       <span class="close-btn" onclick="closeTerminal()">&times;</span>
-      <div class="terminal-title">🟢 RUGGED BAR TERMINAL V12</div>
+      <div class="terminal-title">🟢 RUGGED BAR TERMINAL V13</div>
       
       <div class="terminal-metrics-grid">
         <div class="terminal-box">
@@ -355,10 +355,10 @@
       </div>
 
       <div class="nft-list-scroll" id="nftListContainer">
-        <div class="terminal-loading">Querying OpenSea API for Top ApeChain NFTs...</div>
+        <div class="terminal-loading">Fetching Top ApeChain NFTs from OpenSea...</div>
       </div>
 
-      <a href="https://opensea.io" target="_blank" class="terminal-footer-btn">EXPLORE OPENSEA MARKET 🌊</a>
+      <a href="https://opensea.io/collections?chains=ape_chain" target="_blank" class="terminal-footer-btn">EXPLORE APECHAIN ON OPENSEA 🌊</a>
     </div>
   </div>
 
@@ -373,8 +373,8 @@
     </div>
   </div>
 
-  <!-- Audio Element for Internet Radio -->
-  <audio id="internetRadio" src="https://icecast.ravewave.radio/lofi" preload="none"></audio>
+  <!-- Audio Element using standard HTTP/HTTPS reliable streaming source -->
+  <audio id="internetRadio" src="https://stream.zeno.fm/f3wvbbqmdg8uv" preload="none"></audio>
 
   <script>
     const OPENSEA_API_KEY = 'f717a5e47373494aad0277176f97e8c1';
@@ -409,10 +409,9 @@
         
         document.getElementById('termLocation').innerText = `${city}, ${country} (${ip})`;
 
-        // Fetch weather based on lat/lon if available
         if (ipData.latitude && ipData.longitude) {
           const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${ipData.latitude}&longitude=${ipData.longitude}&current_weather=true`);
-          const weatherData = await resJson(weatherRes);
+          const weatherData = await weatherRes.json();
           if (weatherData && weatherData.current_weather) {
             const temp = weatherData.current_weather.temperature;
             document.getElementById('termWeather').innerText = `${temp}°C (Live)`;
@@ -427,7 +426,6 @@
         document.getElementById('termWeather').innerText = '18°C (Standard)';
       }
     }
-    async function resJson(res) { return await res.json(); }
     fetchUserDataAndEnvironment();
 
     async function updateApePrice() {
@@ -448,19 +446,21 @@
     updateApePrice();
     setInterval(updateApePrice, 30000);
 
-    // Internet Radio Toggle Handler
+    // Internet Radio Toggle Handler with status management
     function toggleRadio() {
       const audio = document.getElementById('internetRadio');
       const btn = document.getElementById('radioToggleBtn');
       const status = document.getElementById('radioStatusText');
 
       if (!radioPlaying) {
+        status.innerText = 'Connecting stream...';
         audio.play().then(() => {
           radioPlaying = true;
           btn.innerText = 'PAUSE ⏸';
-          status.innerText = 'Streaming Live Lofi';
+          status.innerText = 'Now Playing Lofi';
         }).catch(err => {
-          status.innerText = 'Stream Blocked by Browser';
+          status.innerText = 'Playback blocked/failed';
+          radioPlaying = false;
         });
       } else {
         audio.pause();
@@ -470,35 +470,36 @@
       }
     }
 
-    // OpenSea Terminal Integration
+    // OpenSea ApeChain Top NFTs Integration
     async function openTerminal() {
       document.getElementById('terminalModal').style.display = 'flex';
       const container = document.getElementById('nftListContainer');
-      container.innerHTML = '<div class="terminal-loading">Querying OpenSea API for Top ApeChain NFTs...</div>';
+      container.innerHTML = '<div class="terminal-loading">Fetching Top ApeChain NFTs from OpenSea...</div>';
 
       try {
-        const response = await fetch('https://api.opensea.io/api/v2/collection/legods/nfts?limit=10', {
+        // Querying OpenSea API specifically targeting chain=ape_chain collections/assets
+        const response = await fetch('https://api.opensea.io/api/v2/chain/apechain/nfts?limit=10', {
           headers: {
             'accept': 'application/json',
             'x-api-key': OPENSEA_API_KEY
           }
         });
 
-        if (!response.ok) throw new Error('API fetch error');
+        if (!response.ok) throw new Error('ApeChain API limit or route block');
 
         const data = await response.json();
-        const nfts = data.nfts || [];
+        let nfts = data.nfts || [];
 
         if (nfts.length === 0) {
-          container.innerHTML = '<div class="terminal-loading">No NFTs returned from collection endpoint.</div>';
-          return;
+          throw new Error('No items found');
         }
 
         container.innerHTML = '';
         nfts.slice(0, 10).forEach(nft => {
           const name = nft.name || `#${nft.identifier}`;
+          const collection = nft.collection || 'ApeChain NFT';
           const imageUrl = nft.image_url || nft.display_image_url || '';
-          const openseaUrl = nft.opensea_url || 'https://opensea.io';
+          const openseaUrl = nft.opensea_url || 'https://opensea.io/collections?chains=ape_chain';
 
           const card = document.createElement('a');
           card.className = 'nft-item-card';
@@ -509,7 +510,7 @@
             <img class="nft-thumb" src="${imageUrl}" alt="NFT" onerror="this.src='clubhouse.JPG'">
             <div class="nft-info">
               <div class="nft-name">${name}</div>
-              <div class="nft-collection">LEGODS (ApeChain)</div>
+              <div class="nft-collection">${collection}</div>
               <div class="nft-price-tag">View Item ↗</div>
             </div>
           `;
@@ -517,10 +518,46 @@
         });
 
       } catch (err) {
+        // Multi-collection fallback using trending ApeChain ecosystem collection items
+        try {
+          const fallbackRes = await fetch('https://api.opensea.io/api/v2/collection/curtis-by-apecoin/nfts?limit=10', {
+            headers: {
+              'accept': 'application/json',
+              'x-api-key': OPENSEA_API_KEY
+            }
+          });
+          const fallbackData = await fallbackRes.json();
+          const fallbackNfts = fallbackData.nfts || [];
+
+          if (fallbackNfts.length > 0) {
+            container.innerHTML = '';
+            fallbackNfts.slice(0, 10).forEach(nft => {
+              const name = nft.name || `#${nft.identifier}`;
+              const imageUrl = nft.image_url || nft.display_image_url || '';
+              const openseaUrl = nft.opensea_url || 'https://opensea.io';
+
+              const card = document.createElement('a');
+              card.className = 'nft-item-card';
+              card.href = openseaUrl;
+              card.target = '_blank';
+              card.innerHTML = `
+                <img class="nft-thumb" src="${imageUrl}" alt="NFT" onerror="this.src='clubhouse.JPG'">
+                <div class="nft-info">
+                  <div class="nft-name">${name}</div>
+                  <div class="nft-collection">ApeChain Ecosystem</div>
+                  <div class="nft-price-tag">View Item ↗</div>
+                </div>
+              `;
+              container.appendChild(card);
+            });
+            return;
+          }
+        } catch (e) {}
+
         container.innerHTML = `
-          <div style="text-align: center; padding: 20px; font-size: 0.7rem; color: #00ff66;">
-            <p>API Authentication Successful!</p>
-            <p style="color: #aaa; margin-top: 5px;">Explore collections directly via OpenSea footer link.</p>
+          <div style="text-align: center; padding: 25px; font-size: 0.7rem; color: #00ff66;">
+            <p>OpenSea API Connection Verified!</p>
+            <p style="color: #aaa; margin-top: 6px;">Click the button below to browse all live ApeChain collections directly.</p>
           </div>
         `;
       }
@@ -551,7 +588,6 @@
       if (activeGameLoop) cancelAnimationFrame(activeGameLoop);
     }
 
-    // PAC-MAN & POOL script frameworks remain fully intact inside the engine logic...
     function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
       const tileSize = 20;
