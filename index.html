@@ -489,28 +489,26 @@
         "Did your grandma throw that cue? Utterly rekt! 🗑️",
         "Skill issue. Go back to flipping burgers at McDonald's. 🍔",
         "That shot aged like an unbacked stablecoin. Dead! 📉",
-        "Bro bought the top on that stroke! Absolute zero IQ play. 🤡",
-        "Even a bot trading on 500ms latency hits better shots than that. 🤖",
-        "Your portfolio is down 99% after that embarrassment. 💀",
-        "That cue stick needs to be locked in a hardware wallet because you can't handle it. 🛑",
-        "Zero liquidity on that shot! Completely dead on arrival. 📉"
+        "Bro bought the top on that stroke! Absolute zero IQ play. 🤡"
       ];
 
       const scratchInsults = [
         "SCRATCH! You just rugged your own cue ball into the void! 🤡💸",
         "Paying gas fees to sink your own white ball? Peak IQ loss! 📉",
-        "Dev wallet drain! You just pocketed your own cue ball! 💀",
-        "Bro paid 50 GWEI to sink his own white ball into oblivion! ⛽🔥",
-        "Self-rekt speedrun any% world record! Congrats! 🏆🤡",
-        "You just liquidated your own collateral. Margin call incoming! 🚨"
+        "Dev wallet drain! You just pocketed your own cue ball! 💀"
+      ];
+
+      const potSuccessMessages = [
+        "CHAD MOVE! You bagged the tokens and mooned hard! 🚀🌕",
+        "WHALE ALERT! Absolute masterclass in paper destruction! 🐋🔥",
+        "DIAMOND HANDS! Clean pocket, straight to Valhalla! 💎🙌",
+        "LEGENDARY SNIPER! You just cooked the market makers! ⚡🚀",
+        "BAG SECURED! Green candles only from here on out! 🟢📈"
       ];
 
       const winMessages = [
-        "CHAD MOVE! You bagged the tokens and mooned hard! 🚀🌕",
-        "WHALE ALERT! Absolute masterclass in paper destruction! 🐋🔥",
-        "YOU NAILED IT! Diamond hands prevail over the ruggers! 💎🙌",
-        "VALHALLA BOUND! You just flipped the table on the market makers! ⚡🚀",
-        "SEND IT! Legendary sniper win, you're the main character now! 👑🔥"
+        "FULL SEND! Table cleared and bags multiplied! 🚀🌕",
+        "CHAD OF THE CENTURY! Absolute perfection! 👑🔥"
       ];
 
       controlsContainer.innerHTML = `
@@ -571,6 +569,8 @@
               } else {
                 balls.splice(i, 1);
                 score += 100;
+                popMessage = potSuccessMessages[Math.floor(Math.random() * potSuccessMessages.length)];
+                messageTimer = 300;
               }
             }
           });
