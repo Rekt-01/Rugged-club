@@ -70,7 +70,7 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
-    /* Laptop Hotspot on Bar with Current Price Display (Cleaned, no dashed border) */
+    /* Laptop Hotspot on Bar with Current Price Display (Exact style from second picture) */
     .laptop-hotspot {
       position: absolute;
       top: 50.3%;
@@ -81,21 +81,37 @@
       display: none;
       align-items: center;
       justify-content: center;
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid #00ff66;
-      box-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+      background: rgba(0, 0, 0, 0.85);
+      border: 2px solid #00ff66;
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
       z-index: 2;
+      text-decoration: none;
+      font-family: monospace;
     }
-    .laptop-hotspot:hover, .laptop-hotspot:active { background: rgba(0, 255, 102, 0.25); }
+    .laptop-hotspot:hover, .laptop-hotspot:active {
+      background: rgba(0, 255, 102, 0.15);
+      box-shadow: 0 0 18px rgba(0, 255, 102, 0.8);
+    }
     .laptop-hotspot::after { content: 'DEXSCREENER CHART'; background: #00ff66; color: #000; }
 
-    .laptop-price-text {
-      font-family: monospace;
+    .laptop-content-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 4px;
+      pointer-events: none;
+    }
+    .laptop-label {
       font-size: 0.55rem;
+      color: #00ff66;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .laptop-price-text {
+      font-size: 0.65rem;
       font-weight: bold;
       color: #fff;
       text-shadow: 0 0 4px #00ff66;
-      pointer-events: none;
       white-space: nowrap;
     }
 
@@ -103,7 +119,6 @@
     .sofa-hotspot:hover, .sofa-hotspot:active { background: rgba(88, 101, 242, 0.15); border-radius: 6px; }
     .sofa-hotspot::after { content: 'JOIN DISCORD'; background: #5865F2; color: #fff; }
 
-    /* Otter Plushie Hotspot on the Floor */
     .otter-hotspot {
       position: absolute;
       top: 81.5%;
@@ -171,7 +186,6 @@
     .door-left .handle { right: 45px; }
     .door-right .handle { left: 45px; }
 
-    /* Version Tag Updated to v4 */
     .door-version {
       position: absolute;
       bottom: 6%;
@@ -263,9 +277,43 @@
       margin-top: 8px; cursor: pointer; box-shadow: 0 0 10px #00ff66;
     }
 
-    .web-iframe {
-      width: 85vw; max-width: 600px; height: 70vh; max-height: 500px;
-      border: none; border-radius: 8px; background: #fff;
+    .opensea-card-container {
+      width: 85vw; max-width: 420px;
+      background: #121214;
+      border: 2px solid #2081e2;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(32, 129, 226, 0.4);
+    }
+    .opensea-card-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #2081e2;
+      letter-spacing: 1px;
+    }
+    .opensea-card-desc {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .opensea-visit-btn {
+      display: inline-block;
+      background: #2081e2;
+      color: #fff;
+      font-weight: bold;
+      text-decoration: none;
+      padding: 10px 24px;
+      border-radius: 25px;
+      box-shadow: 0 0 12px rgba(32, 129, 226, 0.6);
+      transition: all 0.2s ease;
+    }
+    .opensea-visit-btn:hover {
+      background: #1868b7;
+      transform: scale(1.03);
     }
   </style>
 </head>
@@ -278,9 +326,12 @@
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
       
-      <div class="laptop-hotspot" onclick="openWebModal('dex')">
-        <span class="laptop-price-text" id="laptopApePrice">...</span>
-      </div>
+      <a href="https://dexscreener.com/apechain" target="_blank" class="laptop-hotspot">
+        <div class="laptop-content-wrapper">
+          <span class="laptop-label">$APE</span>
+          <span class="laptop-price-text" id="laptopApePrice">...</span>
+        </div>
+      </a>
 
       <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
 
@@ -292,7 +343,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v4</div>
+    <div class="door-version">v6</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -312,7 +363,11 @@
   <div class="modal" id="webModal">
     <div class="modal-content" id="webModalContent">
       <span class="close-btn" onclick="closeWebModal()">&times;</span>
-      <iframe class="web-iframe" id="webIframe" src=""></iframe>
+      <div id="openseaCardModal" class="opensea-card-container">
+        <div class="opensea-card-title">OPENSEA COLLECTION</div>
+        <div class="opensea-card-desc">Explore our official NFT collection safely on OpenSea without leaving the ecosystem context.</div>
+        <a href="https://opensea.io/collection/legods" target="_blank" class="opensea-visit-btn">OPEN COLLECTION 🌊</a>
+      </div>
     </div>
   </div>
 
@@ -323,22 +378,16 @@
 
     function openWebModal(type) {
       const modal = document.getElementById('webModal');
-      const iframe = document.getElementById('webIframe');
       const content = document.getElementById('webModalContent');
-
       modal.style.display = 'flex';
-      if (type === 'dex') {
-        content.className = 'modal-content';
-        iframe.src = 'https://dexscreener.com/apechain?embed=1&theme=dark';
-      } else if (type === 'opensea') {
+      if (type === 'opensea') {
         content.className = 'modal-content opensea-style';
-        iframe.src = 'https://opensea.io/collection/legods?embed=true';
+        document.getElementById('openseaCardModal').style.display = 'block';
       }
     }
 
     function closeWebModal() {
       document.getElementById('webModal').style.display = 'none';
-      document.getElementById('webIframe').src = '';
     }
 
     async function updateApePrice() {
@@ -351,8 +400,8 @@
           document.getElementById('laptopApePrice').innerText = formattedPrice;
         }
       } catch (e) {
-        document.getElementById('signApePrice').innerText = '$APE';
-        document.getElementById('laptopApePrice').innerText = '$APE';
+        document.getElementById('signApePrice').innerText = '$0.14';
+        document.getElementById('laptopApePrice').innerText = '$0.14';
       }
     }
     updateApePrice();
