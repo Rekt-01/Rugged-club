@@ -70,7 +70,7 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
-    /* Laptop Hotspot on Bar with Current Price Display (Exact style from second picture) */
+    /* Cleaned up Laptop Hotspot: Only displays the live price text matching the style */
     .laptop-hotspot {
       position: absolute;
       top: 50.3%;
@@ -94,24 +94,11 @@
     }
     .laptop-hotspot::after { content: 'DEXSCREENER CHART'; background: #00ff66; color: #000; }
 
-    .laptop-content-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0 4px;
-      pointer-events: none;
-    }
-    .laptop-label {
-      font-size: 0.55rem;
-      color: #00ff66;
-      font-weight: bold;
-      letter-spacing: 0.5px;
-    }
     .laptop-price-text {
-      font-size: 0.65rem;
+      font-size: 0.75rem;
       font-weight: bold;
       color: #fff;
-      text-shadow: 0 0 4px #00ff66;
+      text-shadow: 0 0 6px #00ff66;
       white-space: nowrap;
     }
 
@@ -327,14 +314,10 @@
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
       
       <a href="https://dexscreener.com/apechain" target="_blank" class="laptop-hotspot">
-        <div class="laptop-content-wrapper">
-          <span class="laptop-label">$APE</span>
-          <span class="laptop-price-text" id="laptopApePrice">...</span>
-        </div>
+        <span class="laptop-price-text" id="laptopApePrice">...</span>
       </a>
 
       <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
-
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
