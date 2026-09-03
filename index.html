@@ -255,7 +255,7 @@
     }
     .terminal-box-title { color: #8a939b; font-size: 0.58rem; text-transform: uppercase; margin-bottom: 2px; }
 
-    /* RETRO INTERNET RADIO / TUNER STYLING */
+    /* RADIO UNIT v14 */
     .radio-unit {
       grid-column: span 2; background: linear-gradient(135deg, #0e120e, #050705);
       border: 2px solid #00ff66; border-radius: 8px; padding: 8px;
@@ -332,7 +332,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v13</div>
+    <div class="door-version">v14</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -352,7 +352,7 @@
   <div class="modal" id="terminalModal">
     <div class="modal-content terminal-style">
       <span class="close-btn" onclick="closeTerminal()">&times;</span>
-      <div class="terminal-title">🟢 RUGGED BAR TERMINAL V13</div>
+      <div class="terminal-title">🟢 RUGGED BAR TERMINAL V14</div>
       
       <div class="terminal-metrics-grid">
         <div class="terminal-box">
@@ -526,7 +526,8 @@
       const container = document.getElementById('nftListContainer');
       container.innerHTML = '<div class="terminal-loading">Scanning ApeChain Collections...</div>';
 
-      const collectionsToTry = ['curtis-by-apecoin', 'legods', 'dengs-apechain'];
+      // Targeting the correct collection slug array (including legods)
+      const collectionsToTry = ['legods', 'curtis-by-apecoin', 'dengs-apechain'];
       let nfts = [];
 
       for (let slug of collectionsToTry) {
