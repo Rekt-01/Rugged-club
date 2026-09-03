@@ -77,7 +77,6 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
-    /* Repositioned to match the small side table on the left */
     .laptop-hotspot {
       top: 61.2%; left: 16.5%; width: 9.5%; height: 6.5%;
       background: #050b07; border-radius: 3px;
@@ -289,7 +288,7 @@
       if (activeGameLoop) cancelAnimationFrame(activeGameLoop);
     }
 
-    /* PAC-MAN: Optimized Hitbox Size, Maze Pathing, and Degen Death Message */
+    /* PAC-MAN CODE */
     function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
       const tileSize = 20;
@@ -309,9 +308,7 @@
         [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
       ];
-      
       let map = initialMap.map(row => [...row]);
-
       let score = 0;
       let gameMessage = null;
       let pacman = { x: 30, y: 30, radius: 5.5, dirX: 0, dirY: 0, speed: 1.2 };
@@ -326,159 +323,63 @@
         </div>
       `;
 
-      window.startPac = (e, dx, dy) => {
-        if (e && e.preventDefault) e.preventDefault();
-        pacman.dirX = dx; pacman.dirY = dy;
-      };
-
-      window.stopPac = (e) => {
-        if (e && e.preventDefault) e.preventDefault();
-        pacman.dirX = 0; pacman.dirY = 0;
-      };
+      window.startPac = (e, dx, dy) => { if (e && e.preventDefault) e.preventDefault(); pacman.dirX = dx; pacman.dirY = dy; };
+      window.stopPac = (e) => { if (e && e.preventDefault) e.preventDefault(); pacman.dirX = 0; pacman.dirY = 0; };
 
       function canMove(x, y, dx, dy, speed, radius) {
-        let targetX = x + dx * speed;
-        let targetY = y + dy * speed;
-        let gX1 = Math.floor((targetX - radius) / tileSize);
-        let gX2 = Math.floor((targetX + radius) / tileSize);
-        let gY1 = Math.floor((targetY - radius) / tileSize);
-        let gY2 = Math.floor((targetY + radius) / tileSize);
-
-        if (map[gY1] && map[gY1][gX1] === 1) return false;
-        if (map[gY1] && map[gY1][gX2] === 1) return false;
-        if (map[gY2] && map[gY2][gX1] === 1) return false;
-        if (map[gY2] && map[gY2][gX2] === 1) return false;
+        let targetX = x + dx * speed, targetY = y + dy * speed;
+        let gX1 = Math.floor((targetX - radius) / tileSize), gX2 = Math.floor((targetX + radius) / tileSize);
+        let gY1 = Math.floor((targetY - radius) / tileSize), gY2 = Math.floor((targetY + radius) / tileSize);
+        if (map[gY1] && (map[gY1][gX1] === 1 || map[gY1][gX2] === 1)) return false;
+        if (map[gY2] && (map[gY2][gX1] === 1 || map[gY2][gX2] === 1)) return false;
         return true;
-      }
-
-      function hasRemainingDots() {
-        for (let r = 0; r < map.length; r++) {
-          for (let c = 0; c < map[r].length; c++) {
-            if (map[r][c] === 2 || map[r][c] === 3) return true;
-          }
-        }
-        return false;
       }
 
       function update() {
         if (!gameMessage) {
           if (canMove(pacman.x, pacman.y, pacman.dirX, pacman.dirY, pacman.speed, pacman.radius)) {
-            pacman.x += pacman.dirX * pacman.speed;
-            pacman.y += pacman.dirY * pacman.speed;
+            pacman.x += pacman.dirX * pacman.speed; pacman.y += pacman.dirY * pacman.speed;
           }
-
-          let cX = Math.floor(pacman.x / tileSize);
-          let cY = Math.floor(pacman.y / tileSize);
-
+          let cX = Math.floor(pacman.x / tileSize), cY = Math.floor(pacman.y / tileSize);
           if (map[cY] && map[cY][cX] > 1) {
             score += map[cY][cX] === 3 ? 50 : 10;
             map[cY][cX] = 0;
-
-            if (!hasRemainingDots()) {
-              gameMessage = "CONGRATS! YOU ATE ALL THE LIQUIDITY. FULLY & PERMANENTLY RUGGED! 💀💸";
+            if (!map.some(row => row.includes(2) || row.includes(3))) {
+              gameMessage = "CONGRATS! LIQUIDITY DRAINED. FULLY RUGGED! 💀💸";
             }
           }
-
-          if (!canMove(ghost.x, ghost.y, ghost.dirX, ghost.dirY, ghost.speed, ghost.radius)) {
-            let possibleDirs = [
-              {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
-            ].filter(d => !(d.dx === -ghost.dirX && d.dy === -ghost.dirY) && canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed, ghost.radius));
-
-            if (possibleDirs.length === 0) {
-              ghost.dirX *= -1; ghost.dirY *= -1;
-            } else {
-              let chosen = possibleDirs[Math.floor(Math.random() * possibleDirs.length)];
-              ghost.dirX = chosen.dx; ghost.dirY = chosen.dy;
-            }
-          } else {
-            let atTileCenter = Math.abs((ghost.x % tileSize) - 10) < 1 && Math.abs((ghost.y % tileSize) - 10) < 1;
-            if (atTileCenter && Math.random() < 0.4) {
-              let possibleDirs = [
-                {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
-              ].filter(d => canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed, ghost.radius));
-              if (possibleDirs.length > 0) {
-                let chosen = possibleDirs[Math.floor(Math.random() * possibleDirs.length)];
-                ghost.dirX = chosen.dx; ghost.dirY = chosen.dy;
-              }
-            }
-          }
-
-          ghost.x += ghost.dirX * ghost.speed;
-          ghost.y += ghost.dirY * ghost.speed;
-
+          ghost.x += ghost.dirX * ghost.speed; ghost.y += ghost.dirY * ghost.speed;
           if (Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y) < 12) {
-            gameMessage = "YOU GOT RUGGED BY THE DEV! BAG GONE TO ZERO! 📉🤡";
+            gameMessage = "GOT RUGGED BY THE DEV! BAG TO ZERO! 📉🤡";
           }
         }
-
         draw();
         activeGameLoop = requestAnimationFrame(update);
       }
 
       function draw() {
         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-
         for (let r = 0; r < map.length; r++) {
           for (let c = 0; c < map[r].length; c++) {
-            if (map[r][c] === 1) {
-              ctx.fillStyle = '#1919a6'; ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
-            } else if (map[r][c] === 2) {
-              ctx.fillStyle = '#ffb8ae'; ctx.beginPath();
-              ctx.arc(c * tileSize + 10, r * tileSize + 10, 3, 0, Math.PI * 2); ctx.fill();
-            } else if (map[r][c] === 3) {
-              ctx.fillStyle = '#ffb8ae'; ctx.beginPath();
-              ctx.arc(c * tileSize + 10, r * tileSize + 10, 6, 0, Math.PI * 2); ctx.fill();
-            }
+            if (map[r][c] === 1) { ctx.fillStyle = '#1919a6'; ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize); }
+            else if (map[r][c] > 1) { ctx.fillStyle = '#ffb8ae'; ctx.beginPath(); ctx.arc(c * tileSize + 10, r * tileSize + 10, map[r][c] === 3 ? 6 : 3, 0, Math.PI * 2); ctx.fill(); }
           }
         }
-
-        let rotate = 0;
-        if (pacman.dirX === 1) rotate = 0;
-        if (pacman.dirX === -1) rotate = Math.PI;
-        if (pacman.dirY === 1) rotate = Math.PI / 2;
-        if (pacman.dirY === -1) rotate = -Math.PI / 2;
-
-        ctx.fillStyle = '#ffe600'; ctx.beginPath();
-        ctx.arc(pacman.x, pacman.y, 8, rotate + 0.2, rotate + 2 * Math.PI - 0.2);
-        ctx.lineTo(pacman.x, pacman.y); ctx.fill();
-
-        ctx.fillStyle = ghost.color; ctx.beginPath();
-        ctx.arc(ghost.x, ghost.y, 8, Math.PI, 0, false);
-        ctx.lineTo(ghost.x + 8, ghost.y + 8);
-        ctx.lineTo(ghost.x - 8, ghost.y + 8); ctx.fill();
-
-        ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
-        ctx.fillText('SCORE: ' + score, 10, 305);
+        ctx.fillStyle = '#ffe600'; ctx.beginPath(); ctx.arc(pacman.x, pacman.y, 8, 0.2, 2 * Math.PI - 0.2); ctx.lineTo(pacman.x, pacman.y); ctx.fill();
+        ctx.fillStyle = ghost.color; ctx.beginPath(); ctx.arc(ghost.x, ghost.y, 8, Math.PI, 0, false); ctx.lineTo(ghost.x + 8, ghost.y + 8); ctx.lineTo(ghost.x - 8, ghost.y + 8); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif'; ctx.fillText('SCORE: ' + score, 10, 305);
 
         if (gameMessage) {
-          ctx.fillStyle = 'rgba(0,0,0,0.85)';
-          ctx.fillRect(0, 80, canvas.width, 160);
-          ctx.fillStyle = '#ff3333';
-          ctx.font = 'bold 13px monospace';
-          ctx.textAlign = 'center';
-          
-          let words = gameMessage.split(' ');
-          let line = '';
-          let startY = 115;
-          for(let n = 0; n < words.length; n++) {
-            let testLine = line + words[n] + ' ';
-            let metrics = ctx.measureText(testLine);
-            if (metrics.width > 280 && n > 0) {
-              ctx.fillText(line, canvas.width / 2, startY);
-              line = words[n] + ' ';
-              startY += 20;
-            } else {
-              line = testLine;
-            }
-          }
-          ctx.fillText(line, canvas.width / 2, startY);
+          ctx.fillStyle = 'rgba(0,0,0,0.85)'; ctx.fillRect(0, 80, canvas.width, 160);
+          ctx.fillStyle = '#ff3333'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
+          ctx.fillText(gameMessage, canvas.width / 2, 160);
           ctx.textAlign = 'left';
         }
       }
-
       update();
     }
 
+    /* EASIER POOL CODE WITH FUNNY DEGEN MESSAGES */
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
       const pockets = [
@@ -489,118 +390,151 @@
       let score = 0;
       let turn = 'Player';
       let shotTaken = false;
-      let cueBall = { x: 80, y: 90, vx: 0, vy: 0, r: 6, color: '#fff' };
+      let popMessage = null;
+      let messageTimer = 0;
+      let cueBall = { x: 80, y: 90, vx: 0, vy: 0, r: 7, color: '#fff' };
       let aimAngle = 0;
+      let powerLevel = 6; // Adjusted lower for easier targeting
+      
+      // Only 3 balls to make it super easy to win quickly
       let balls = [
         cueBall,
-        { x: 220, y: 90, vx: 0, vy: 0, r: 6, color: '#ffcc00' },
-        { x: 232, y: 83, vx: 0, vy: 0, r: 6, color: '#ff3333' },
-        { x: 232, y: 97, vx: 0, vy: 0, r: 6, color: '#ffcc00' },
-        { x: 244, y: 76, vx: 0, vy: 0, r: 6, color: '#ff3333' },
-        { x: 244, y: 90, vx: 0, vy: 0, r: 6, color: '#111' },
-        { x: 244, y: 104, vx: 0, vy: 0, r: 6, color: '#ffcc00' }
+        { x: 220, y: 90, vx: 0, vy: 0, r: 7, color: '#ffcc00' },
+        { x: 235, y: 82, vx: 0, vy: 0, r: 7, color: '#ff3333' },
+        { x: 235, y: 98, vx: 0, vy: 0, r: 7, color: '#00ff66' }
+      ];
+
+      const missInsults = [
+        "Bro missed harder than a sniper buying a honeypot token! 📉🤡",
+        "Absolute paperhands shot! Went straight into the shadow realm. 💀",
+        "Did your grandma throw that cue? Utterly rekt! 🗑️",
+        "Skill issue. Go back to flipping burgers at McDonald's. 🍔",
+        "That shot aged like an unbacked stablecoin. Dead! 📉"
+      ];
+
+      const scratchInsults = [
+        "SCRATCH! You just rugged your own cue ball into the void! 🤡💸",
+        "Paying gas fees to sink your own white ball? Peak IQ loss! 📉",
+        "Dev wallet drain! You just pocketed your own cue ball! 💀"
+      ];
+
+      const winMessages = [
+        "CHAD MOVE! You bagged the tokens and mooned hard! 🚀🌕",
+        "WHALE ALERT! Absolute masterclass in paper destruction! 🐋🔥",
+        "YOU NAILED IT! Diamond hands prevail over the ruggers! 💎🙌"
       ];
 
       controlsContainer.innerHTML = `
         <div class="dpad-row">
-          <div class="btn-ctrl" onclick="rotateAim(-0.1)">↺ AIM</div>
-          <div class="btn-ctrl" onclick="rotateAim(0.1)">AIM ↻</div>
+          <div class="btn-ctrl" onclick="rotateAim(-0.15)">↺</div>
+          <div class="btn-ctrl" onclick="rotateAim(0.15)">↻</div>
         </div>
-        <button class="btn-shoot" id="shootBtn" onclick="shootCue()">SHOOT!</button>
+        <button class="btn-shoot" onclick="shootCue()">SHOOT SHOT!</button>
       `;
 
       window.rotateAim = (rad) => { if (turn === 'Player' && !isMoving()) aimAngle += rad; };
       
       window.shootCue = () => {
         if (turn === 'Player' && !isMoving()) {
-          cueBall.vx = Math.cos(aimAngle) * 7;
-          cueBall.vy = Math.sin(aimAngle) * 7;
+          cueBall.vx = Math.cos(aimAngle) * powerLevel;
+          cueBall.vy = Math.sin(aimAngle) * powerLevel;
           shotTaken = true;
+          popMessage = null; // Clear previous messages on new shot
         }
       };
 
       function isMoving() {
-        return balls.some(b => Math.abs(b.vx) > 0.08 || Math.abs(b.vy) > 0.08);
+        return balls.some(b => Math.abs(b.vx) > 0.05 || Math.abs(b.vy) > 0.05);
       }
 
       function takeAiTurn() {
         if (balls.length <= 1) return;
         let target = balls[1];
-        let aiAngle = Math.atan2(target.y - cueBall.y, target.x - cueBall.x);
-        cueBall.vx = Math.cos(aiAngle) * 6;
-        cueBall.vy = Math.sin(aiAngle) * 6;
+        let aiAngle = Math.atan2(target.y - cueBall.y, target.x - cueBall.x) + (Math.random() - 0.5) * 0.4;
+        cueBall.vx = Math.cos(aiAngle) * 5;
+        cueBall.vy = Math.sin(aiAngle) * 5;
         shotTaken = true;
       }
 
       function update() {
         let moving = isMoving();
+        let ballsBeforeCount = balls.length;
 
         for (let i = balls.length - 1; i >= 0; i--) {
           let b = balls[i];
           b.x += b.vx; b.y += b.vy;
           b.vx *= 0.985; b.vy *= 0.985;
 
-          if (Math.abs(b.vx) < 0.05) b.vx = 0;
-          if (Math.abs(b.vy) < 0.05) b.vy = 0;
+          if (Math.abs(b.vx) < 0.04) b.vx = 0;
+          if (Math.abs(b.vy) < 0.04) b.vy = 0;
 
+          // Bouncier walls to keep play fast and easy
           if (b.x - b.r < 18) { b.x = 18 + b.r; b.vx *= -1; }
           if (b.x + b.r > 302) { b.x = 302 - b.r; b.vx *= -1; }
           if (b.y - b.r < 18) { b.y = 18 + b.r; b.vy *= -1; }
           if (b.y + b.r > 162) { b.y = 162 - b.r; b.vy *= -1; }
 
           pockets.forEach(p => {
-            if (Math.hypot(b.x - p.x, b.y - p.y) < 12) {
+            // Larger pocket grab range for easier sinking
+            if (Math.hypot(b.x - p.x, b.y - p.y) < 15) {
               if (b === cueBall) {
                 b.x = 80; b.y = 90; b.vx = 0; b.vy = 0;
+                popMessage = scratchInsults[Math.floor(Math.random() * scratchInsults.length)];
+                messageTimer = 180;
               } else {
                 balls.splice(i, 1);
-                score += 10;
+                score += 100;
               }
             }
           });
         }
 
+        // Ball collision physics
         for (let i = 0; i < balls.length; i++) {
           for (let j = i + 1; j < balls.length; j++) {
             let b1 = balls[i], b2 = balls[j];
-            let dx = b2.x - b1.x;
-            let dy = b2.y - b1.y;
+            let dx = b2.x - b1.x, dy = b2.y - b1.y;
             let dist = Math.hypot(dx, dy);
             let minDist = b1.r + b2.r;
 
             if (dist < minDist && dist > 0) {
-              let nx = dx / dist;
-              let ny = dy / dist;
-
+              let nx = dx / dist, ny = dy / dist;
               let overlap = minDist - dist;
-              b1.x -= nx * overlap * 0.5;
-              b1.y -= ny * overlap * 0.5;
-              b2.x += nx * overlap * 0.5;
-              b2.y += ny * overlap * 0.5;
+              b1.x -= nx * overlap * 0.5; b1.y -= ny * overlap * 0.5;
+              b2.x += nx * overlap * 0.5; b2.y += ny * overlap * 0.5;
 
-              let kx = b1.vx - b2.vx;
-              let ky = b1.vy - b2.vy;
+              let kx = b1.vx - b2.vx, ky = b1.vy - b2.vy;
               let p = 2 * (nx * kx + ny * ky) / 2;
-
               if (p > 0) {
-                b1.vx -= p * nx * 0.95;
-                b1.vy -= p * ny * 0.95;
-                b2.vx += p * nx * 0.95;
-                b2.vy += p * ny * 0.95;
+                b1.vx -= p * nx * 0.95; b1.vy -= p * ny * 0.95;
+                b2.vx += p * nx * 0.95; b2.vy += p * ny * 0.95;
               }
             }
           }
         }
 
+        // Trigger message check when motion stops
         if (shotTaken && !moving) {
           shotTaken = false;
-          if (turn === 'Player') {
-            turn = 'Computer';
-            setTimeout(takeAiTurn, 1000);
-          } else {
-            turn = 'Player';
+          if (balls.length === 1) {
+            popMessage = winMessages[Math.floor(Math.random() * winMessages.length)];
+            messageTimer = 300;
+          } else if (balls.length === ballsBeforeCount && !popMessage) {
+            popMessage = missInsults[Math.floor(Math.random() * missInsults.length)];
+            messageTimer = 180;
+          }
+
+          if (balls.length > 1) {
+            if (turn === 'Player') {
+              turn = 'Computer';
+              setTimeout(takeAiTurn, 1000);
+            } else {
+              turn = 'Player';
+            }
           }
         }
+
+        if (messageTimer > 0) messageTimer--;
 
         draw();
         activeGameLoop = requestAnimationFrame(update);
@@ -612,26 +546,49 @@
         ctx.strokeRect(7, 7, 306, 166);
 
         pockets.forEach(p => {
-          ctx.fillStyle = '#000'; ctx.beginPath();
-          ctx.arc(p.x, p.y, 10, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(p.x, p.y, 11, 0, Math.PI * 2); ctx.fill();
         });
 
         balls.forEach(b => {
-          ctx.fillStyle = b.color; ctx.beginPath();
-          ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
           ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
         });
 
-        if (!isMoving() && turn === 'Player') {
-          ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.beginPath();
+        if (!isMoving() && turn === 'Player' && balls.length > 1) {
+          ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 2; ctx.beginPath();
           ctx.moveTo(cueBall.x, cueBall.y);
-          ctx.lineTo(cueBall.x + Math.cos(aimAngle) * 50, cueBall.y + Math.sin(aimAngle) * 50);
+          ctx.lineTo(cueBall.x + Math.cos(aimAngle) * 70, cueBall.y + Math.sin(aimAngle) * 70);
           ctx.stroke();
         }
 
-        ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
-        ctx.fillText('SCORE: ' + score, 20, 28);
-        ctx.fillText('TURN: ' + turn, 200, 28);
+        ctx.fillStyle = '#fff'; ctx.font = '11px sans-serif';
+        ctx.fillText('SCORE: ' + score, 20, 26);
+        ctx.fillText('TURN: ' + turn, 200, 26);
+
+        // Pop up degen feedback message
+        if (popMessage && messageTimer > 0) {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+          ctx.fillRect(25, 60, 270, 60);
+          ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 2;
+          ctx.strokeRect(25, 60, 270, 60);
+
+          ctx.fillStyle = '#00ff66'; ctx.font = 'bold 10px monospace';
+          ctx.textAlign = 'center';
+          
+          let words = popMessage.split(' ');
+          let line = '', startY = 82;
+          for (let n = 0; n < words.length; n++) {
+            let testLine = line + words[n] + ' ';
+            if (ctx.measureText(testLine).width > 250 && n > 0) {
+              ctx.fillText(line, canvas.width / 2, startY);
+              line = words[n] + ' '; startY += 15;
+            } else {
+              line = testLine;
+            }
+          }
+          ctx.fillText(line, canvas.width / 2, startY);
+          ctx.textAlign = 'left';
+        }
       }
 
       update();
