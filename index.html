@@ -281,7 +281,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v5.9</div>
+    <div class="door-version">v6.0</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -588,7 +588,7 @@
       updatePacmanGame();
     }
 
-    /* POOL GAME LOOP */
+    /* POOL GAME LOOP WITH FULL RACK */
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
       const pockets = [
@@ -601,14 +601,26 @@
       let shotTaken = false;
       let popMessage = null;
       let messageTimer = 0;
-      let cueBall = { x: 230, y: 88, vx: 0, vy: 0, r: 7, color: '#fff' };
+      let cueBall = { x: 80, y: 90, vx: 0, vy: 0, r: 6, color: '#fff', isCue: true };
       let aimAngle = 0;
       let powerLevel = 6;
       
-      let balls = [
-        cueBall,
-        { x: 280, y: 92, vx: 0, vy: 0, r: 7, color: '#00ff66' }
-      ];
+      // Full triangle rack setup
+      let ballColors = ['#e3af34', '#1f3fd8', '#d63031', '#9b59b6', '#e67e22', '#2ecc71', '#34495e', '#f1c40f'];
+      let rackStartX = 220;
+      let rackStartY = 90;
+      let spacing = 13;
+      let balls = [cueBall];
+
+      let colorIdx = 0;
+      for (let col = 0; col < 4; col++) {
+        for (let row = 0; row <= col; row++) {
+          let bx = rackStartX + (col * spacing * 0.866);
+          let by = rackStartY + (row * spacing) - (col * spacing / 2);
+          balls.push({ x: bx, y: by, vx: 0, vy: 0, r: 6, color: ballColors[colorIdx % ballColors.length], isCue: false });
+          colorIdx++;
+        }
+      }
 
       const missInsults = ["Wiped out! Shot missed completely!"];
       const scratchInsults = ["SCRATCH! You rugged your cue ball!"];
@@ -638,8 +650,9 @@
       }
 
       function takeAiTurn() {
-        if (balls.length <= 1) return;
-        let target = balls[1];
+        let targetBalls = balls.filter(b => !b.isCue);
+        if (targetBalls.length === 0) return;
+        let target = targetBalls[Math.floor(Math.random() * targetBalls.length)];
         let aiAngle = Math.atan2(target.y - cueBall.y, target.x - cueBall.x) + (Math.random() - 0.5) * 0.4;
         cueBall.vx = Math.cos(aiAngle) * 5;
         cueBall.vy = Math.sin(aiAngle) * 5;
@@ -665,7 +678,7 @@
 
           pockets.forEach(p => {
             if (Math.hypot(b.x - p.x, b.y - p.y) < 19) {
-              if (b === cueBall) {
+              if (b.isCue) {
                 b.x = 80; b.y = 90; b.vx = 0; b.vy = 0;
                 popMessage = scratchInsults[0];
                 messageTimer = 300;
@@ -704,7 +717,8 @@
 
         if (shotTaken && !moving) {
           shotTaken = false;
-          if (balls.length === 1) {
+          let remainingObjects = balls.filter(b => !b.isCue).length;
+          if (remainingObjects === 0) {
             popMessage = winMessages[0];
             messageTimer = 420;
           } else if (balls.length === ballsBeforeCount && !popMessage) {
@@ -712,7 +726,7 @@
             messageTimer = 300;
           }
 
-          if (balls.length > 1) {
+          if (remainingObjects > 0) {
             if (turn === 'Player') {
               turn = 'Computer';
               setTimeout(takeAiTurn, 1000);
@@ -742,7 +756,7 @@
           ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
         });
 
-        if (!isMoving() && turn === 'Player' && balls.length > 1) {
+        if (!isMoving() && turn === 'Player') {
           ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 2; ctx.beginPath();
           ctx.moveTo(cueBall.x, cueBall.y);
           ctx.lineTo(cueBall.x + Math.cos(aimAngle) * 70, cueBall.y + Math.sin(aimAngle) * 70);
