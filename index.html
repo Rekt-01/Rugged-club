@@ -70,35 +70,10 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
-    /* Corrected Laptop Coordinates to match the coffee table laptop */
-    .laptop-hotspot {
-      position: absolute;
-      top: 62.5%;
-      left: 69.5%;
-      width: 7.5%;
-      height: 4.5%;
-      border-radius: 4px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid #00ff66;
-      box-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
-      z-index: 2;
-      cursor: pointer;
-    }
-    .laptop-hotspot:hover, .laptop-hotspot:active { background: rgba(0, 255, 102, 0.25); }
+    /* Hidden Laptop Hotspot matching standard style */
+    .laptop-hotspot { top: 45.5%; left: 22.5%; width: 10.5%; height: 6.5%; }
+    .laptop-hotspot:hover, .laptop-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .laptop-hotspot::after { content: 'DEXSCREENER CHART'; background: #00ff66; color: #000; }
-
-    .laptop-price-text {
-      font-family: monospace;
-      font-size: 0.5rem;
-      font-weight: bold;
-      color: #fff;
-      text-shadow: 0 0 4px #00ff66;
-      pointer-events: none;
-      white-space: nowrap;
-    }
 
     .sofa-hotspot { top: 60.5%; left: 24%; width: 52%; height: 12%; }
     .sofa-hotspot:hover, .sofa-hotspot:active { background: rgba(88, 101, 242, 0.15); border-radius: 6px; }
@@ -217,7 +192,7 @@
     .viewport.open .door-version { opacity: 0; }
     .viewport.open .door-ape-sign { opacity: 0; pointer-events: none; }
     .viewport.open .doors-container { pointer-events: none; }
-    .viewport.open .hotspot, .viewport.open .laptop-hotspot { display: flex; }
+    .viewport.open .hotspot { display: flex; }
 
     .modal {
       display: none; position: fixed; top: 0; left: 0;
@@ -316,9 +291,8 @@
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
       
-      <div class="laptop-hotspot" onclick="openWebModal('dex')">
-        <span class="laptop-price-text" id="laptopApePrice">...</span>
-      </div>
+      <!-- Clean Hidden Laptop Hotspot -->
+      <div class="hotspot laptop-hotspot" onclick="openWebModal('dex')"></div>
 
       <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
 
@@ -330,7 +304,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v5.1</div>
+    <div class="door-version">v5.3</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -397,11 +371,9 @@
         if (data.apecoin && data.apecoin.usd) {
           const formattedPrice = '$' + data.apecoin.usd.toFixed(2);
           document.getElementById('signApePrice').innerText = formattedPrice;
-          document.getElementById('laptopApePrice').innerText = formattedPrice;
         }
       } catch (e) {
         document.getElementById('signApePrice').innerText = '$APE';
-        document.getElementById('laptopApePrice').innerText = '$APE';
       }
     }
     updateApePrice();
