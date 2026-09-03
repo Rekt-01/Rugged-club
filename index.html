@@ -281,7 +281,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v5.8</div>
+    <div class="door-version">v5.9</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -451,6 +451,10 @@
     const controlsContainer = document.getElementById('controlsContainer');
 
     function openGame(gameType) {
+      if (activeGameLoop) {
+        cancelAnimationFrame(activeGameLoop);
+        activeGameLoop = null;
+      }
       document.getElementById('gameModal').style.display = 'flex';
       if (gameType === 'pacman') {
         document.getElementById('modalContent').className = 'modal-content pacman-style';
@@ -463,7 +467,10 @@
 
     function closeGame() {
       document.getElementById('gameModal').style.display = 'none';
-      if (activeGameLoop) cancelAnimationFrame(activeGameLoop);
+      if (activeGameLoop) {
+        cancelAnimationFrame(activeGameLoop);
+        activeGameLoop = null;
+      }
     }
 
     /* PAC-MAN */
@@ -513,7 +520,7 @@
         return true;
       }
 
-      function update() {
+      function updatePacmanGame() {
         if (!gameMessage) {
           if (canMove(pacman.x, pacman.y, pacman.dirX, pacman.dirY, pacman.speed, pacman.radius)) {
             pacman.x += pacman.dirX * pacman.speed; pacman.y += pacman.dirY * pacman.speed;
@@ -555,11 +562,11 @@
             gameMessage = "GOT RUGGED! BAG TO ZERO! 📉";
           }
         }
-        draw();
-        activeGameLoop = requestAnimationFrame(update);
+        drawPacman();
+        activeGameLoop = requestAnimationFrame(updatePacmanGame);
       }
 
-      function draw() {
+      function drawPacman() {
         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         for (let r = 0; r < map.length; r++) {
           for (let c = 0; c < map[r].length; c++) {
@@ -578,10 +585,10 @@
           ctx.textAlign = 'left';
         }
       }
-      update();
+      updatePacmanGame();
     }
 
-    /* POOL GAME LOOP (FIXED MULTI-LINE TEXT WRAPPING) */
+    /* POOL GAME LOOP */
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
       const pockets = [
@@ -590,7 +597,7 @@
       ];
 
       let score = 100;
-      let turn = 'Computer';
+      let turn = 'Player';
       let shotTaken = false;
       let popMessage = null;
       let messageTimer = 0;
@@ -603,18 +610,10 @@
         { x: 280, y: 92, vx: 0, vy: 0, r: 7, color: '#00ff66' }
       ];
 
-      const missInsults = [
-        "Wiped out! Shot missed completely!"
-      ];
-      const scratchInsults = [
-        "SCRATCH! You rugged your cue ball!"
-      ];
-      const potSuccessMessages = [
-        "WHALE PUMP! Pocketed nicely!"
-      ];
-      const winMessages = [
-        "TABLE CLEARED! Bags mooned!"
-      ];
+      const missInsults = ["Wiped out! Shot missed completely!"];
+      const scratchInsults = ["SCRATCH! You rugged your cue ball!"];
+      const potSuccessMessages = ["WHALE PUMP! Pocketed nicely!"];
+      const winMessages = ["TABLE CLEARED! Bags mooned!"];
 
       controlsContainer.innerHTML = `
         <div class="dpad-row">
@@ -647,7 +646,7 @@
         shotTaken = true;
       }
 
-      function update() {
+      function updatePoolGame() {
         let moving = isMoving();
         let ballsBeforeCount = balls.length;
 
@@ -725,11 +724,11 @@
 
         if (messageTimer > 0) messageTimer--;
 
-        draw();
-        activeGameLoop = requestAnimationFrame(update);
+        drawPool();
+        activeGameLoop = requestAnimationFrame(updatePoolGame);
       }
 
-      function draw() {
+      function drawPool() {
         ctx.fillStyle = '#0f5220'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = '#5c3a21'; ctx.lineWidth = 14;
         ctx.strokeRect(7, 7, 306, 166);
@@ -755,7 +754,6 @@
         ctx.fillText('TURN: ' + turn, 200, 26);
 
         if (popMessage && messageTimer > 0) {
-          // Wider notification box overlay for clean text wrapping
           ctx.fillStyle = 'rgba(0, 0, 0, 0.92)';
           ctx.fillRect(20, 50, 280, 80);
           ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 2;
@@ -764,7 +762,6 @@
           ctx.fillStyle = '#00ff66'; ctx.font = 'bold 11px monospace';
           ctx.textAlign = 'center';
           
-          // Multi-line text wrapping logic for long messages
           let words = popMessage.split(' ');
           let line1 = '';
           let line2 = '';
@@ -788,7 +785,7 @@
         }
       }
 
-      update();
+      updatePoolGame();
     }
   </script>
 
