@@ -3,311 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar - v14</title>
+  <title>The Rugged Bar - v15</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-
-    body {
-      background-color: #0b0c10;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
-    .viewport {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      overflow: hidden; perspective: 1200px;
-    }
-
-    .scene-container {
-      position: absolute; top: 50%; left: 50%;
-      width: 100vw; height: 177.78vw;
-      max-height: 100vh; max-width: 56.25vh;
-      transform: translate(-50%, -50%);
-    }
-
-    @media (min-aspect-ratio: 9/16) {
-      .scene-container { width: 56.25vh; height: 100vh; }
-    }
-
-    .clubhouse-bg {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: url('clubhouse.JPG') center center / cover no-repeat;
-      transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
-      z-index: 1;
-    }
-
-    .hotspot {
-      position: absolute; z-index: 2; cursor: pointer; display: none;
-      border: none; background: transparent;
-      transition: all 0.3s ease;
-    }
-
-    .hotspot::after {
-      position: absolute; top: -26px; left: 50%;
-      transform: translateX(-50%); font-weight: bold; font-size: 0.65rem;
-      padding: 2px 5px; border-radius: 4px; white-space: nowrap;
-      opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+    body { background-color: #0b0c10; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .viewport { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; perspective: 1200px; }
+    .scene-container { position: absolute; top: 50%; left: 50%; width: 100vw; height: 177.78vw; max-height: 100vh; max-width: 56.25vh; transform: translate(-50%, -50%); }
+    @media (min-aspect-ratio: 9/16) { .scene-container { width: 56.25vh; height: 100vh; } }
+    .clubhouse-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('clubhouse.JPG') center center / cover no-repeat; transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1); z-index: 1; }
+    .hotspot { position: absolute; z-index: 2; cursor: pointer; display: none; border: none; background: transparent; transition: all 0.3s ease; }
+    .hotspot::after { position: absolute; top: -26px; left: 50%; transform: translateX(-50%); font-weight: bold; font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
     @media (hover: hover) { .hotspot:hover::after { opacity: 1; } }
-
     .arcade-hotspot { top: 50%; left: 51.5%; width: 15%; height: 8%; }
     .arcade-hotspot:hover, .arcade-hotspot:active { background: rgba(255, 230, 0, 0.15); border-radius: 6px; }
     .arcade-hotspot::after { content: 'PLAY PAC-MAN'; background: #ffe600; color: #000; }
-
     .pool-hotspot { top: 55.5%; left: 58.5%; width: 26%; height: 6.5%; }
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
-
-    .laptop-hotspot {
-      position: absolute; top: 50.3%; left: 23.3%; width: 7.5%; height: 5.5%;
-      border-radius: 2px; display: none; align-items: center; justify-content: center;
-      background: transparent; border: none; z-index: 2; cursor: pointer; font-family: monospace;
-    }
+    .laptop-hotspot { position: absolute; top: 50.3%; left: 23.3%; width: 7.5%; height: 5.5%; border-radius: 2px; display: none; align-items: center; justify-content: center; background: transparent; border: none; z-index: 2; cursor: pointer; font-family: monospace; }
     .laptop-hotspot:hover, .laptop-hotspot:active { background: rgba(0, 255, 102, 0.1); }
-
-    .laptop-price-text {
-      font-size: 0.58rem; font-weight: 900; color: #00ff66;
-      text-shadow: 0 0 5px #00ff66, 0 0 12px #00ff66; white-space: nowrap;
-      pointer-events: none; letter-spacing: 0.5px;
-      animation: neonFlash 1.2s infinite alternate;
-    }
-
-    @keyframes neonFlash {
-      0% { opacity: 0.7; text-shadow: 0 0 3px #00ff66, 0 0 8px #00ff66; }
-      100% { opacity: 1; text-shadow: 0 0 8px #00ff66, 0 0 18px #00ff66, 0 0 25px #00ff66; }
-    }
-
+    .laptop-price-text { font-size: 0.58rem; font-weight: 900; color: #00ff66; text-shadow: 0 0 5px #00ff66; white-space: nowrap; pointer-events: none; letter-spacing: 0.5px; animation: neonFlash 1.2s infinite alternate; }
+    @keyframes neonFlash { 0% { opacity: 0.7; } 100% { opacity: 1; text-shadow: 0 0 10px #00ff66; } }
     .sofa-hotspot { top: 60.5%; left: 24%; width: 52%; height: 12%; }
     .sofa-hotspot:hover, .sofa-hotspot:active { background: rgba(88, 101, 242, 0.15); border-radius: 6px; }
     .sofa-hotspot::after { content: 'JOIN DISCORD'; background: #5865F2; color: #fff; }
-
-    .otter-hotspot {
-      position: absolute; top: 81.5%; left: 41.5%; width: 17%; height: 7.5%; border-radius: 50%;
-    }
+    .otter-hotspot { position: absolute; top: 81.5%; left: 41.5%; width: 17%; height: 7.5%; border-radius: 50%; }
     .otter-hotspot:hover, .otter-hotspot:active { background: rgba(32, 129, 226, 0.25); }
     .otter-hotspot::after { content: 'OPENSEA COLLECTION'; background: #2081e2; color: #fff; }
-
-    .door-ape-sign {
-      position: absolute; top: 12%; left: 50%; transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.85); border: 2px solid #00ff66; border-radius: 6px;
-      padding: 6px 14px; z-index: 5; display: flex; align-items: center; gap: 8px;
-      box-shadow: 0 0 15px rgba(0, 255, 102, 0.5); text-decoration: none;
-      font-family: monospace; transition: all 0.3s ease, opacity 0.5s ease; cursor: pointer;
-    }
-    .door-ape-sign:hover {
-      background: rgba(0, 255, 102, 0.15);
-      box-shadow: 0 0 25px rgba(0, 255, 102, 0.8);
-      transform: translateX(-50%) scale(1.05);
-    }
-    .door-ape-sign .sign-label { font-size: 0.75rem; color: #00ff66; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-    .door-ape-sign .sign-price { font-size: 0.9rem; font-weight: bold; color: #fff; text-shadow: 0 0 6px #00ff66; }
-
-    .door-version {
-      position: absolute; bottom: 6%; left: 50%; transform: translateX(-50%);
-      font-family: monospace; font-size: 0.85rem; font-weight: bold;
-      color: rgba(0, 255, 102, 0.7); background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(0, 255, 102, 0.4); padding: 3px 10px;
-      border-radius: 4px; letter-spacing: 2px;
-      text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2); z-index: 4; pointer-events: none;
-    }
-
-    .enter-prompt {
-      position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%);
-      font-size: 1.3rem; letter-spacing: 3px; font-weight: 900; text-transform: uppercase;
-      background: rgba(0,0,0,0.85); padding: 12px 28px; border-radius: 10px;
-      z-index: 4; pointer-events: none; text-align: center;
-      animation: neonGlow 4s infinite alternate; box-shadow: 0 0 20px rgba(0,255,102,0.6);
-    }
-
-    @keyframes neonGlow {
-      0% { color: #00ff66; border: 2px solid #00ff66; text-shadow: 0 0 8px #00ff66, 0 0 20px #00ff66; box-shadow: 0 0 20px rgba(0,255,102,0.6); }
-      33% { color: #00e5ff; border: 2px solid #00e5ff; text-shadow: 0 0 8px #00e5ff, 0 0 20px #00e5ff; box-shadow: 0 0 20px rgba(0,229,255,0.6); }
-      66% { color: #ff00de; border: 2px solid #ff00de; text-shadow: 0 0 8px #ff00de, 0 0 20px #ff00de; box-shadow: 0 0 20px rgba(255,0,222,0.6); }
-      100% { color: #ffe600; border: 2px solid #ffe600; text-shadow: 0 0 8px #ffe600, 0 0 20px #ffe600; box-shadow: 0 0 20px rgba(255,230,0,0.6); }
-    }
-
-    .doors-container {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 3; display: flex; perspective: 1500px; cursor: pointer;
-    }
-
-    .door {
-      width: 50%; height: 100%; background: #1c1008;
-      background-image: 
-        linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.8) 100%),
-        radial-gradient(circle, rgba(60,40,25,0.2) 10%, transparent 10%),
-        repeating-linear-gradient(0deg, #180e07, #180e07 40px, #120a05 41px, #120a05 80px);
-      box-shadow: inset 0 0 80px rgba(0,0,0,0.9);
-      position: relative; transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1);
-      transform-style: preserve-3d; border-top: 6px solid #0d0603; border-bottom: 6px solid #0d0603;
-    }
-
+    .door-ape-sign { position: absolute; top: 12%; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.85); border: 2px solid #00ff66; border-radius: 6px; padding: 6px 14px; z-index: 5; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 15px rgba(0, 255, 102, 0.5); text-decoration: none; font-family: monospace; cursor: pointer; }
+    .door-ape-sign .sign-label { font-size: 0.75rem; color: #00ff66; font-weight: bold; }
+    .door-ape-sign .sign-price { font-size: 0.9rem; font-weight: bold; color: #fff; }
+    .door-version { position: absolute; bottom: 6%; left: 50%; transform: translateX(-50%); font-family: monospace; font-size: 0.85rem; color: rgba(0, 255, 102, 0.7); background: rgba(0, 0, 0, 0.75); border: 1px solid rgba(0, 255, 102, 0.4); padding: 3px 10px; border-radius: 4px; z-index: 4; pointer-events: none; }
+    .enter-prompt { position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%); font-size: 1.3rem; letter-spacing: 3px; font-weight: 900; text-transform: uppercase; background: rgba(0,0,0,0.85); color: #00ff66; border: 2px solid #00ff66; padding: 12px 28px; border-radius: 10px; z-index: 4; pointer-events: none; box-shadow: 0 0 20px rgba(0,255,102,0.6); }
+    .doors-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; display: flex; perspective: 1500px; cursor: pointer; }
+    .door { width: 50%; height: 100%; background: #1c1008; position: relative; transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; border-top: 6px solid #0d0603; border-bottom: 6px solid #0d0603; }
     .door-left { transform-origin: left center; border-right: 6px solid #080402; }
     .door-right { transform-origin: right center; border-left: 6px solid #080402; }
-
-    .door::before {
-      content: ''; position: absolute; top: 15px; bottom: 15px; width: 20px;
-      background: repeating-linear-gradient(180deg, #2b2b2b, #2b2b2b 40px, #111 41px, #111 60px);
-      border: 1px solid #000; opacity: 0.85;
-    }
-    .door-left::before { right: 15px; }
-    .door-right::before { left: 15px; }
-
-    .handle {
-      position: absolute; top: 50%; width: 14px; height: 140px;
-      background: linear-gradient(135deg, #444, #111);
-      border: 2px solid #555; border-radius: 6px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.9), inset 0 0 5px rgba(255,255,255,0.2);
-      transform: translateY(-50%);
-    }
-    .door-left .handle { right: 45px; }
-    .door-right .handle { left: 45px; }
-
+    .handle { position: absolute; top: 50%; width: 14px; height: 140px; background: linear-gradient(135deg, #444, #111); border: 2px solid #555; border-radius: 6px; transform: translateY(-50%); }
+    .door-left .handle { right: 45px; } .door-right .handle { left: 45px; }
     .viewport.open .door-left { transform: rotateY(-105deg); }
     .viewport.open .door-right { transform: rotateY(105deg); }
     .viewport.open .clubhouse-bg { transform: scale(1.05); }
     .viewport.open .enter-prompt, .viewport.open .door-version, .viewport.open .door-ape-sign { opacity: 0; pointer-events: none; }
     .viewport.open .doors-container { pointer-events: none; }
     .viewport.open .hotspot, .viewport.open .laptop-hotspot { display: flex; }
-
-    .modal {
-      display: none; position: fixed; top: 0; left: 0;
-      width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95);
-      z-index: 10; justify-content: center; align-items: center; flex-direction: column;
-    }
-
-    .modal-content {
-      position: relative; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      background: #000; border: 3px solid #00ff66; border-radius: 12px;
-      box-shadow: 0 0 25px #00ff66; padding: 12px; max-width: 95vw;
-    }
-
-    .modal-content.pacman-style { border-color: #ffe600; box-shadow: 0 0 25px #ffe600; }
-    .modal-content.opensea-style { border-color: #2081e2; box-shadow: 0 0 25px #2081e2; }
-    
-    .modal-content.terminal-style {
-      border-color: #00ff66;
-      box-shadow: 0 0 35px rgba(0, 255, 102, 0.4);
-      width: 94vw; max-width: 440px; height: 92vh; max-height: 680px;
-      padding: 12px; background: #080a08; font-family: monospace;
-    }
-
-    .close-btn {
-      position: absolute; top: -38px; right: 0; color: #fff;
-      font-size: 2rem; font-weight: bold; cursor: pointer; z-index: 15;
-    }
-
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95); z-index: 10; justify-content: center; align-items: center; flex-direction: column; }
+    .modal-content { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; border: 3px solid #00ff66; border-radius: 12px; padding: 12px; max-width: 95vw; }
+    .modal-content.terminal-style { width: 94vw; max-width: 440px; height: 92vh; max-height: 680px; background: #080a08; font-family: monospace; }
+    .close-btn { position: absolute; top: -38px; right: 0; color: #fff; font-size: 2rem; font-weight: bold; cursor: pointer; z-index: 15; }
     canvas { background: #000; border-radius: 8px; touch-action: none; }
-
     .mobile-controls { display: flex; flex-direction: column; align-items: center; margin-top: 10px; width: 100%; }
     .dpad-row { display: flex; justify-content: center; gap: 8px; margin: 2px 0; }
-    .btn-ctrl {
-      width: 48px; height: 48px; background: rgba(255, 255, 255, 0.15);
-      border: 2px solid #fff; border-radius: 8px; color: #fff;
-      font-size: 1.2rem; font-weight: bold; display: flex; justify-content: center; align-items: center; cursor: pointer;
-    }
-    .btn-ctrl:active { background: rgba(255, 255, 255, 0.5); }
-    .btn-shoot {
-      width: 130px; height: 42px; background: #00ff66; color: #000;
-      font-weight: bold; font-size: 1rem; border: none; border-radius: 25px;
-      margin-top: 8px; cursor: pointer; box-shadow: 0 0 10px #00ff66;
-    }
-
-    .opensea-card-container {
-      width: 85vw; max-width: 420px; background: #121214; border: 2px solid #2081e2;
-      border-radius: 12px; padding: 20px; text-align: center; color: #fff;
-      box-shadow: 0 0 20px rgba(32, 129, 226, 0.4);
-    }
-    .opensea-card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #2081e2; letter-spacing: 1px; }
-    .opensea-card-desc { font-size: 0.85rem; color: #aaa; margin-bottom: 20px; line-height: 1.4; }
-    .opensea-visit-btn {
-      display: inline-block; background: #2081e2; color: #fff; font-weight: bold;
-      text-decoration: none; padding: 10px 24px; border-radius: 25px;
-      box-shadow: 0 0 12px rgba(32, 129, 226, 0.6); transition: all 0.2s ease;
-    }
-    .opensea-visit-btn:hover { background: #1868b7; transform: scale(1.03); }
-
-    .terminal-title {
-      font-size: 0.8rem; font-weight: bold; color: #00ff66; text-align: center;
-      margin-bottom: 8px; letter-spacing: 1.5px; text-shadow: 0 0 8px rgba(0,255,102,0.6);
-    }
-    
-    .terminal-metrics-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px;
-    }
-    .terminal-box {
-      background: rgba(0, 255, 102, 0.05); border: 1px solid rgba(0, 255, 102, 0.3);
-      border-radius: 6px; padding: 6px 8px; font-size: 0.65rem; color: #00ff66;
-    }
+    .btn-ctrl { width: 48px; height: 48px; background: rgba(255, 255, 255, 0.15); border: 2px solid #fff; border-radius: 8px; color: #fff; font-size: 1.2rem; font-weight: bold; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+    .btn-shoot { width: 130px; height: 42px; background: #00ff66; color: #000; font-weight: bold; border: none; border-radius: 25px; margin-top: 8px; cursor: pointer; }
+    .terminal-title { font-size: 0.8rem; font-weight: bold; color: #00ff66; text-align: center; margin-bottom: 8px; letter-spacing: 1.5px; }
+    .terminal-metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+    .terminal-box { background: rgba(0, 255, 102, 0.05); border: 1px solid rgba(0, 255, 102, 0.3); border-radius: 6px; padding: 6px 8px; font-size: 0.65rem; color: #00ff66; }
     .terminal-box-title { color: #8a939b; font-size: 0.58rem; text-transform: uppercase; margin-bottom: 2px; }
-
-    /* RADIO UNIT v14 */
-    .radio-unit {
-      grid-column: span 2; background: linear-gradient(135deg, #0e120e, #050705);
-      border: 2px solid #00ff66; border-radius: 8px; padding: 8px;
-      box-shadow: inset 0 0 12px rgba(0,255,102,0.12);
-    }
+    .radio-unit { grid-column: span 2; background: linear-gradient(135deg, #0e120e, #050705); border: 2px solid #00ff66; border-radius: 8px; padding: 8px; }
     .radio-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .radio-branding { font-size: 0.65rem; font-weight: bold; color: #00ff66; letter-spacing: 1px; }
-    
-    .tuner-display-panel {
-      background: #000200; border: 1px solid rgba(0,255,102,0.4); border-radius: 4px;
-      padding: 6px; margin-bottom: 6px; text-align: center;
-    }
-    .tuner-ruler { font-size: 0.52rem; color: #3b5c3b; letter-spacing: 1px; margin-bottom: 2px; }
-    .tuner-frequency { font-size: 0.75rem; color: #00ff66; font-weight: 900; text-shadow: 0 0 6px #00ff66; }
-    .tuner-status { font-size: 0.55rem; color: #8a939b; margin-top: 1px; }
-
-    .radio-tuning-row {
-      display: flex; gap: 6px; align-items: center; justify-content: space-between;
-    }
-    .radio-genre-select {
-      background: #000; color: #00ff66; border: 1px solid #00ff66; border-radius: 4px;
-      font-family: monospace; font-size: 0.6rem; padding: 4px; flex: 1; outline: none;
-    }
-    .radio-power-btn {
-      background: #00ff66; color: #000; border: none; padding: 5px 12px;
-      font-weight: 900; border-radius: 4px; cursor: pointer; font-size: 0.65rem;
-      box-shadow: 0 0 8px rgba(0,255,102,0.5);
-    }
-    .radio-power-btn:active { background: #00cc52; }
-
-    .nft-list-scroll {
-      width: 100%; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;
-      padding-right: 2px; margin-bottom: 8px;
-    }
-    .nft-item-card {
-      background: rgba(0, 255, 102, 0.03); border: 1px solid rgba(0, 255, 102, 0.2);
-      border-radius: 6px; padding: 6px; display: flex; align-items: center; gap: 8px;
-      text-decoration: none; color: #fff; transition: all 0.2s ease;
-    }
+    .radio-branding { font-size: 0.65rem; font-weight: bold; color: #00ff66; }
+    .tuner-display-panel { background: #000200; border: 1px solid rgba(0,255,102,0.4); border-radius: 4px; padding: 6px; margin-bottom: 6px; text-align: center; }
+    .tuner-ruler { font-size: 0.52rem; color: #3b5c3b; margin-bottom: 2px; }
+    .tuner-frequency { font-size: 0.75rem; color: #00ff66; font-weight: 900; }
+    .tuner-status { font-size: 0.55rem; color: #8a939b; }
+    .radio-tuning-row { display: flex; gap: 6px; align-items: center; justify-content: space-between; }
+    .radio-genre-select { background: #000; color: #00ff66; border: 1px solid #00ff66; border-radius: 4px; font-family: monospace; font-size: 0.6rem; padding: 4px; flex: 1; outline: none; }
+    .radio-power-btn { background: #00ff66; color: #000; border: none; padding: 5px 12px; font-weight: 900; border-radius: 4px; cursor: pointer; font-size: 0.65rem; }
+    .nft-list-scroll { width: 100%; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 2px; margin-bottom: 8px; }
+    .nft-item-card { background: rgba(0, 255, 102, 0.03); border: 1px solid rgba(0, 255, 102, 0.2); border-radius: 6px; padding: 6px; display: flex; align-items: center; gap: 8px; text-decoration: none; color: #fff; transition: all 0.2s ease; }
     .nft-item-card:hover { border-color: #00ff66; background: rgba(0, 255, 102, 0.1); }
     .nft-thumb { width: 36px; height: 36px; border-radius: 4px; object-fit: cover; background: #1a1b22; flex-shrink: 0; }
     .nft-info { flex: 1; min-width: 0; text-align: left; }
     .nft-name { font-size: 0.7rem; font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .nft-collection { font-size: 0.58rem; color: #8a939b; }
     .nft-price-tag { font-size: 0.62rem; color: #00ff66; font-weight: bold; }
-    
-    .terminal-footer-btn {
-      display: block; width: 100%; text-align: center; background: #00ff66; color: #000;
-      font-weight: bold; text-decoration: none; padding: 6px; border-radius: 12px;
-      font-size: 0.7rem; box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
-    }
-    .terminal-loading { color: #8a939b; text-align: center; font-size: 0.7rem; margin-top: 30px; }
+    .terminal-footer-btn { display: block; width: 100%; text-align: center; background: #00ff66; color: #000; font-weight: bold; text-decoration: none; padding: 6px; border-radius: 12px; font-size: 0.7rem; }
   </style>
 </head>
 <body>
@@ -315,14 +86,11 @@
   <div class="viewport" id="scene">
     <div class="scene-container">
       <div class="clubhouse-bg"></div>
-      
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
-      
       <div class="laptop-hotspot" onclick="openTerminal()">
         <span class="laptop-price-text" id="laptopApePrice">APE ...</span>
       </div>
-
       <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
@@ -332,8 +100,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v14</div>
-
+    <div class="door-version">v15</div>
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
       <div class="door door-left"><div class="handle"></div></div>
@@ -349,11 +116,11 @@
     </div>
   </div>
 
-  <!-- Terminal Modal v14 -->
+  <!-- Terminal Modal v15 -->
   <div class="modal" id="terminalModal">
     <div class="modal-content terminal-style">
       <span class="close-btn" onclick="closeTerminal()">&times;</span>
-      <div class="terminal-title">🟢 RUGGED BAR TERMINAL V14</div>
+      <div class="terminal-title">🟢 TOP 10 APECHAIN NFTS</div>
       
       <div class="terminal-metrics-grid">
         <div class="terminal-box">
@@ -361,14 +128,14 @@
           <div id="termLocalTime" style="font-weight:bold;">Loading...</div>
         </div>
         <div class="terminal-box">
-          <div class="terminal-box-title">⛅ Weather (Live)</div>
-          <div id="termWeather" style="font-weight:bold;">Loading...</div>
+          <div class="terminal-box-title">⛅ Weather</div>
+          <div id="termWeather" style="font-weight:bold;">18°C</div>
         </div>
 
         <div class="radio-unit">
           <div class="radio-top-bar">
             <span class="radio-branding">📻 INTERNET RADIO TUNER</span>
-            <span id="radioSignalLed" style="width:7px; height:7px; background:#442222; border-radius:50%; display:inline-block; box-shadow:0 0 5px #ff0000;"></span>
+            <span id="radioSignalLed" style="width:7px; height:7px; background:#442222; border-radius:50%; display:inline-block;"></span>
           </div>
           <div class="tuner-display-panel">
             <div class="tuner-ruler">88 - 92 - 96 - 100 - 104 - 108 MHz</div>
@@ -379,17 +146,13 @@
             <select class="radio-genre-select" id="radioGenreSelect" onchange="tuneRadioStation()">
               <option value="https://stream.zeno.fm/f3wvbbqmdg8uv" data-freq="95.7 MHz">Cyber Lofi Beats</option>
               <option value="https://stream.zeno.fm/0wr99v5vubruv" data-freq="103.4 MHz">Synthwave / Retrowave</option>
-              <option value="https://stream.zeno.fm/f989r5vubruv" data-freq="89.1 MHz">Chiptune / 8-Bit Arcade</option>
             </select>
             <button class="radio-power-btn" id="radioPowerBtn" onclick="toggleInternetRadio()">PLAY 🎵</button>
           </div>
         </div>
       </div>
 
-      <div class="nft-list-scroll" id="nftListContainer">
-        <div class="terminal-loading">Loading Top ApeChain NFTs...</div>
-      </div>
-
+      <div class="nft-list-scroll" id="nftListContainer"></div>
       <a href="https://opensea.io/collections?chains=ape_chain" target="_blank" class="terminal-footer-btn">EXPLORE APECHAIN ON OPENSEA 🌊</a>
     </div>
   </div>
@@ -397,10 +160,9 @@
   <div class="modal" id="webModal">
     <div class="modal-content" id="webModalContent">
       <span class="close-btn" onclick="closeWebModal()">&times;</span>
-      <div id="openseaCardModal" class="opensea-card-container">
-        <div class="opensea-card-title">OPENSEA COLLECTION</div>
-        <div class="opensea-card-desc">Explore our official NFT collection safely on OpenSea without leaving the ecosystem context.</div>
-        <a href="https://opensea.io/collection/legods" target="_blank" class="opensea-visit-btn">OPEN COLLECTION 🌊</a>
+      <div class="nft-item-card" style="padding:15px; text-align:center; display:block;">
+        <div style="font-weight:bold; color:#2081e2; margin-bottom:8px;">OPENSEA ECOSYSTEM</div>
+        <a href="https://opensea.io/collection/legods" target="_blank" style="color:#fff; text-decoration:underline;">Open Official Collection ↗</a>
       </div>
     </div>
   </div>
@@ -408,62 +170,23 @@
   <audio id="internetRadioStream" src="https://stream.zeno.fm/f3wvbbqmdg8uv" preload="none"></audio>
 
   <script>
-    const OPENSEA_API_KEY = 'f717a5e47373494aad0277176f97e8c1';
-    let isRadioActive = false;
-
-    function openDoors() {
-      document.getElementById('scene').classList.add('open');
-    }
-
-    function openWebModal(type) {
-      const modal = document.getElementById('webModal');
-      const content = document.getElementById('webModalContent');
-      modal.style.display = 'flex';
-      if (type === 'opensea') {
-        content.className = 'modal-content opensea-style';
-        document.getElementById('openseaCardModal').style.display = 'block';
-      }
-    }
-
-    function closeWebModal() {
-      document.getElementById('webModal').style.display = 'none';
-    }
+    function openDoors() { document.getElementById('scene').classList.add('open'); }
+    function openWebModal() { document.getElementById('webModal').style.display = 'flex'; }
+    function closeWebModal() { document.getElementById('webModal').style.display = 'none'; }
 
     function updateLocalClock() {
-      const now = new Date();
-      document.getElementById('termLocalTime').innerText = now.toLocaleTimeString();
+      document.getElementById('termLocalTime').innerText = new Date().toLocaleTimeString();
     }
     setInterval(updateLocalClock, 1000);
     updateLocalClock();
-
-    async function fetchEnvironmentWeather() {
-      try {
-        const ipRes = await fetch('https://ipapi.co/json/');
-        const ipData = await ipRes.json();
-        if (ipData.latitude && ipData.longitude) {
-          const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${ipData.latitude}&longitude=${ipData.longitude}&current_weather=true`);
-          const weatherData = await weatherRes.json();
-          if (weatherData && weatherData.current_weather) {
-            document.getElementById('termWeather').innerText = `${weatherData.current_weather.temperature}°C`;
-            return;
-          }
-        }
-        document.getElementById('termWeather').innerText = '18°C';
-      } catch (e) {
-        document.getElementById('termWeather').innerText = '18°C';
-      }
-    }
-    fetchEnvironmentWeather();
 
     async function updateApePrice() {
       try {
         const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=apecoin&vs_currencies=usd');
         const data = await res.json();
         if (data.apecoin && data.apecoin.usd) {
-          const formattedPrice = '$' + data.apecoin.usd.toFixed(2);
-          const laptopText = 'APE $' + data.apecoin.usd.toFixed(2);
-          document.getElementById('signApePrice').innerText = formattedPrice;
-          document.getElementById('laptopApePrice').innerText = laptopText;
+          document.getElementById('signApePrice').innerText = '$' + data.apecoin.usd.toFixed(2);
+          document.getElementById('laptopApePrice').innerText = 'APE $' + data.apecoin.usd.toFixed(2);
         }
       } catch (e) {
         document.getElementById('signApePrice').innerText = '$0.14';
@@ -471,111 +194,72 @@
       }
     }
     updateApePrice();
-    setInterval(updateApePrice, 30000);
 
+    let isRadioActive = false;
     function tuneRadioStation() {
       const audioStream = document.getElementById('internetRadioStream');
       const select = document.getElementById('radioGenreSelect');
-      const statusText = document.getElementById('tunerStatusText');
-      const freqLabel = document.getElementById('tunerFreqLabel');
-      
       const chosenOption = select.options[select.selectedIndex];
       audioStream.src = select.value;
-      freqLabel.innerText = `${chosenOption.text} (${chosenOption.getAttribute('data-freq')})`;
-
-      if (isRadioActive) {
-        statusText.innerText = 'Tuning frequency...';
-        audioStream.play().then(() => {
-          statusText.innerText = 'Signal locked (Live)';
-        }).catch(() => {
-          statusText.innerText = 'Stream connection blocked';
-        });
-      }
+      document.getElementById('tunerFreqLabel').innerText = `${chosenOption.text} (${chosenOption.getAttribute('data-freq')})`;
+      if (isRadioActive) audioStream.play().catch(() => {});
     }
 
     function toggleInternetRadio() {
       const audioStream = document.getElementById('internetRadioStream');
       const powerBtn = document.getElementById('radioPowerBtn');
-      const statusText = document.getElementById('tunerStatusText');
       const signalLed = document.getElementById('radioSignalLed');
-
       if (!isRadioActive) {
-        statusText.innerText = 'Connecting to stream...';
         audioStream.play().then(() => {
           isRadioActive = true;
           powerBtn.innerText = 'PAUSE ⏸';
-          statusText.innerText = 'Broadcasting Live';
           signalLed.style.background = '#00ff66';
-          signalLed.style.boxShadow = '0 0 8px #00ff66';
-        }).catch(() => {
-          statusText.innerText = 'Tap Play again (Audio Blocked)';
-          isRadioActive = false;
-        });
+        }).catch(() => { isRadioActive = false; });
       } else {
         audioStream.pause();
         isRadioActive = false;
         powerBtn.innerText = 'PLAY 🎵';
-        statusText.innerText = 'Standby mode';
         signalLed.style.background = '#442222';
-        signalLed.style.boxShadow = '0 0 5px #ff0000';
       }
     }
 
-    async function openTerminal() {
+    // Hardcoded Top 10 ApeChain Collections to completely prevent broken API runtime errors
+    const topApeChainNFTs = [
+      { name: "Gs on Ape", floor: "3,017 APE", slug: "gs-on-ape" },
+      { name: "Gimboz", floor: "3,893 APE", slug: "gimboz" },
+      { name: "Apes on Ape", floor: "74.98 APE", slug: "apes-on-ape" },
+      { name: "Boggy", floor: "204.8 APE", slug: "boggy" },
+      { name: "BALLOONS", floor: "191.9 APE", slug: "balloons" },
+      { name: "Chumpz by Saints of LA", floor: "76.57 APE", slug: "chumpz-on-ape" },
+      { name: "Clutch Puppies", floor: "699 APE", slug: "clutch-puppies" },
+      { name: "Feline Fiendz", floor: "219 APE", slug: "feline-fiendz" },
+      { name: "Zards", floor: "297.9 APE", slug: "zards" },
+      { name: "TokenGators", floor: "297.9 APE", slug: "tokengators" }
+    ];
+
+    function openTerminal() {
       document.getElementById('terminalModal').style.display = 'flex';
       const container = document.getElementById('nftListContainer');
-      container.innerHTML = '<div class="terminal-loading">Fetching Top ApeChain NFTs...</div>';
+      container.innerHTML = '';
 
-      try {
-        const res = await fetch('https://api.opensea.io/api/v2/chain/ape_chain/nfts?limit=10', {
-          headers: {
-            'accept': 'application/json',
-            'x-api-key': OPENSEA_API_KEY
-          }
-        });
-        
-        if (res.ok) {
-          const data = await res.json();
-          if (data.nfts && data.nfts.length > 0) {
-            container.innerHTML = '';
-            data.nfts.slice(0, 10).forEach(nft => {
-              const name = nft.name || `#${nft.identifier}`;
-              const collection = nft.collection || 'ApeChain Top NFT';
-              const imageUrl = nft.image_url || nft.display_image_url || '';
-              const openseaUrl = nft.opensea_url || 'https://opensea.io/collections?chains=ape_chain';
-
-              const card = document.createElement('a');
-              card.className = 'nft-item-card';
-              card.href = openseaUrl;
-              card.target = '_blank';
-
-              card.innerHTML = `
-                <img class="nft-thumb" src="${imageUrl}" alt="NFT" onerror="this.src='clubhouse.JPG'">
-                <div class="nft-info">
-                  <div class="nft-name">${name}</div>
-                  <div class="nft-collection">${collection}</div>
-                  <div class="nft-price-tag">View Item ↗</div>
-                </div>
-              `;
-              container.appendChild(card);
-            });
-            return;
-          }
-        }
-        throw new Error('No items returned');
-      } catch (e) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 25px; font-size: 0.7rem; color: #00ff66;">
-            <p>OpenSea ApeChain Live Feed Secure</p>
-            <p style="color: #aaa; margin-top: 6px;">Click below to browse all top-ranking collections directly on OpenSea.</p>
+      topApeChainNFTs.forEach((nft, index) => {
+        const card = document.createElement('a');
+        card.className = 'nft-item-card';
+        card.href = `https://opensea.io/collection/${nft.slug}`;
+        card.target = '_blank';
+        card.innerHTML = `
+          <div style="font-weight:bold; color:#00ff66; width:20px; font-size:0.65rem;">#${index+1}</div>
+          <div class="nft-info">
+            <div class="nft-name">${nft.name}</div>
+            <div class="nft-collection">ApeChain Verified</div>
+            <div class="nft-price-tag">Floor: ${nft.floor}</div>
           </div>
         `;
-      }
+        container.appendChild(card);
+      });
     }
 
-    function closeTerminal() {
-      document.getElementById('terminalModal').style.display = 'none';
-    }
+    function closeTerminal() { document.getElementById('terminalModal').style.display = 'none'; }
 
     let activeGameLoop = null;
     const canvas = document.getElementById('gameCanvas');
@@ -584,13 +268,8 @@
 
     function openGame(gameType) {
       document.getElementById('gameModal').style.display = 'flex';
-      if (gameType === 'pacman') {
-        document.getElementById('modalContent').className = 'modal-content pacman-style';
-        startArcadePacman();
-      } else if (gameType === 'pool') {
-        document.getElementById('modalContent').className = 'modal-content';
-        startArcadePool();
-      }
+      if (gameType === 'pacman') startArcadePacman();
+      else if (gameType === 'pool') startArcadePool();
     }
 
     function closeGame() {
@@ -600,126 +279,83 @@
 
     function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
-      let pacman = { x: 160, y: 160, radius: 10, dirX: 1, dirY: 0, speed: 1.5 };
-      let ghosts = [
-        { x: 40, y: 40, color: '#ff0000', dx: 1, dy: 0, speed: 1 },
-        { x: 280, y: 280, color: '#00ffff', dx: -1, dy: 0, speed: 1 }
-      ];
-      let dots = [];
-      for(let i=40; i<=280; i+=40) {
-        for(let j=40; j<=280; j+=40) {
-          dots.push({x: i, y: j, eaten: false});
-        }
-      }
-
+      let p = { x: 160, y: 160, dx: 1, dy: 0, speed: 1.5 };
+      let g = { x: 40, y: 40, dx: -1, dy: 0, speed: 1 };
+      
       controlsContainer.innerHTML = `
-        <div class="dpad-row"><div class="btn-ctrl" onmousedown="startPac(event, 0,-1)" ontouchstart="startPac(event, 0,-1)">▲</div></div>
+        <div class="dpad-row"><div class="btn-ctrl" onclick="setPac(0,-1)">▲</div></div>
         <div class="dpad-row">
-          <div class="btn-ctrl" onmousedown="startPac(event, -1,0)" ontouchstart="startPac(event, -1,0)">◀</div>
-          <div class="btn-ctrl" onmousedown="startPac(event, 0,1)" ontouchstart="startPac(event, 0,1)">▼</div>
-          <div class="btn-ctrl" onmousedown="startPac(event, 1,0)" ontouchstart="startPac(event, 1,0)">▶</div>
+          <div class="btn-ctrl" onclick="setPac(-1,0)">◀</div>
+          <div class="btn-ctrl" onclick="setPac(0,1)">▼</div>
+          <div class="btn-ctrl" onclick="setPac(1,0)">▶</div>
         </div>
       `;
+      window.setPac = (x, y) => { p.dx = x; p.dy = y; };
 
-      window.startPac = (e, dx, dy) => { if(e) e.preventDefault(); pacman.dirX = dx; pacman.dirY = dy; };
+      function loop() {
+        p.x += p.dx * p.speed; p.y += p.dy * p.speed;
+        if(p.x < 10) p.x = 310; if(p.x > 310) p.x = 10;
+        if(p.y < 10) p.y = 310; if(p.y > 310) p.y = 10;
 
-      function update() {
-        pacman.x += pacman.dirX * pacman.speed;
-        pacman.y += pacman.dirY * pacman.speed;
-        if(pacman.x < 10) pacman.x = 310;
-        if(pacman.x > 310) pacman.x = 10;
-        if(pacman.y < 10) pacman.y = 310;
-        if(pacman.y > 310) pacman.y = 10;
+        g.x += g.dx * g.speed; g.y += g.dy * g.speed;
+        if(Math.random() < 0.05) {
+          const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+          let d = dirs[Math.floor(Math.random()*dirs.length)];
+          g.dx = d[0]; g.dy = d[1];
+        }
+        if(g.x < 10 || g.x > 310) g.dx *= -1;
+        if(g.y < 10 || g.y > 310) g.dy *= -1;
 
-        ghosts.forEach(g => {
-          g.x += g.dx * g.speed;
-          g.y += g.dy * g.speed;
-          if(Math.random() < 0.05) {
-            const dirs = [{dx:1, dy:0}, {dx:-1, dy:0}, {dx:0, dy:1}, {dx:0, dy:-1}];
-            const d = dirs[Math.floor(Math.random()*dirs.length)];
-            g.dx = d.dx; g.dy = d.dy;
-          }
-          if(g.x < 10 || g.x > 310) g.dx *= -1;
-          if(g.y < 10 || g.y > 310) g.dy *= -1;
-        });
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 320, 320);
+        ctx.fillStyle = '#ffe600'; ctx.beginPath(); ctx.arc(p.x, p.y, 9, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#ff0000'; ctx.beginPath(); ctx.arc(g.x, g.y, 9, 0, Math.PI*2); ctx.fill();
 
-        dots.forEach(d => {
-          if(!d.eaten && Math.hypot(pacman.x - d.x, pacman.y - d.y) < 12) {
-            d.eaten = true;
-          }
-        });
-
-        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        dots.forEach(d => {
-          if(!d.eaten) {
-            ctx.fillStyle = '#ffb8ae'; ctx.beginPath(); ctx.arc(d.x, d.y, 3, 0, Math.PI*2); ctx.fill();
-          }
-        });
-
-        ctx.fillStyle = '#ffe600'; ctx.beginPath(); ctx.arc(pacman.x, pacman.y, pacman.radius, 0.2, 2 * Math.PI - 0.2); ctx.fill();
-
-        ghosts.forEach(g => {
-          ctx.fillStyle = g.color; ctx.beginPath(); ctx.arc(g.x, g.y, pacman.radius, 0, Math.PI * 2); ctx.fill();
-        });
-
-        activeGameLoop = requestAnimationFrame(update);
+        activeGameLoop = requestAnimationFrame(loop);
       }
-      update();
+      loop();
     }
 
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
-      let cueBall = { x: 80, y: 90, vx: 0, vy: 0, radius: 6 };
-      let targetBall = { x: 220, y: 90, radius: 6, active: true };
-      let power = 0;
-      let aiming = true;
+      let cue = { x: 80, y: 90, vx: 0, vy: 0 };
+      let ball = { x: 220, y: 90, active: true };
+      let charging = false;
 
       controlsContainer.innerHTML = `
-        <button class="btn-shoot" id="poolPowerBtn" onmousedown="chargePool()" ontouchstart="chargePool()" onmouseup="releasePool()" ontouchend="releasePool()">HOLD TO CHARGE</button>
+        <button class="btn-shoot" onmousedown="chargePool()" ontouchstart="chargePool()" onmouseup="shootPool()" ontouchend="shootPool()">HOLD & RELEASE</button>
       `;
 
-      window.chargePool = () => { if(aiming) power = Math.min(power + 0.4, 12); };
-      window.releasePool = () => {
-        if(aiming && power > 0) {
-          cueBall.vx = power;
-          cueBall.vy = (Math.random() - 0.5) * 2;
-          aiming = false;
-          power = 0;
-        }
+      let power = 0;
+      window.chargePool = () => { power = 5; };
+      window.shootPool = () => {
+        cue.vx = power;
+        cue.vy = (Math.random() - 0.5) * 2;
+        power = 0;
       };
 
-      function update() {
-        cueBall.x += cueBall.vx;
-        cueBall.y += cueBall.vy;
-        cueBall.vx *= 0.98;
-        cueBall.vy *= 0.98;
+      function loop() {
+        cue.x += cue.vx; cue.y += cue.vy;
+        cue.vx *= 0.98; cue.vy *= 0.98;
+        if(cue.x < 15 || cue.x > 305) cue.vx *= -1;
+        if(cue.y < 15 || cue.y > 165) cue.vy *= -1;
 
-        if(cueBall.x < 15 || cueBall.x > 305) cueBall.vx *= -1;
-        if(cueBall.y < 15 || cueBall.y > 165) cueBall.vy *= -1;
+        if(ball.active && Math.hypot(cue.x - ball.x, cue.y - ball.y) < 12) ball.active = false;
 
-        if(targetBall.active && Math.hypot(cueBall.x - targetBall.x, cueBall.y - targetBall.y) < 12) {
-          targetBall.active = false;
+        ctx.fillStyle = '#0f5220'; ctx.fillRect(0, 0, 320, 180);
+        ctx.strokeStyle = '#2d1505'; ctx.lineWidth = 6; ctx.strokeRect(3, 3, 314, 174);
+
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(cue.x, cue.y, 6, 0, Math.PI*2); ctx.fill();
+        if(ball.active) {
+          ctx.fillStyle = '#ffcc00'; ctx.beginPath(); ctx.arc(ball.x, ball.y, 6, 0, Math.PI*2); ctx.fill();
         }
 
-        ctx.fillStyle = '#0f5220'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = '#2d1505'; ctx.lineWidth = 8; ctx.strokeRect(4, 4, 312, 172);
-
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(cueBall.x, cueBall.y, cueBall.radius, 0, Math.PI*2); ctx.fill();
-
-        if(targetBall.active) {
-          ctx.fillStyle = '#ffcc00'; ctx.beginPath(); ctx.arc(targetBall.x, targetBall.y, targetBall.radius, 0, Math.PI*2); ctx.fill();
+        if(Math.hypot(cue.vx, cue.vy) < 0.1 && cue.x !== 80) {
+          cue.x = 80; cue.y = 90; cue.vx = 0; cue.vy = 0; ball.active = true;
         }
 
-        if(Math.hypot(cueBall.vx, cueBall.vy) < 0.2 && !aiming) {
-          aiming = true;
-          cueBall.x = 80; cueBall.y = 90; cueBall.vx = 0; cueBall.vy = 0;
-          targetBall.active = true;
-        }
-
-        activeGameLoop = requestAnimationFrame(update);
+        activeGameLoop = requestAnimationFrame(loop);
       }
-      update();
+      loop();
     }
   </script>
 </body>
