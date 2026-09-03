@@ -77,8 +77,9 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
+    /* Repositioned to match the small side table on the left */
     .laptop-hotspot {
-      top: 53.5%; left: 37.5%; width: 8.5%; height: 4.8%;
+      top: 61.2%; left: 16.5%; width: 9.5%; height: 6.5%;
       background: #050b07; border-radius: 3px;
       box-shadow: 0 0 8px rgba(0, 255, 102, 0.4); display: none;
       flex-direction: column; justify-content: center; align-items: center;
@@ -288,7 +289,7 @@
       if (activeGameLoop) cancelAnimationFrame(activeGameLoop);
     }
 
-    /* PAC-MAN: Fixed Ghost Maze Pathfinding & Victory Rugged Message */
+    /* PAC-MAN: Optimized Hitbox Size, Maze Pathing, and Degen Death Message */
     function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
       const tileSize = 20;
@@ -309,13 +310,12 @@
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
       ];
       
-      // Deep clone map so dots respawn on restart
       let map = initialMap.map(row => [...row]);
 
       let score = 0;
-      let gameOverMessage = null;
-      let pacman = { x: 30, y: 30, dirX: 0, dirY: 0, speed: 1.2 };
-      let ghost = { x: 150, y: 130, dirX: 0, dirY: -1, speed: 0.9, color: '#ff0000' };
+      let gameMessage = null;
+      let pacman = { x: 30, y: 30, radius: 5.5, dirX: 0, dirY: 0, speed: 1.2 };
+      let ghost = { x: 150, y: 130, radius: 6, dirX: 0, dirY: -1, speed: 0.9, color: '#ff0000' };
 
       controlsContainer.innerHTML = `
         <div class="dpad-row"><div class="btn-ctrl" onmousedown="startPac(event, 0,-1)" onmouseup="stopPac(event)" ontouchstart="startPac(event, 0,-1)" ontouchend="stopPac(event)">▲</div></div>
@@ -336,13 +336,13 @@
         pacman.dirX = 0; pacman.dirY = 0;
       };
 
-      function canMove(x, y, dx, dy, speed) {
+      function canMove(x, y, dx, dy, speed, radius) {
         let targetX = x + dx * speed;
         let targetY = y + dy * speed;
-        let gX1 = Math.floor((targetX - 7) / tileSize);
-        let gX2 = Math.floor((targetX + 7) / tileSize);
-        let gY1 = Math.floor((targetY - 7) / tileSize);
-        let gY2 = Math.floor((targetY + 7) / tileSize);
+        let gX1 = Math.floor((targetX - radius) / tileSize);
+        let gX2 = Math.floor((targetX + radius) / tileSize);
+        let gY1 = Math.floor((targetY - radius) / tileSize);
+        let gY2 = Math.floor((targetY + radius) / tileSize);
 
         if (map[gY1] && map[gY1][gX1] === 1) return false;
         if (map[gY1] && map[gY1][gX2] === 1) return false;
@@ -361,8 +361,8 @@
       }
 
       function update() {
-        if (!gameOverMessage) {
-          if (canMove(pacman.x, pacman.y, pacman.dirX, pacman.dirY, pacman.speed)) {
+        if (!gameMessage) {
+          if (canMove(pacman.x, pacman.y, pacman.dirX, pacman.dirY, pacman.speed, pacman.radius)) {
             pacman.x += pacman.dirX * pacman.speed;
             pacman.y += pacman.dirY * pacman.speed;
           }
@@ -375,15 +375,14 @@
             map[cY][cX] = 0;
 
             if (!hasRemainingDots()) {
-              gameOverMessage = "CONGRATS! YOU ATE ALL THE LIQUIDITY. FULLY & PERMANENTLY RUGGED! 💀💸";
+              gameMessage = "CONGRATS! YOU ATE ALL THE LIQUIDITY. FULLY & PERMANENTLY RUGGED! 💀💸";
             }
           }
 
-          // Ghost Maze AI Pathfinding (turns at intersections or reverses when blocked)
-          if (!canMove(ghost.x, ghost.y, ghost.dirX, ghost.dirY, ghost.speed)) {
+          if (!canMove(ghost.x, ghost.y, ghost.dirX, ghost.dirY, ghost.speed, ghost.radius)) {
             let possibleDirs = [
               {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
-            ].filter(d => !(d.dx === -ghost.dirX && d.dy === -ghost.dirY) && canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed));
+            ].filter(d => !(d.dx === -ghost.dirX && d.dy === -ghost.dirY) && canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed, ghost.radius));
 
             if (possibleDirs.length === 0) {
               ghost.dirX *= -1; ghost.dirY *= -1;
@@ -392,12 +391,11 @@
               ghost.dirX = chosen.dx; ghost.dirY = chosen.dy;
             }
           } else {
-            // At exact tile centers, give ghost a chance to switch paths organically
             let atTileCenter = Math.abs((ghost.x % tileSize) - 10) < 1 && Math.abs((ghost.y % tileSize) - 10) < 1;
             if (atTileCenter && Math.random() < 0.4) {
               let possibleDirs = [
                 {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
-              ].filter(d => canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed));
+              ].filter(d => canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed, ghost.radius));
               if (possibleDirs.length > 0) {
                 let chosen = possibleDirs[Math.floor(Math.random() * possibleDirs.length)];
                 ghost.dirX = chosen.dx; ghost.dirY = chosen.dy;
@@ -408,8 +406,8 @@
           ghost.x += ghost.dirX * ghost.speed;
           ghost.y += ghost.dirY * ghost.speed;
 
-          if (Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y) < 14) {
-            pacman.x = 30; pacman.y = 30; stopPac();
+          if (Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y) < 12) {
+            gameMessage = "YOU GOT RUGGED BY THE DEV! BAG GONE TO ZERO! 📉🤡";
           }
         }
 
@@ -452,15 +450,14 @@
         ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
         ctx.fillText('SCORE: ' + score, 10, 305);
 
-        if (gameOverMessage) {
+        if (gameMessage) {
           ctx.fillStyle = 'rgba(0,0,0,0.85)';
           ctx.fillRect(0, 80, canvas.width, 160);
-          ctx.fillStyle = '#00ff66';
+          ctx.fillStyle = '#ff3333';
           ctx.font = 'bold 13px monospace';
           ctx.textAlign = 'center';
           
-          // Wrap text into multiple lines inside canvas overlay
-          let words = gameOverMessage.split(' ');
+          let words = gameMessage.split(' ');
           let line = '';
           let startY = 115;
           for(let n = 0; n < words.length; n++) {
