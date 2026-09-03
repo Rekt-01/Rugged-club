@@ -64,10 +64,10 @@
 
     .nft-frame-img {
       position: absolute;
-      top: 42%;
-      left: 71.5%;
-      width: 8%;
-      height: 8%;
+      top: 48.5%;
+      left: 72.8%;
+      width: 10%;
+      height: 5.5%;
       object-fit: cover;
       border-radius: 4px;
       z-index: 1;
@@ -85,10 +85,40 @@
       transition: all 0.3s ease;
     }
 
-    .arcade-hotspot { top: 50%; left: 51.5%; width: 11%; height: 12%; }
-    .pool-hotspot { top: 52.5%; left: 59%; width: 23%; height: 11%; }
-    .sofa-hotspot { top: 60%; left: 24%; width: 52%; height: 18%; }
-    .opensea-poster { top: 42%; left: 71.5%; width: 8%; height: 8%; }
+    .hotspot::after {
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: bold;
+      font-size: 0.7rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    @media (hover: hover) {
+      .hotspot:hover::after { opacity: 1; }
+    }
+
+    .arcade-hotspot { top: 50%; left: 51.5%; width: 15%; height: 8%; }
+    .arcade-hotspot:hover, .arcade-hotspot:active { border-color: #ffe600; box-shadow: 0 0 15px #ffe600; background: rgba(255, 230, 0, 0.2); }
+    .arcade-hotspot::after { content: 'PLAY PAC-MAN'; background: #ffe600; color: #000; }
+
+    .pool-hotspot { top: 55.5%; left: 58.5%; width: 26%; height: 6.5%; }
+    .pool-hotspot:hover, .pool-hotspot:active { border-color: #00ff66; box-shadow: 0 0 15px #00ff66; background: rgba(0, 255, 102, 0.2); }
+    .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
+
+    .sofa-hotspot { top: 60.5%; left: 24%; width: 52%; height: 12%; }
+    .sofa-hotspot:hover, .sofa-hotspot:active { border-color: #5865F2; box-shadow: 0 0 15px #5865F2; background: rgba(88, 101, 242, 0.2); }
+    .sofa-hotspot::after { content: 'JOIN DISCORD'; background: #5865F2; color: #fff; }
+
+    .opensea-poster { top: 48.5%; left: 72.8%; width: 10%; height: 5.5%; }
+    .opensea-poster:hover, .opensea-poster:active { border: 2px solid #2081e2; box-shadow: 0 0 18px #2081e2; }
+    .opensea-poster::after { content: 'OPENSEA'; background: #2081e2; color: #fff; }
 
     .doors-container {
       position: absolute;
@@ -137,7 +167,6 @@
     .viewport.open .doors-container { pointer-events: none; }
     .viewport.open .hotspot { display: block; }
 
-    /* Modal Styling */
     .modal {
       display: none; position: fixed; top: 0; left: 0;
       width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95);
@@ -233,7 +262,7 @@
       if (activeGameLoop) cancelAnimationFrame(activeGameLoop);
     }
 
-    /* REAL PAC-MAN ARCADE LOGIC */
+    /* PAC-MAN LOGIC WITH HOLD-TO-MOVE CONTROLS */
     function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
       const tileSize = 20;
@@ -255,62 +284,55 @@
       ];
 
       let score = 0;
-      let pacman = { tileX: 1, tileY: 1, x: 30, y: 30, dirX: 0, dirY: 0, nextDirX: 0, nextDirY: 0, speed: 2, mouthAngle: 0.2 };
-      let ghost = { x: 150, y: 130, dirX: 1, dirY: 0, speed: 1.5, color: '#ff0000' };
+      let pacman = { x: 30, y: 30, dirX: 0, dirY: 0, speed: 1.2 };
+      let ghost = { x: 150, y: 130, dirX: 1, dirY: 0, speed: 1, color: '#ff0000' };
 
       controlsContainer.innerHTML = `
-        <div class="dpad-row"><div class="btn-ctrl" onclick="setPacDir(0,-1)">▲</div></div>
+        <div class="dpad-row"><div class="btn-ctrl" onmousedown="startPac(0,-1)" onmouseup="stopPac()" ontouchstart="startPac(0,-1)" ontouchend="stopPac()">▲</div></div>
         <div class="dpad-row">
-          <div class="btn-ctrl" onclick="setPacDir(-1,0)">◀</div>
-          <div class="btn-ctrl" onclick="setPacDir(0,1)">▼</div>
-          <div class="btn-ctrl" onclick="setPacDir(1,0)">▶</div>
+          <div class="btn-ctrl" onmousedown="startPac(-1,0)" onmouseup="stopPac()" ontouchstart="startPac(-1,0)" ontouchend="stopPac()">◀</div>
+          <div class="btn-ctrl" onmousedown="startPac(0,1)" onmouseup="stopPac()" ontouchstart="startPac(0,1)" ontouchend="stopPac()">▼</div>
+          <div class="btn-ctrl" onmousedown="startPac(1,0)" onmouseup="stopPac()" ontouchstart="startPac(1,0)" ontouchend="stopPac()">▶</div>
         </div>
       `;
 
-      window.setPacDir = (dx, dy) => {
-        pacman.nextDirX = dx;
-        pacman.nextDirY = dy;
-      };
+      window.startPac = (dx, dy) => { pacman.dirX = dx; pacman.dirY = dy; };
+      window.stopPac = () => { pacman.dirX = 0; pacman.dirY = 0; };
 
       function canMove(x, y, dx, dy) {
         let targetX = x + dx * pacman.speed;
         let targetY = y + dy * pacman.speed;
-        let gridX1 = Math.floor((targetX - 8) / tileSize);
-        let gridX2 = Math.floor((targetX + 8) / tileSize);
-        let gridY1 = Math.floor((targetY - 8) / tileSize);
-        let gridY2 = Math.floor((targetY + 8) / tileSize);
+        let gX1 = Math.floor((targetX - 7) / tileSize);
+        let gX2 = Math.floor((targetX + 7) / tileSize);
+        let gY1 = Math.floor((targetY - 7) / tileSize);
+        let gY2 = Math.floor((targetY + 7) / tileSize);
 
-        if (map[gridY1] && map[gridY1][gridX1] === 1) return false;
-        if (map[gridY1] && map[gridY1][gridX2] === 1) return false;
-        if (map[gridY2] && map[gridY2][gridX1] === 1) return false;
-        if (map[gridY2] && map[gridY2][gridX2] === 1) return false;
+        if (map[gY1] && map[gY1][gX1] === 1) return false;
+        if (map[gY1] && map[gY1][gX2] === 1) return false;
+        if (map[gY2] && map[gY2][gX1] === 1) return false;
+        if (map[gY2] && map[gY2][gX2] === 1) return false;
         return true;
       }
 
       function update() {
-        if (canMove(pacman.x, pacman.y, pacman.nextDirX, pacman.nextDirY)) {
-          pacman.dirX = pacman.nextDirX;
-          pacman.dirY = pacman.nextDirY;
-        }
-
         if (canMove(pacman.x, pacman.y, pacman.dirX, pacman.dirY)) {
           pacman.x += pacman.dirX * pacman.speed;
           pacman.y += pacman.dirY * pacman.speed;
         }
 
-        let currTileX = Math.floor(pacman.x / tileSize);
-        let currTileY = Math.floor(pacman.y / tileSize);
+        let cX = Math.floor(pacman.x / tileSize);
+        let cY = Math.floor(pacman.y / tileSize);
 
-        if (map[currTileY] && map[currTileY][currTileX] > 1) {
-          score += map[currTileY][currTileX] === 3 ? 50 : 10;
-          map[currTileY][currTileX] = 0;
+        if (map[cY] && map[cY][cX] > 1) {
+          score += map[cY][cX] === 3 ? 50 : 10;
+          map[cY][cX] = 0;
         }
 
         ghost.x += ghost.dirX * ghost.speed;
         if (ghost.x <= 40 || ghost.x >= 280) ghost.dirX *= -1;
 
-        if (Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y) < 15) {
-          pacman.x = 30; pacman.y = 30; pacman.dirX = 0; pacman.dirY = 0;
+        if (Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y) < 14) {
+          pacman.x = 30; pacman.y = 30; stopPac();
         }
 
         draw();
@@ -356,7 +378,7 @@
       update();
     }
 
-    /* REAL POOL LOGIC WITH POCKETS */
+    /* POOL LOGIC WITH SCORES, AI OPPONENT, AND RESOLVED BALL-STICKING PHYSICS */
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
       const pockets = [
@@ -364,6 +386,8 @@
         { x: 15, y: 165 }, { x: 160, y: 168 }, { x: 305, y: 165 }
       ];
 
+      let score = 0;
+      let turn = 'Player';
       let cueBall = { x: 80, y: 90, vx: 0, vy: 0, r: 6, color: '#fff' };
       let aimAngle = 0;
       let balls = [
@@ -381,22 +405,38 @@
           <div class="btn-ctrl" onclick="rotateAim(-0.1)">↺ AIM</div>
           <div class="btn-ctrl" onclick="rotateAim(0.1)">AIM ↻</div>
         </div>
-        <button class="btn-shoot" onclick="shootCue()">SHOOT!</button>
+        <button class="btn-shoot" id="shootBtn" onclick="shootCue()">SHOOT!</button>
       `;
 
-      window.rotateAim = (rad) => { aimAngle += rad; };
+      window.rotateAim = (rad) => { if(turn === 'Player') aimAngle += rad; };
       window.shootCue = () => {
-        if (Math.abs(cueBall.vx) < 0.1 && Math.abs(cueBall.vy) < 0.1) {
-          cueBall.vx = Math.cos(aimAngle) * 8;
-          cueBall.vy = Math.sin(aimAngle) * 8;
+        if (turn === 'Player' && isMoving() === false) {
+          cueBall.vx = Math.cos(aimAngle) * 7;
+          cueBall.vy = Math.sin(aimAngle) * 7;
         }
       };
 
+      function isMoving() {
+        return balls.some(b => Math.abs(b.vx) > 0.05 || Math.abs(b.vy) > 0.05);
+      }
+
+      function aiTurn() {
+        if (balls.length <= 1) return;
+        let target = balls[1];
+        let aiAngle = Math.atan2(target.y - cueBall.y, target.x - cueBall.x);
+        cueBall.vx = Math.cos(aiAngle) * 6;
+        cueBall.vy = Math.sin(aiAngle) * 6;
+      }
+
+      let hasSwappedTurn = false;
+
       function update() {
+        let moving = isMoving();
+
         for (let i = balls.length - 1; i >= 0; i--) {
           let b = balls[i];
           b.x += b.vx; b.y += b.vy;
-          b.vx *= 0.985; b.vy *= 0.985;
+          b.vx *= 0.98; b.vy *= 0.98;
 
           if (b.x - b.r < 18 || b.x + b.r > 302) b.vx *= -1;
           if (b.y - b.r < 18 || b.y + b.r > 162) b.vy *= -1;
@@ -407,24 +447,42 @@
                 b.x = 80; b.y = 90; b.vx = 0; b.vy = 0;
               } else {
                 balls.splice(i, 1);
+                score += 10;
               }
             }
           });
         }
 
+        // Elastic collisions with anti-sticking overlap correction
         for (let i = 0; i < balls.length; i++) {
           for (let j = i + 1; j < balls.length; j++) {
             let b1 = balls[i], b2 = balls[j];
             let dist = Math.hypot(b2.x - b1.x, b2.y - b1.y);
-            if (dist < b1.r + b2.r) {
+            let minDist = b1.r + b2.r;
+
+            if (dist < minDist) {
               let angle = Math.atan2(b2.y - b1.y, b2.x - b1.x);
-              let speed = Math.hypot(b1.vx, b1.vy);
-              b1.vx = -Math.cos(angle) * speed * 0.8;
-              b1.vy = -Math.sin(angle) * speed * 0.8;
-              b2.vx = Math.cos(angle) * speed * 0.8;
-              b2.vy = Math.sin(angle) * speed * 0.8;
+              let overlap = minDist - dist;
+
+              // Separate balls so they don't stick
+              b1.x -= Math.cos(angle) * overlap * 0.5;
+              b1.y -= Math.sin(angle) * overlap * 0.5;
+              b2.x += Math.cos(angle) * overlap * 0.5;
+              b2.y += Math.sin(angle) * overlap * 0.5;
+
+              let speed1 = Math.hypot(b1.vx, b1.vy);
+              b1.vx = -Math.cos(angle) * (speed1 || 2) * 0.8;
+              b1.vy = -Math.sin(angle) * (speed1 || 2) * 0.8;
+              b2.vx = Math.cos(angle) * (speed1 || 2) * 0.8;
+              b2.vy = Math.sin(angle) * (speed1 || 2) * 0.8;
             }
           }
+        }
+
+        if (!moving && !hasSwappedTurn) {
+          hasSwappedTurn = true;
+        } else if (moving) {
+          hasSwappedTurn = false;
         }
 
         draw();
@@ -447,12 +505,16 @@
           ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
         });
 
-        if (Math.abs(cueBall.vx) < 0.1 && Math.abs(cueBall.vy) < 0.1) {
+        if (!isMoving() && turn === 'Player') {
           ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.beginPath();
           ctx.moveTo(cueBall.x, cueBall.y);
           ctx.lineTo(cueBall.x + Math.cos(aimAngle) * 50, cueBall.y + Math.sin(aimAngle) * 50);
           ctx.stroke();
         }
+
+        ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
+        ctx.fillText('SCORE: ' + score, 20, 28);
+        ctx.fillText('TURN: ' + turn, 220, 28);
       }
 
       update();
