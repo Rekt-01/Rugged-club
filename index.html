@@ -70,7 +70,7 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
-    /* Laptop Hotspot: Displays only price, no green tooltip card popping up on hover */
+    /* Laptop Hotspot without box border/background - text flashing like neon on screen */
     .laptop-hotspot {
       position: absolute;
       top: 50.3%;
@@ -81,25 +81,30 @@
       display: none;
       align-items: center;
       justify-content: center;
-      background: rgba(0, 0, 0, 0.85);
-      border: 2px solid #00ff66;
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+      background: transparent;
+      border: none;
+      box-shadow: none;
       z-index: 2;
       cursor: pointer;
       font-family: monospace;
     }
     .laptop-hotspot:hover, .laptop-hotspot:active {
-      background: rgba(0, 255, 102, 0.15);
-      box-shadow: 0 0 18px rgba(0, 255, 102, 0.8);
+      background: rgba(0, 255, 102, 0.12);
     }
 
     .laptop-price-text {
-      font-size: 0.75rem;
+      font-size: 0.62rem;
       font-weight: bold;
-      color: #fff;
-      text-shadow: 0 0 6px #00ff66;
+      color: #00ff66;
+      text-shadow: 0 0 6px #00ff66, 0 0 12px #00ff66;
       white-space: nowrap;
       pointer-events: none;
+      animation: neonFlash 1.5s infinite alternate;
+    }
+
+    @keyframes neonFlash {
+      0% { opacity: 0.75; text-shadow: 0 0 4px #00ff66, 0 0 10px #00ff66; }
+      100% { opacity: 1; text-shadow: 0 0 9px #00ff66, 0 0 18px #00ff66, 0 0 25px #00ff66; }
     }
 
     .sofa-hotspot { top: 60.5%; left: 24%; width: 52%; height: 12%; }
@@ -132,6 +137,45 @@
     }
     .door-ape-sign .sign-label { font-size: 0.75rem; color: #00ff66; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
     .door-ape-sign .sign-price { font-size: 0.9rem; font-weight: bold; color: #fff; text-shadow: 0 0 6px #00ff66; }
+
+    .door-version {
+      position: absolute;
+      bottom: 6%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: monospace;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: rgba(0, 255, 102, 0.7);
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(0, 255, 102, 0.4);
+      padding: 3px 10px;
+      border-radius: 4px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
+      z-index: 4;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .enter-prompt {
+      position: absolute; bottom: 8%; left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.3rem; letter-spacing: 3px; font-weight: 900;
+      text-transform: uppercase; background: rgba(0,0,0,0.85);
+      padding: 12px 28px; border-radius: 10px;
+      z-index: 4; pointer-events: none; text-align: center;
+      animation: neonGlow 4s infinite alternate;
+      box-shadow: 0 0 20px rgba(0,255,102,0.6);
+    }
+
+    @keyframes neonGlow {
+      0% { color: #00ff66; border: 2px solid #00ff66; text-shadow: 0 0 8px #00ff66, 0 0 20px #00ff66; box-shadow: 0 0 20px rgba(0,255,102,0.6); }
+      33% { color: #00e5ff; border: 2px solid #00e5ff; text-shadow: 0 0 8px #00e5ff, 0 0 20px #00e5ff; box-shadow: 0 0 20px rgba(0,229,255,0.6); }
+      66% { color: #ff00de; border: 2px solid #ff00de; text-shadow: 0 0 8px #ff00de, 0 0 20px #ff00de; box-shadow: 0 0 20px rgba(255,0,222,0.6); }
+      100% { color: #ffe600; border: 2px solid #ffe600; text-shadow: 0 0 8px #ffe600, 0 0 20px #ffe600; box-shadow: 0 0 20px rgba(255,230,0,0.6); }
+    }
 
     .doors-container {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -173,45 +217,6 @@
     .door-left .handle { right: 45px; }
     .door-right .handle { left: 45px; }
 
-    .door-version {
-      position: absolute;
-      bottom: 6%;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: monospace;
-      font-size: 0.85rem;
-      font-weight: bold;
-      color: rgba(0, 255, 102, 0.7);
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(0, 255, 102, 0.4);
-      padding: 3px 10px;
-      border-radius: 4px;
-      letter-spacing: 2px;
-      text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
-      z-index: 4;
-      pointer-events: none;
-      transition: opacity 0.4s ease;
-    }
-
-    .enter-prompt {
-      position: absolute; bottom: 8%; left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.3rem; letter-spacing: 3px; font-weight: 900;
-      text-transform: uppercase; background: rgba(0,0,0,0.85);
-      padding: 12px 28px; border-radius: 10px;
-      z-index: 4; pointer-events: none; text-align: center;
-      animation: neonGlow 4s infinite alternate;
-      box-shadow: 0 0 20px rgba(0,255,102,0.6);
-    }
-
-    @keyframes neonGlow {
-      0% { color: #00ff66; border: 2px solid #00ff66; text-shadow: 0 0 8px #00ff66, 0 0 20px #00ff66; box-shadow: 0 0 20px rgba(0,255,102,0.6); }
-      33% { color: #00e5ff; border: 2px solid #00e5ff; text-shadow: 0 0 8px #00e5ff, 0 0 20px #00e5ff; box-shadow: 0 0 20px rgba(0,229,255,0.6); }
-      66% { color: #ff00de; border: 2px solid #ff00de; text-shadow: 0 0 8px #ff00de, 0 0 20px #ff00de; box-shadow: 0 0 20px rgba(255,0,222,0.6); }
-      100% { color: #ffe600; border: 2px solid #ffe600; text-shadow: 0 0 8px #ffe600, 0 0 20px #ffe600; box-shadow: 0 0 20px rgba(255,230,0,0.6); }
-    }
-
     .viewport.open .door-left { transform: rotateY(-105deg); }
     .viewport.open .door-right { transform: rotateY(105deg); }
     .viewport.open .clubhouse-bg { transform: scale(1.05); }
@@ -237,7 +242,7 @@
 
     .modal-content.pacman-style { border-color: #ffe600; box-shadow: 0 0 25px #ffe600; }
     .modal-content.opensea-style { border-color: #2081e2; box-shadow: 0 0 25px #2081e2; }
-    .modal-content.dex-dashboard-style { border-color: #00ff66; box-shadow: 0 0 30px rgba(0,255,102,0.6); width: 90vw; max-width: 440px; padding: 22px; }
+    .modal-content.dex-dashboard-style { border-color: #00ff66; box-shadow: 0 0 30px rgba(0,255,102,0.6); width: 92vw; max-width: 480px; padding: 18px; }
 
     .close-btn {
       position: absolute; top: -40px; right: 0; color: #fff;
@@ -276,62 +281,56 @@
       box-shadow: 0 0 20px rgba(32, 129, 226, 0.4);
     }
     .opensea-card-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: 15px;
-      color: #2081e2;
-      letter-spacing: 1px;
+      font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #2081e2; letter-spacing: 1px;
     }
     .opensea-card-desc {
-      font-size: 0.85rem;
-      color: #aaa;
-      margin-bottom: 20px;
-      line-height: 1.4;
+      font-size: 0.85rem; color: #aaa; margin-bottom: 20px; line-height: 1.4;
     }
     .opensea-visit-btn {
-      display: inline-block;
-      background: #2081e2;
-      color: #fff;
-      font-weight: bold;
-      text-decoration: none;
-      padding: 10px 24px;
-      border-radius: 25px;
-      box-shadow: 0 0 12px rgba(32, 129, 226, 0.6);
-      transition: all 0.2s ease;
+      display: inline-block; background: #2081e2; color: #fff; font-weight: bold;
+      text-decoration: none; padding: 10px 24px; border-radius: 25px;
+      box-shadow: 0 0 12px rgba(32, 129, 226, 0.6); transition: all 0.2s ease;
     }
-    .opensea-visit-btn:hover {
-      background: #1868b7;
-      transform: scale(1.03);
-    }
+    .opensea-visit-btn:hover { background: #1868b7; transform: scale(1.03); }
 
     /* Dex Dashboard Modal Styling */
     .dex-dash-header {
-      font-size: 1.1rem; font-weight: bold; color: #00ff66; text-align: center;
-      margin-bottom: 15px; letter-spacing: 1.5px; font-family: monospace;
+      font-size: 1rem; font-weight: bold; color: #00ff66; text-align: center;
+      margin-bottom: 10px; letter-spacing: 1px; font-family: monospace;
     }
     .dex-dash-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; width: 100%;
     }
     .dex-dash-box {
       background: rgba(255,255,255,0.05); border: 1px solid rgba(0,255,102,0.3);
-      border-radius: 8px; padding: 12px; text-align: center;
+      border-radius: 6px; padding: 8px; text-align: center;
     }
-    .dex-dash-box-title { font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 6px; font-family: monospace; }
-    .dex-dash-box-val { font-size: 0.95rem; font-weight: bold; color: #fff; font-family: monospace; }
+    .dex-dash-box-title { font-size: 0.65rem; color: #888; text-transform: uppercase; margin-bottom: 4px; font-family: monospace; }
+    .dex-dash-box-val { font-size: 0.85rem; font-weight: bold; color: #fff; font-family: monospace; }
+    
     .radio-player-box {
-      background: rgba(0,255,102,0.08); border: 1px solid #00ff66; border-radius: 8px;
-      padding: 12px; text-align: center; width: 100%; margin-bottom: 18px;
+      background: rgba(0,255,102,0.08); border: 1px solid #00ff66; border-radius: 6px;
+      padding: 8px 12px; text-align: center; width: 100%; margin-bottom: 10px;
     }
-    .radio-title { font-size: 0.75rem; color: #00ff66; font-weight: bold; margin-bottom: 8px; font-family: monospace; }
+    .radio-title { font-size: 0.7rem; color: #00ff66; font-weight: bold; margin-bottom: 4px; font-family: monospace; }
     .radio-controls { display: flex; justify-content: center; gap: 10px; align-items: center; }
     .radio-btn {
-      background: #00ff66; color: #000; border: none; padding: 6px 14px;
-      border-radius: 15px; font-weight: bold; font-size: 0.8rem; cursor: pointer;
+      background: #00ff66; color: #000; border: none; padding: 4px 12px;
+      border-radius: 12px; font-weight: bold; font-size: 0.75rem; cursor: pointer;
     }
+    
+    .dex-iframe-container {
+      width: 100%; height: 210px; border-radius: 6px; overflow: hidden;
+      border: 1px solid rgba(0,255,102,0.4); background: #000; margin-bottom: 10px;
+    }
+    .dex-iframe-container iframe {
+      width: 100%; height: 100%; border: none;
+    }
+
     .dex-link-btn {
       display: block; width: 100%; text-align: center; background: #00ff66; color: #000;
-      font-weight: bold; text-decoration: none; padding: 10px; border-radius: 20px;
-      font-size: 0.9rem; font-family: monospace; box-shadow: 0 0 10px rgba(0,255,102,0.4);
+      font-weight: bold; text-decoration: none; padding: 8px; border-radius: 18px;
+      font-size: 0.8rem; font-family: monospace; box-shadow: 0 0 10px rgba(0,255,102,0.4);
     }
     .dex-link-btn:hover { background: #00cc52; }
   </style>
@@ -345,9 +344,9 @@
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
       
-      <!-- Laptop Hotspot clicking to open the custom popup dashboard -->
+      <!-- Laptop Hotspot with APE + Price flashing like neon on the laptop screen -->
       <div class="laptop-hotspot" onclick="openDexDashboard()">
-        <span class="laptop-price-text" id="laptopApePrice">...</span>
+        <span class="laptop-price-text" id="laptopApePrice">APE ...</span>
       </div>
 
       <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
@@ -360,8 +359,8 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <!-- Version Tag Updated to v7 -->
-    <div class="door-version">v7</div>
+    <!-- Version Tag -->
+    <div class="door-version">v8</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -379,11 +378,12 @@
     </div>
   </div>
 
-  <!-- Custom Dex / Location / Radio Dashboard Modal -->
+  <!-- Custom Dex / Location / Radio Dashboard Modal with Embedded Live Chart -->
   <div class="modal" id="dexDashboardModal">
     <div class="modal-content dex-dashboard-style">
       <span class="close-btn" onclick="closeDexDashboard()">&times;</span>
       <div class="dex-dash-header">🌐 RUGGED BAR TERMINAL</div>
+      
       <div class="dex-dash-grid">
         <div class="dex-dash-box">
           <div class="dex-dash-box-title">📍 Your Location</div>
@@ -394,14 +394,21 @@
           <div class="dex-dash-box-val" id="dashWeather">Loading...</div>
         </div>
       </div>
+
       <div class="radio-player-box">
         <div class="radio-title" id="radioStationTitle">📻 Local Station: Scanning...</div>
         <div class="radio-controls">
           <button class="radio-btn" id="radioPlayBtn" onclick="toggleRadio()">▶ PLAY</button>
-          <span style="font-size:0.75rem; color:#aaa;" id="radioStatus">Paused</span>
+          <span style="font-size:0.7rem; color:#aaa;" id="radioStatus">Ready</span>
         </div>
-        <audio id="localRadioAudio" preload="none"></audio>
+        <audio id="localRadioAudio" preload="none" crossorigin="anonymous"></audio>
       </div>
+
+      <!-- Embedded Live DexScreener Chart -->
+      <div class="dex-iframe-container">
+        <iframe id="dexIframe" src="" title="DexScreener Live Chart"></iframe>
+      </div>
+
       <a href="https://dexscreener.com/apechain" target="_blank" class="dex-link-btn">OPEN FULL DEXSCREENER CHART 📈</a>
     </div>
   </div>
@@ -442,21 +449,28 @@
         const data = await res.json();
         if (data.apecoin && data.apecoin.usd) {
           const formattedPrice = '$' + data.apecoin.usd.toFixed(2);
+          const laptopText = 'APE $' + data.apecoin.usd.toFixed(2);
           document.getElementById('signApePrice').innerText = formattedPrice;
-          document.getElementById('laptopApePrice').innerText = formattedPrice;
+          document.getElementById('laptopApePrice').innerText = laptopText;
         }
       } catch (e) {
         document.getElementById('signApePrice').innerText = '$0.14';
-        document.getElementById('laptopApePrice').innerText = '$0.14';
+        document.getElementById('laptopApePrice').innerText = 'APE $0.14';
       }
     }
     updateApePrice();
     setInterval(updateApePrice, 30000);
 
-    /* Dynamic IP Location, Weather, and Radio Stream Integration */
+    /* Dynamic IP Location, Weather, Embedded Dex, and Radio Stream Integration */
     let radioPlaying = false;
     async function openDexDashboard() {
       document.getElementById('dexDashboardModal').style.display = 'flex';
+      
+      const iframe = document.getElementById('dexIframe');
+      if (!iframe.src || iframe.src === 'about:blank') {
+        iframe.src = 'https://dexscreener.com/apechain?embed=1&loadChartSettings=0&tabs=0&chartLeftToolbar=0&chartTheme=dark&theme=dark';
+      }
+
       try {
         const ipRes = await fetch('https://ipapi.co/json/');
         const ipData = await ipRes.json();
@@ -464,7 +478,6 @@
         const country = ipData.country_name || '';
         document.getElementById('dashLocation').innerText = `${city}, ${country}`;
 
-        // Get Weather based on coordinates if available
         if (ipData.latitude && ipData.longitude) {
           const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${ipData.latitude}&longitude=${ipData.longitude}&current_weather=true`);
           const weatherData = await weatherRes.json();
@@ -478,11 +491,10 @@
           document.getElementById('dashWeather').innerText = '18°C (Clear)';
         }
 
-        // Setup local radio stream based on country/region fallback to public global/regional radio streams
         setupRadioStation(ipData.country_code);
       } catch (e) {
         document.getElementById('dashLocation').innerText = 'Global Node';
-        document.getElementById('dashWeather').innerText = '20°C';
+        document.getElementById('dashWeather').innerText = '18°C';
         setupRadioStation('US');
       }
     }
@@ -494,22 +506,17 @@
 
     function setupRadioStation(countryCode) {
       const audio = document.getElementById('localRadioAudio');
-      const titleEl = document.getElementById('radioStationTitle');
       
-      // Select sample public streams or generic regional streams
-      let streamUrl = 'https://stream.zeno.fm/f3wvbbqmdg8uv'; // Chill lofi / global node stream
-      let stationName = 'Global Lofi Beats Radio';
+      let streamUrl = 'https://stream.zeno.fm/f3wvbbqmdg8uv'; 
 
       if (countryCode === 'GB' || countryCode === 'IE') {
-        streamUrl = 'https://stream-mz.planetradio.co.uk/net2national.mp3';
-        stationName = 'UK / Regional Hit Radio';
+        streamUrl = 'https://icecast.liveatc.net/dub_twr';
       } else if (countryCode === 'US') {
         streamUrl = 'https://ice5.securenetsystems.net/DASH35';
-        stationName = 'US Indie & Local Vibe';
       }
 
       audio.src = streamUrl;
-      titleEl.innerText = `📻 Station: ${stationName}`;
+      document.getElementById('radioStatus').innerText = 'Ready';
     }
 
     function toggleRadio() {
@@ -523,12 +530,15 @@
         btn.innerText = '▶ PLAY';
         status.innerText = 'Paused';
       } else {
+        status.innerText = 'Connecting...';
         audio.play().then(() => {
           radioPlaying = true;
           btn.innerText = '⏸ PAUSE';
           status.innerText = 'Live Streaming';
         }).catch(err => {
-          status.innerText = 'Stream Blocked / Error';
+          status.innerText = 'Stream Active (Click Play Again)';
+          radioPlaying = false;
+          btn.innerText = '▶ PLAY';
         });
       }
     }
@@ -716,28 +726,22 @@
         "Bro missed harder than a sniper buying a honeypot token! 📉🤡",
         "Absolute paperhands shot! Went straight into the shadow realm. 💀",
         "Did your grandma throw that cue? Utterly rekt! 🗑️",
-        "Skill issue. Go back to flipping burgers at McDonald's. 🍔",
-        "That shot aged like an unbacked stablecoin. Dead! 📉",
-        "Bro bought the top on that stroke! Absolute zero IQ play. 🤡"
+        "Skill issue. Go back to flipping burgers at McDonald's. 🍔"
       ];
 
       const scratchInsults = [
         "SCRATCH! You just rugged your own cue ball into the void! 🤡💸",
-        "Paying gas fees to sink your own white ball? Peak IQ loss! 📉",
-        "Dev wallet drain! You just pocketed your own cue ball! 💀"
+        "Paying gas fees to sink your own white ball? Peak IQ loss! 📉"
       ];
 
       const potSuccessMessages = [
         "CHAD MOVE! You bagged the tokens and mooned hard! 🚀🌕",
         "WHALE ALERT! Absolute masterclass in paper destruction! 🐋🔥",
-        "DIAMOND HANDS! Clean pocket, straight to Valhalla! 💎🙌",
-        "LEGENDARY SNIPER! You just cooked the market makers! ⚡🚀",
-        "BAG SECURED! Green candles only from here on out! 🟢📈"
+        "DIAMOND HANDS! Clean pocket, straight to Valhalla! 💎🙌"
       ];
 
       const winMessages = [
-        "FULL SEND! Table cleared and bags multiplied! 🚀🌕",
-        "CHAD OF THE CENTURY! Absolute perfection! 👑🔥"
+        "FULL SEND! Table cleared and bags multiplied! 🚀🌕"
       ];
 
       controlsContainer.innerHTML = `
