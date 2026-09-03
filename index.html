@@ -281,7 +281,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v5.5</div>
+    <div class="door-version">v5.6</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -523,7 +523,7 @@
             score += map[cY][cX] === 3 ? 50 : 10;
             map[cY][cX] = 0;
             if (!map.some(row => row.includes(2) || row.includes(3))) {
-              gameMessage = "CONGRATS! LIQUIDITY DRAINED. FULLY RUGGED! 💀💸";
+              gameMessage = "CONGRATS! FULLY RUGGED! 💀";
             }
           }
 
@@ -552,7 +552,7 @@
           ghost.y += ghost.dirY * ghost.speed;
 
           if (Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y) < 12) {
-            gameMessage = "GOT RUGGED BY THE DEV! BAG TO ZERO! 📉🤡";
+            gameMessage = "GOT RUGGED! BAG TO ZERO! 📉";
           }
         }
         draw();
@@ -581,7 +581,7 @@
       update();
     }
 
-    /* RESTORED POOL GAME LOOP */
+    /* POOL GAME LOOP (FIXED TEXT WIDTH) */
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
       const pockets = [
@@ -606,19 +606,19 @@
       ];
 
       const missInsults = [
-        "Bro missed harder than a sniper buying a honeypot token! 📉🤡",
-        "Absolute paperhands shot! Went straight into the shadow realm. 💀",
-        "Did your grandma throw that cue? Utterly rekt! 🗑️"
+        "MISSED! Paperhands shot into the void! 📉",
+        "Wiped out! Shot missed completely! 🗑️",
+        "Absolute zero-iq shot! Try again. 🤡"
       ];
       const scratchInsults = [
-        "SCRATCH! You just rugged your own cue ball into the void! 🤡💸"
+        "SCRATCH! You rugged your cue ball! 🤡"
       ];
       const potSuccessMessages = [
-        "CHAD MOVE! You bagged the tokens and mooned hard! 🚀🌕",
-        "WHALE ALERT! Absolute masterclass in paper destruction! 🐋🔥"
+        "CHAD SHOT! Tokens bagged! 🚀",
+        "WHALE PUMP! Pocketed nicely! 🐋"
       ];
       const winMessages = [
-        "FULL SEND! Table cleared and bags multiplied! 🚀🌕"
+        "TABLE CLEARED! Bags mooned! 🌕"
       ];
 
       controlsContainer.innerHTML = `
@@ -760,12 +760,12 @@
         ctx.fillText('TURN: ' + turn, 200, 26);
 
         if (popMessage && messageTimer > 0) {
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-          ctx.fillRect(25, 60, 270, 60);
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+          ctx.fillRect(35, 55, 250, 70);
           ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 2;
-          ctx.strokeRect(25, 60, 270, 60);
+          ctx.strokeRect(35, 55, 250, 70);
 
-          ctx.fillStyle = '#00ff66'; ctx.font = 'bold 10px monospace';
+          ctx.fillStyle = '#00ff66'; ctx.font = 'bold 11px monospace';
           ctx.textAlign = 'center';
           ctx.fillText(popMessage, canvas.width / 2, 95);
           ctx.textAlign = 'left';
