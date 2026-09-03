@@ -42,7 +42,7 @@
       z-index: 1;
     }
 
-    /* Embedded NFT Frame Image */
+    /* Embedded NFT Frame Image on Wall */
     .nft-frame-img {
       position: absolute;
       top: 27.5%;
@@ -56,7 +56,7 @@
       transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    /* Interactive Hotspots General Style */
+    /* Interactive Hotspots */
     .hotspot {
       position: absolute;
       z-index: 2;
@@ -88,11 +88,11 @@
       }
     }
 
-    /* Arcade Cabinet Hotspot */
+    /* Arcade Cabinet Hotspot (Center-Right Arcade Machine) */
     .arcade-hotspot {
-      top: 40%;
-      left: 50%;
-      width: 8%;
+      top: 41%;
+      left: 51.5%;
+      width: 5.5%;
       height: 20%;
     }
 
@@ -105,6 +105,26 @@
     .arcade-hotspot::after {
       content: 'PLAY PAC-MAN';
       background: #ffe600;
+      color: #000;
+    }
+
+    /* Pool Table Hotspot (Green Felt Table) */
+    .pool-hotspot {
+      top: 51%;
+      left: 55.5%;
+      width: 11.5%;
+      height: 14%;
+    }
+
+    .pool-hotspot:hover, .pool-hotspot:active {
+      border-color: #00ff66;
+      box-shadow: 0 0 15px #00ff66;
+      background: rgba(0, 255, 102, 0.15);
+    }
+
+    .pool-hotspot::after {
+      content: 'PLAY POOL';
+      background: #00ff66;
       color: #000;
     }
 
@@ -126,26 +146,6 @@
       content: 'JOIN DISCORD';
       background: #5865F2;
       color: #fff;
-    }
-
-    /* Pool Table Hotspot */
-    .pool-hotspot {
-      top: 50%;
-      left: 55%;
-      width: 14%;
-      height: 18%;
-    }
-
-    .pool-hotspot:hover, .pool-hotspot:active {
-      border-color: #00ff66;
-      box-shadow: 0 0 15px #00ff66;
-      background: rgba(0, 255, 102, 0.15);
-    }
-
-    .pool-hotspot::after {
-      content: 'PLAY POOL';
-      background: #00ff66;
-      color: #000;
     }
 
     /* Framed Wall Poster Hotspot (OpenSea Link) */
@@ -329,7 +329,7 @@
   <div class="modal" id="gameModal">
     <span class="close-btn" onclick="closeGame()">&times;</span>
     <div class="modal-content" id="modalContent">
-      <iframe id="gameFrame" src="" title="Interactive Game" allow="autoplay; keyboard"></iframe>
+      <iframe id="gameFrame" src="" title="Interactive Game" allow="autoplay; payment; microphone; camera; gyroscope; accelerometer"></iframe>
     </div>
   </div>
 
@@ -345,12 +345,12 @@
 
       if (gameType === 'pacman') {
         modalContent.className = 'modal-content pacman-style';
-        // Mobile-friendly HTML5 Pac-Man implementation
-        gameFrame.src = 'https://freecodecamp.github.io/3d-pacman-game/';
+        // Fully mobile-compatible open source HTML5 Pac-Man
+        gameFrame.src = 'https://pacman-js.vercel.app/';
       } else if (gameType === 'pool') {
         modalContent.className = 'modal-content';
-        // Mobile-friendly HTML5 Pool game
-        gameFrame.src = 'https://html5.gamedistribution.com/rvvAS3083656/';
+        // Fully mobile-compatible open source HTML5 Pool game
+        gameFrame.src = 'https://play.gamepix.com/8-ball-pool/embed?sid=88001';
       }
 
       modal.style.display = 'flex';
