@@ -77,23 +77,56 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
-    .laptop-hotspot {
-      top: 61.8%; left: 14.8%; width: 13.5%; height: 5.5%;
-      background: rgba(0, 255, 102, 0.03); border: none;
-      border-radius: 2px; display: none;
-      flex-direction: column; justify-content: center; align-items: center;
-      padding: 1px; transform: rotate(-2deg);
+    /* Flashing Neon Ape Sign on the Back Wall */
+    .wall-ape-sign {
+      position: absolute;
+      top: 43.5%;
+      left: 43.5%;
+      width: 12%;
+      height: 6%;
+      background: rgba(0, 0, 0, 0.75);
+      border: 2px solid #00ff66;
+      border-radius: 4px;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2px;
+      z-index: 2;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: monospace;
+      animation: neonPulse 1.5s infinite alternate;
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.7), inset 0 0 6px rgba(0, 255, 102, 0.4);
+      transition: transform 0.2s ease;
     }
-    .laptop-hotspot:hover, .laptop-hotspot:active { background: rgba(0, 255, 102, 0.18); box-shadow: 0 0 10px rgba(0, 255, 102, 0.4); }
-    .laptop-hotspot::after { content: 'APE CHAIN DEX'; background: #00ff66; color: #000; }
 
-    .laptop-screen-content {
-      display: flex; flex-direction: row; align-items: center;
-      justify-content: center; gap: 4px; width: 100%; height: 100%;
-      font-family: monospace; text-shadow: 0 0 4px #00ff66;
+    .wall-ape-sign:hover {
+      transform: scale(1.08);
+      background: rgba(0, 255, 102, 0.2);
     }
-    .laptop-title { font-size: 0.38rem; color: #00ff66; text-transform: uppercase; font-weight: bold; }
-    .laptop-price { font-size: 0.45rem; font-weight: bold; color: #fff; background: rgba(0,0,0,0.6); padding: 1px 3px; border-radius: 3px; border: 1px solid rgba(0,255,102,0.3); }
+
+    @keyframes neonPulse {
+      0% {
+        border-color: #00ff66;
+        box-shadow: 0 0 6px rgba(0, 255, 102, 0.5), inset 0 0 4px rgba(0, 255, 102, 0.3);
+      }
+      50% {
+        border-color: #00ff66;
+        box-shadow: 0 0 18px rgba(0, 255, 102, 1), 0 0 30px rgba(0, 255, 102, 0.5), inset 0 0 8px rgba(0, 255, 102, 0.7);
+      }
+      100% {
+        border-color: #00cc52;
+        box-shadow: 0 0 8px rgba(0, 255, 102, 0.6), inset 0 0 4px rgba(0, 255, 102, 0.3);
+      }
+    }
+
+    .wall-ape-content {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; width: 100%; height: 100%; text-align: center;
+    }
+    .wall-ape-title { font-size: 0.32rem; color: #00ff66; text-transform: uppercase; font-weight: bold; text-shadow: 0 0 4px #00ff66; }
+    .wall-ape-price { font-size: 0.42rem; font-weight: bold; color: #fff; text-shadow: 0 0 6px #fff, 0 0 10px #00ff66; margin-top: 1px; }
 
     .sofa-hotspot { top: 60.5%; left: 24%; width: 52%; height: 12%; }
     .sofa-hotspot:hover, .sofa-hotspot:active { background: rgba(88, 101, 242, 0.15); border-radius: 6px; }
@@ -159,6 +192,28 @@
     .door-left .handle { right: 45px; }
     .door-right .handle { left: 45px; }
 
+    /* Version Tag at the Bottom of the Front Door */
+    .door-version {
+      position: absolute;
+      bottom: 6%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: monospace;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: rgba(0, 255, 102, 0.7);
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(0, 255, 102, 0.4);
+      padding: 3px 10px;
+      border-radius: 4px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
+      z-index: 4;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
     .enter-prompt {
       position: absolute; bottom: 8%; left: 50%;
       transform: translateX(-50%);
@@ -182,9 +237,11 @@
     .viewport.open .clubhouse-bg,
     .viewport.open .nft-frame-img { transform: scale(1.05); }
     .viewport.open .enter-prompt { opacity: 0; }
+    .viewport.open .door-version { opacity: 0; }
     .viewport.open .door-ape-sign { opacity: 0; pointer-events: none; }
     .viewport.open .doors-container { pointer-events: none; }
-    .viewport.open .hotspot { display: flex; }
+    .viewport.open .hotspot,
+    .viewport.open .wall-ape-sign { display: flex; }
 
     .modal {
       display: none; position: fixed; top: 0; left: 0;
@@ -244,12 +301,12 @@
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
       
-      <div class="hotspot laptop-hotspot" onclick="openLaptopModal()">
-        <div class="laptop-screen-content">
-          <span class="laptop-title">$APE</span>
-          <span class="laptop-price" id="barApePrice">...</span>
+      <a href="https://dexscreener.com/apechain" target="_blank" class="wall-ape-sign">
+        <div class="wall-ape-content">
+          <span class="wall-ape-title">$APE</span>
+          <span class="wall-ape-price" id="barApePrice">...</span>
         </div>
-      </div>
+      </a>
 
       <a href="https://opensea.io/collection/legods" target="_blank" class="hotspot opensea-poster"></a>
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
@@ -259,6 +316,9 @@
       <span class="sign-label">$APE PRICE:</span>
       <span class="sign-price" id="signApePrice">...</span>
     </a>
+
+    <!-- Version Tag at the Bottom of Doors -->
+    <div class="door-version">v1</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -303,14 +363,6 @@
     }
     updateApePrice();
     setInterval(updateApePrice, 30000);
-
-    function openLaptopModal() {
-      document.getElementById('laptopModal').style.display = 'flex';
-    }
-
-    function closeLaptopModal() {
-      document.getElementById('laptopModal').style.display = 'none';
-    }
 
     let activeGameLoop = null;
     const canvas = document.getElementById('gameCanvas');
