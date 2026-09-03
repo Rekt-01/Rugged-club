@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar - v15</title>
+  <title>The Rugged Bar - v16</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
     body { background-color: #0b0c10; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -100,7 +100,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v15</div>
+    <div class="door-version">v16</div>
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
       <div class="door door-left"><div class="handle"></div></div>
@@ -116,7 +116,7 @@
     </div>
   </div>
 
-  <!-- Terminal Modal v15 -->
+  <!-- Terminal Modal v16 -->
   <div class="modal" id="terminalModal">
     <div class="modal-content terminal-style">
       <span class="close-btn" onclick="closeTerminal()">&times;</span>
@@ -223,7 +223,7 @@
       }
     }
 
-    // Hardcoded Top 10 ApeChain Collections to completely prevent broken API runtime errors
+    // Top 10 ApeChain Collections
     const topApeChainNFTs = [
       { name: "Gs on Ape", floor: "3,017 APE", slug: "gs-on-ape" },
       { name: "Gimboz", floor: "3,893 APE", slug: "gimboz" },
@@ -319,7 +319,6 @@
       canvas.width = 320; canvas.height = 180;
       let cue = { x: 80, y: 90, vx: 0, vy: 0 };
       let ball = { x: 220, y: 90, active: true };
-      let charging = false;
 
       controlsContainer.innerHTML = `
         <button class="btn-shoot" onmousedown="chargePool()" ontouchstart="chargePool()" onmouseup="shootPool()" ontouchend="shootPool()">HOLD & RELEASE</button>
