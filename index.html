@@ -61,9 +61,9 @@
     }
 
     .hotspot::after {
-      position: absolute; top: -28px; left: 50%;
-      transform: translateX(-50%); font-weight: bold; font-size: 0.7rem;
-      padding: 3px 6px; border-radius: 4px; white-space: nowrap;
+      position: absolute; top: -26px; left: 50%;
+      transform: translateX(-50%); font-weight: bold; font-size: 0.65rem;
+      padding: 2px 5px; border-radius: 4px; white-space: nowrap;
       opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
     }
 
@@ -77,23 +77,24 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
+    /* Sleek, flat laptop hotspot profile mapped perfectly to the table */
     .laptop-hotspot {
-      top: 61.2%; left: 16.5%; width: 9.5%; height: 6.5%;
-      background: #050b07; border-radius: 3px;
-      box-shadow: 0 0 8px rgba(0, 255, 102, 0.4); display: none;
+      top: 62.5%; left: 15.2%; width: 12.5%; height: 4.2%;
+      background: #030704; border: 1px solid rgba(0, 255, 102, 0.4);
+      border-radius: 2px; box-shadow: 0 0 6px rgba(0, 255, 102, 0.3); display: none;
       flex-direction: column; justify-content: center; align-items: center;
-      padding: 2px;
+      padding: 1px;
     }
-    .laptop-hotspot:hover, .laptop-hotspot:active { box-shadow: 0 0 15px #00ff66; }
+    .laptop-hotspot:hover, .laptop-hotspot:active { box-shadow: 0 0 12px #00ff66; border-color: #00ff66; }
     .laptop-hotspot::after { content: 'APE CHAIN DEX'; background: #00ff66; color: #000; }
 
     .laptop-screen-content {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; width: 100%; height: 100%;
+      display: flex; flex-direction: row; align-items: center;
+      justify-content: space-around; width: 100%; height: 100%;
       font-family: monospace; color: #00ff66; text-align: center;
     }
-    .laptop-title { font-size: 0.4rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
-    .laptop-price { font-size: 0.55rem; font-weight: bold; margin-top: 1px; color: #fff; }
+    .laptop-title { font-size: 0.38rem; color: #888; text-transform: uppercase; }
+    .laptop-price { font-size: 0.45rem; font-weight: bold; color: #fff; }
 
     .sofa-hotspot { top: 60.5%; left: 24%; width: 52%; height: 12%; }
     .sofa-hotspot:hover, .sofa-hotspot:active { background: rgba(88, 101, 242, 0.15); border-radius: 6px; }
@@ -379,7 +380,7 @@
       update();
     }
 
-    /* EASIER POOL CODE WITH FUNNY DEGEN MESSAGES */
+    /* EASY POOL CODE WITH DEGEN MESSAGES */
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
       const pockets = [
@@ -394,9 +395,8 @@
       let messageTimer = 0;
       let cueBall = { x: 80, y: 90, vx: 0, vy: 0, r: 7, color: '#fff' };
       let aimAngle = 0;
-      let powerLevel = 6; // Adjusted lower for easier targeting
+      let powerLevel = 6;
       
-      // Only 3 balls to make it super easy to win quickly
       let balls = [
         cueBall,
         { x: 220, y: 90, vx: 0, vy: 0, r: 7, color: '#ffcc00' },
@@ -439,7 +439,7 @@
           cueBall.vx = Math.cos(aimAngle) * powerLevel;
           cueBall.vy = Math.sin(aimAngle) * powerLevel;
           shotTaken = true;
-          popMessage = null; // Clear previous messages on new shot
+          popMessage = null;
         }
       };
 
@@ -468,14 +468,12 @@
           if (Math.abs(b.vx) < 0.04) b.vx = 0;
           if (Math.abs(b.vy) < 0.04) b.vy = 0;
 
-          // Bouncier walls to keep play fast and easy
           if (b.x - b.r < 18) { b.x = 18 + b.r; b.vx *= -1; }
           if (b.x + b.r > 302) { b.x = 302 - b.r; b.vx *= -1; }
           if (b.y - b.r < 18) { b.y = 18 + b.r; b.vy *= -1; }
           if (b.y + b.r > 162) { b.y = 162 - b.r; b.vy *= -1; }
 
           pockets.forEach(p => {
-            // Larger pocket grab range for easier sinking
             if (Math.hypot(b.x - p.x, b.y - p.y) < 15) {
               if (b === cueBall) {
                 b.x = 80; b.y = 90; b.vx = 0; b.vy = 0;
@@ -489,7 +487,6 @@
           });
         }
 
-        // Ball collision physics
         for (let i = 0; i < balls.length; i++) {
           for (let j = i + 1; j < balls.length; j++) {
             let b1 = balls[i], b2 = balls[j];
@@ -513,7 +510,6 @@
           }
         }
 
-        // Trigger message check when motion stops
         if (shotTaken && !moving) {
           shotTaken = false;
           if (balls.length === 1) {
@@ -565,7 +561,6 @@
         ctx.fillText('SCORE: ' + score, 20, 26);
         ctx.fillText('TURN: ' + turn, 200, 26);
 
-        // Pop up degen feedback message
         if (popMessage && messageTimer > 0) {
           ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
           ctx.fillRect(25, 60, 270, 60);
