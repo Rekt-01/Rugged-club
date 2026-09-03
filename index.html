@@ -77,24 +77,24 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
-    /* Sleek, flat laptop hotspot profile mapped perfectly to the table */
+    /* Completely flat, borderless surface map for the laptop on the side table */
     .laptop-hotspot {
-      top: 62.5%; left: 15.2%; width: 12.5%; height: 4.2%;
-      background: #030704; border: 1px solid rgba(0, 255, 102, 0.4);
-      border-radius: 2px; box-shadow: 0 0 6px rgba(0, 255, 102, 0.3); display: none;
+      top: 61.8%; left: 14.8%; width: 13.5%; height: 5.5%;
+      background: rgba(0, 255, 102, 0.03); border: none;
+      border-radius: 2px; display: none;
       flex-direction: column; justify-content: center; align-items: center;
-      padding: 1px;
+      padding: 1px; transform: rotate(-2deg);
     }
-    .laptop-hotspot:hover, .laptop-hotspot:active { box-shadow: 0 0 12px #00ff66; border-color: #00ff66; }
+    .laptop-hotspot:hover, .laptop-hotspot:active { background: rgba(0, 255, 102, 0.18); box-shadow: 0 0 10px rgba(0, 255, 102, 0.4); }
     .laptop-hotspot::after { content: 'APE CHAIN DEX'; background: #00ff66; color: #000; }
 
     .laptop-screen-content {
       display: flex; flex-direction: row; align-items: center;
-      justify-content: space-around; width: 100%; height: 100%;
-      font-family: monospace; color: #00ff66; text-align: center;
+      justify-content: center; gap: 4px; width: 100%; height: 100%;
+      font-family: monospace; text-shadow: 0 0 4px #00ff66;
     }
-    .laptop-title { font-size: 0.38rem; color: #888; text-transform: uppercase; }
-    .laptop-price { font-size: 0.45rem; font-weight: bold; color: #fff; }
+    .laptop-title { font-size: 0.38rem; color: #00ff66; text-transform: uppercase; font-weight: bold; }
+    .laptop-price { font-size: 0.45rem; font-weight: bold; color: #fff; background: rgba(0,0,0,0.6); padding: 1px 3px; border-radius: 3px; border: 1px solid rgba(0,255,102,0.3); }
 
     .sofa-hotspot { top: 60.5%; left: 24%; width: 52%; height: 12%; }
     .sofa-hotspot:hover, .sofa-hotspot:active { background: rgba(88, 101, 242, 0.15); border-radius: 6px; }
@@ -380,7 +380,7 @@
       update();
     }
 
-    /* EASY POOL CODE WITH DEGEN MESSAGES */
+    /* MASSIVELY EXPANDED DEGEN POOL CODE */
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
       const pockets = [
@@ -409,19 +409,29 @@
         "Absolute paperhands shot! Went straight into the shadow realm. 💀",
         "Did your grandma throw that cue? Utterly rekt! 🗑️",
         "Skill issue. Go back to flipping burgers at McDonald's. 🍔",
-        "That shot aged like an unbacked stablecoin. Dead! 📉"
+        "That shot aged like an unbacked stablecoin. Dead! 📉",
+        "Bro bought the top on that stroke! Absolute zero IQ play. 🤡",
+        "Even a bot trading on 500ms latency hits better shots than that. 🤖",
+        "Your portfolio is down 99% after that embarrassment. 💀",
+        "That cue stick needs to be locked in a hardware wallet because you can't handle it. 🛑",
+        "Zero liquidity on that shot! Completely dead on arrival. 📉"
       ];
 
       const scratchInsults = [
         "SCRATCH! You just rugged your own cue ball into the void! 🤡💸",
         "Paying gas fees to sink your own white ball? Peak IQ loss! 📉",
-        "Dev wallet drain! You just pocketed your own cue ball! 💀"
+        "Dev wallet drain! You just pocketed your own cue ball! 💀",
+        "Bro paid 50 GWEI to sink his own white ball into oblivion! ⛽🔥",
+        "Self-rekt speedrun any% world record! Congrats! 🏆🤡",
+        "You just liquidated your own collateral. Margin call incoming! 🚨"
       ];
 
       const winMessages = [
         "CHAD MOVE! You bagged the tokens and mooned hard! 🚀🌕",
         "WHALE ALERT! Absolute masterclass in paper destruction! 🐋🔥",
-        "YOU NAILED IT! Diamond hands prevail over the ruggers! 💎🙌"
+        "YOU NAILED IT! Diamond hands prevail over the ruggers! 💎🙌",
+        "VALHALLA BOUND! You just flipped the table on the market makers! ⚡🚀",
+        "SEND IT! Legendary sniper win, you're the main character now! 👑🔥"
       ];
 
       controlsContainer.innerHTML = `
