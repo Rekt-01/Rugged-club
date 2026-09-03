@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Retro Arcade Club</title>
+  <title>The Rugged Bar</title>
   <style>
     * {
       box-sizing: border-box;
@@ -20,26 +20,35 @@
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     .viewport {
-      position: relative;
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       overflow: hidden;
       perspective: 1200px;
     }
 
     .scene-container {
-      position: relative;
+      position: absolute;
+      top: 50%;
+      left: 50%;
       width: 100vw;
-      height: 56.25vw; /* 16:9 Aspect Ratio Lock */
+      height: 177.78vw;
       max-height: 100vh;
-      max-width: 177.78vh;
+      max-width: 56.25vh;
+      transform: translate(-50%, -50%);
+    }
+
+    @media (min-aspect-ratio: 9/16) {
+      .scene-container {
+        width: 56.25vh;
+        height: 100vh;
+      }
     }
 
     .clubhouse-bg {
@@ -48,112 +57,39 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: url('clubhouse.JPG') center/cover no-repeat;
+      background: url('clubhouse.JPG') center center / cover no-repeat;
       transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
       z-index: 1;
     }
 
-    /* Embedded NFT Frame Image on Wall */
     .nft-frame-img {
       position: absolute;
-      top: 18.5%;
+      top: 42%;
       left: 71.5%;
-      width: 5.2%;
-      height: 14%;
+      width: 8%;
+      height: 8%;
       object-fit: cover;
-      border-radius: 2px;
+      border-radius: 4px;
       z-index: 1;
       pointer-events: none;
       transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    /* Animated Neon Lights Overlays */
-    @keyframes neonFlicker {
-      0%, 100% { opacity: 1; box-shadow: 0 0 15px #ff007f, 0 0 30px #ff007f, inset 0 0 10px #ff007f; }
-      50% { opacity: 0.3; box-shadow: 0 0 2px #ff007f, inset 0 0 2px #ff007f; }
-      52% { opacity: 1; box-shadow: 0 0 18px #ff007f, 0 0 35px #ff007f; }
-      54% { opacity: 0.2; box-shadow: none; }
-      56% { opacity: 0.9; box-shadow: 0 0 12px #ff007f; }
-    }
-
-    @keyframes yellowGlow {
-      0%, 100% { opacity: 0.9; box-shadow: 0 0 15px #ffe600, 0 0 30px #ffe600; }
-      50% { opacity: 0.3; box-shadow: 0 0 4px #ffe600; }
-    }
-
-    .neon-light {
-      position: absolute;
-      pointer-events: none;
-      border-radius: 4px;
-      z-index: 1;
-    }
-
-    .neon-arcade {
-      top: 42%;
-      left: 49%;
-      width: 7.5%;
-      height: 4%;
-      background: rgba(255, 230, 0, 0.2);
-      animation: yellowGlow 2s infinite ease-in-out;
-    }
-
-    .neon-sign {
-      top: 15%;
-      left: 30%;
-      width: 12%;
-      height: 6%;
-      background: rgba(255, 0, 127, 0.25);
-      border: 1px solid #ff007f;
-      animation: neonFlicker 3s infinite;
-    }
-
-    /* Interactive Hotspots */
     .hotspot {
       position: absolute;
       z-index: 2;
       cursor: pointer;
       display: none;
-      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border: 2px dashed rgba(0, 255, 102, 0.4);
       border-radius: 6px;
       transition: all 0.3s ease;
     }
 
-    .hotspot::after {
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-weight: bold;
-      font-size: 0.75rem;
-      padding: 4px 8px;
-      border-radius: 4px;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
+    .arcade-hotspot { top: 50%; left: 51.5%; width: 11%; height: 12%; }
+    .pool-hotspot { top: 52.5%; left: 59%; width: 23%; height: 11%; }
+    .sofa-hotspot { top: 60%; left: 24%; width: 52%; height: 18%; }
+    .opensea-poster { top: 42%; left: 71.5%; width: 8%; height: 8%; }
 
-    @media (hover: hover) {
-      .hotspot:hover::after { opacity: 1; }
-    }
-
-    .arcade-hotspot { top: 42%; left: 49%; width: 7.5%; height: 26%; }
-    .arcade-hotspot:hover, .arcade-hotspot:active { border-color: #ffe600; box-shadow: 0 0 15px #ffe600; background: rgba(255, 230, 0, 0.2); }
-    .arcade-hotspot::after { content: 'PLAY PAC-MAN'; background: #ffe600; color: #000; }
-
-    .pool-hotspot { top: 55%; left: 58.5%; width: 17.5%; height: 19%; }
-    .pool-hotspot:hover, .pool-hotspot:active { border-color: #00ff66; box-shadow: 0 0 15px #00ff66; background: rgba(0, 255, 102, 0.2); }
-    .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
-
-    .sofa-hotspot { top: 60%; left: 21%; width: 25%; height: 28%; }
-    .sofa-hotspot:hover, .sofa-hotspot:active { border-color: #5865F2; box-shadow: 0 0 15px #5865F2; background: rgba(88, 101, 242, 0.2); }
-    .sofa-hotspot::after { content: 'JOIN DISCORD'; background: #5865F2; color: #fff; }
-
-    .opensea-poster { top: 18.5%; left: 71.5%; width: 5.2%; height: 14%; }
-    .opensea-poster:hover, .opensea-poster:active { border: 2px solid #2081e2; box-shadow: 0 0 18px #2081e2; }
-    .opensea-poster::after { content: 'OPENSEA COLLECTION'; background: #2081e2; color: #fff; }
-
-    /* Doors & Entrance Setup */
     .doors-container {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -188,23 +124,23 @@
       transform: translate(-50%, -50%);
       color: #fff; font-size: 1.2rem; letter-spacing: 2px;
       text-transform: uppercase; background: rgba(0,0,0,0.8);
-      padding: 12px 24px; border: 2px solid #ff007f; border-radius: 8px;
-      box-shadow: 0 0 15px #ff007f; z-index: 4; pointer-events: none;
+      padding: 12px 24px; border: 2px solid #00ff66; border-radius: 8px;
+      box-shadow: 0 0 15px #00ff66; z-index: 4; pointer-events: none;
       transition: opacity 0.5s ease; text-align: center;
     }
 
     .viewport.open .door-left { transform: rotateY(-105deg); }
     .viewport.open .door-right { transform: rotateY(105deg); }
     .viewport.open .clubhouse-bg,
-    .viewport.open .nft-frame-img { transform: scale(1.1); }
+    .viewport.open .nft-frame-img { transform: scale(1.05); }
     .viewport.open .enter-prompt { opacity: 0; }
     .viewport.open .doors-container { pointer-events: none; }
     .viewport.open .hotspot { display: block; }
 
-    /* Custom Game Modal Window */
+    /* Modal Styling */
     .modal {
       display: none; position: fixed; top: 0; left: 0;
-      width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.94);
+      width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95);
       z-index: 10; justify-content: center; align-items: center;
       flex-direction: column;
     }
@@ -221,28 +157,26 @@
     }
 
     .close-btn {
-      position: absolute; top: -45px; right: 0; color: #fff;
-      font-size: 2.2rem; font-weight: bold; cursor: pointer; padding: 5px;
+      position: absolute; top: -40px; right: 0; color: #fff;
+      font-size: 2rem; font-weight: bold; cursor: pointer;
     }
 
-    canvas { background: #111; border-radius: 8px; touch-action: none; }
+    canvas { background: #000; border-radius: 8px; touch-action: none; }
 
-    /* Mobile Controls */
     .mobile-controls { display: flex; flex-direction: column; align-items: center; margin-top: 10px; width: 100%; }
-    .dpad-row { display: flex; justify-content: center; gap: 10px; margin: 3px 0; }
+    .dpad-row { display: flex; justify-content: center; gap: 8px; margin: 2px 0; }
     .btn-ctrl {
-      width: 50px; height: 50px; background: rgba(255, 255, 255, 0.15);
+      width: 48px; height: 48px; background: rgba(255, 255, 255, 0.15);
       border: 2px solid #fff; border-radius: 8px; color: #fff;
       font-size: 1.2rem; font-weight: bold; display: flex;
       justify-content: center; align-items: center; cursor: pointer;
     }
-    .btn-ctrl:active { background: rgba(255, 255, 255, 0.5); transform: scale(0.95); }
+    .btn-ctrl:active { background: rgba(255, 255, 255, 0.5); }
     .btn-shoot {
-      width: 120px; height: 45px; background: #00ff66; color: #000;
+      width: 130px; height: 42px; background: #00ff66; color: #000;
       font-weight: bold; font-size: 1rem; border: none; border-radius: 25px;
       margin-top: 8px; cursor: pointer; box-shadow: 0 0 10px #00ff66;
     }
-    .btn-shoot:active { transform: scale(0.95); background: #00cc52; }
   </style>
 </head>
 <body>
@@ -250,11 +184,7 @@
   <div class="viewport" id="scene">
     <div class="scene-container">
       <div class="clubhouse-bg"></div>
-      
-      <div class="neon-light neon-arcade"></div>
-      <div class="neon-light neon-sign"></div>
-
-      <img src="nft.png" class="nft-frame-img" alt="LEGODS NFT">
+      <img src="nft.png" class="nft-frame-img" alt="NFT">
       
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
@@ -289,13 +219,12 @@
 
     function openGame(gameType) {
       document.getElementById('gameModal').style.display = 'flex';
-
       if (gameType === 'pacman') {
         document.getElementById('modalContent').className = 'modal-content pacman-style';
-        startPacman();
+        startArcadePacman();
       } else if (gameType === 'pool') {
         document.getElementById('modalContent').className = 'modal-content';
-        startPool();
+        startArcadePool();
       }
     }
 
@@ -304,51 +233,84 @@
       if (activeGameLoop) cancelAnimationFrame(activeGameLoop);
     }
 
-    function startPacman() {
+    /* REAL PAC-MAN ARCADE LOGIC */
+    function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
-      let player = { x: 160, y: 160, size: 12, dx: 0, dy: 0, speed: 2.5, score: 0 };
-      let ghost = { x: 40, y: 40, size: 12, dx: 1.5, dy: 1.5 };
-      let dots = [];
+      const tileSize = 20;
+      const map = [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
+        [1,2,1,1,2,1,2,1,1,2,1,2,1,1,2,1],
+        [1,3,1,1,2,2,2,1,1,2,2,2,1,1,3,1],
+        [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
+        [1,1,1,2,1,1,1,0,0,1,1,1,2,1,1,1],
+        [0,0,1,2,1,0,0,0,0,0,0,1,2,1,0,0],
+        [1,1,1,2,1,0,1,1,1,1,0,1,2,1,1,1],
+        [1,2,2,2,2,0,1,0,0,1,0,2,2,2,2,1],
+        [1,2,1,1,2,1,1,1,1,1,1,2,1,1,2,1],
+        [1,3,2,1,2,2,2,0,0,2,2,2,1,2,3,1],
+        [1,1,2,1,2,1,2,1,1,2,1,2,1,2,1,1],
+        [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+      ];
 
-      for (let r = 30; r < 300; r += 30) {
-        for (let c = 30; c < 300; c += 30) {
-          dots.push({ x: r, y: c, active: true });
-        }
-      }
+      let score = 0;
+      let pacman = { tileX: 1, tileY: 1, x: 30, y: 30, dirX: 0, dirY: 0, nextDirX: 0, nextDirY: 0, speed: 2, mouthAngle: 0.2 };
+      let ghost = { x: 150, y: 130, dirX: 1, dirY: 0, speed: 1.5, color: '#ff0000' };
 
       controlsContainer.innerHTML = `
+        <div class="dpad-row"><div class="btn-ctrl" onclick="setPacDir(0,-1)">▲</div></div>
         <div class="dpad-row">
-          <div class="btn-ctrl" onclick="movePlayer(0, -1)">▲</div>
-        </div>
-        <div class="dpad-row">
-          <div class="btn-ctrl" onclick="movePlayer(-1, 0)">◀</div>
-          <div class="btn-ctrl" onclick="movePlayer(0, 1)">▼</div>
-          <div class="btn-ctrl" onclick="movePlayer(1, 0)">▶</div>
+          <div class="btn-ctrl" onclick="setPacDir(-1,0)">◀</div>
+          <div class="btn-ctrl" onclick="setPacDir(0,1)">▼</div>
+          <div class="btn-ctrl" onclick="setPacDir(1,0)">▶</div>
         </div>
       `;
 
-      window.movePlayer = (dirX, dirY) => {
-        player.dx = dirX * player.speed;
-        player.dy = dirY * player.speed;
+      window.setPacDir = (dx, dy) => {
+        pacman.nextDirX = dx;
+        pacman.nextDirY = dy;
       };
 
+      function canMove(x, y, dx, dy) {
+        let targetX = x + dx * pacman.speed;
+        let targetY = y + dy * pacman.speed;
+        let gridX1 = Math.floor((targetX - 8) / tileSize);
+        let gridX2 = Math.floor((targetX + 8) / tileSize);
+        let gridY1 = Math.floor((targetY - 8) / tileSize);
+        let gridY2 = Math.floor((targetY + 8) / tileSize);
+
+        if (map[gridY1] && map[gridY1][gridX1] === 1) return false;
+        if (map[gridY1] && map[gridY1][gridX2] === 1) return false;
+        if (map[gridY2] && map[gridY2][gridX1] === 1) return false;
+        if (map[gridY2] && map[gridY2][gridX2] === 1) return false;
+        return true;
+      }
+
       function update() {
-        player.x += player.dx; player.y += player.dy;
-        if (player.x < 15) player.x = 305; if (player.x > 305) player.x = 15;
-        if (player.y < 15) player.y = 305; if (player.y > 305) player.y = 15;
+        if (canMove(pacman.x, pacman.y, pacman.nextDirX, pacman.nextDirY)) {
+          pacman.dirX = pacman.nextDirX;
+          pacman.dirY = pacman.nextDirY;
+        }
 
-        ghost.x += ghost.dx; ghost.y += ghost.dy;
-        if (ghost.x <= 20 || ghost.x >= 300) ghost.dx *= -1;
-        if (ghost.y <= 20 || ghost.y >= 300) ghost.dy *= -1;
+        if (canMove(pacman.x, pacman.y, pacman.dirX, pacman.dirY)) {
+          pacman.x += pacman.dirX * pacman.speed;
+          pacman.y += pacman.dirY * pacman.speed;
+        }
 
-        dots.forEach(d => {
-          if (d.active && Math.hypot(player.x - d.x, player.y - d.y) < 12) {
-            d.active = false; player.score += 10;
-          }
-        });
+        let currTileX = Math.floor(pacman.x / tileSize);
+        let currTileY = Math.floor(pacman.y / tileSize);
 
-        if (Math.hypot(player.x - ghost.x, player.y - ghost.y) < 18) {
-          player.x = 160; player.y = 160; player.dx = 0; player.dy = 0; player.score = 0;
+        if (map[currTileY] && map[currTileY][currTileX] > 1) {
+          score += map[currTileY][currTileX] === 3 ? 50 : 10;
+          map[currTileY][currTileX] = 0;
+        }
+
+        ghost.x += ghost.dirX * ghost.speed;
+        if (ghost.x <= 40 || ghost.x >= 280) ghost.dirX *= -1;
+
+        if (Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y) < 15) {
+          pacman.x = 30; pacman.y = 30; pacman.dirX = 0; pacman.dirY = 0;
         }
 
         draw();
@@ -357,52 +319,67 @@
 
       function draw() {
         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        dots.forEach(d => {
-          if (d.active) {
-            ctx.fillStyle = '#ffb8ae'; ctx.beginPath();
-            ctx.arc(d.x, d.y, 3, 0, Math.PI * 2); ctx.fill();
+
+        for (let r = 0; r < map.length; r++) {
+          for (let c = 0; c < map[r].length; c++) {
+            if (map[r][c] === 1) {
+              ctx.fillStyle = '#1919a6'; ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
+            } else if (map[r][c] === 2) {
+              ctx.fillStyle = '#ffb8ae'; ctx.beginPath();
+              ctx.arc(c * tileSize + 10, r * tileSize + 10, 3, 0, Math.PI * 2); ctx.fill();
+            } else if (map[r][c] === 3) {
+              ctx.fillStyle = '#ffb8ae'; ctx.beginPath();
+              ctx.arc(c * tileSize + 10, r * tileSize + 10, 6, 0, Math.PI * 2); ctx.fill();
+            }
           }
-        });
+        }
+
+        let rotate = 0;
+        if (pacman.dirX === 1) rotate = 0;
+        if (pacman.dirX === -1) rotate = Math.PI;
+        if (pacman.dirY === 1) rotate = Math.PI / 2;
+        if (pacman.dirY === -1) rotate = -Math.PI / 2;
 
         ctx.fillStyle = '#ffe600'; ctx.beginPath();
-        ctx.arc(player.x, player.y, player.size, 0.2 * Math.PI, 1.8 * Math.PI);
-        ctx.lineTo(player.x, player.y); ctx.fill();
+        ctx.arc(pacman.x, pacman.y, 8, rotate + 0.2, rotate + 2 * Math.PI - 0.2);
+        ctx.lineTo(pacman.x, pacman.y); ctx.fill();
 
-        ctx.fillStyle = '#ff0000'; ctx.beginPath();
-        ctx.arc(ghost.x, ghost.y, ghost.size, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = ghost.color; ctx.beginPath();
+        ctx.arc(ghost.x, ghost.y, 8, Math.PI, 0, false);
+        ctx.lineTo(ghost.x + 8, ghost.y + 8);
+        ctx.lineTo(ghost.x - 8, ghost.y + 8); ctx.fill();
 
-        ctx.fillStyle = '#fff'; ctx.font = '14px sans-serif';
-        ctx.fillText('SCORE: ' + player.score, 15, 25);
+        ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
+        ctx.fillText('SCORE: ' + score, 10, 305);
       }
-
-      window.onkeydown = (e) => {
-        if (e.key === 'ArrowUp') movePlayer(0, -1);
-        if (e.key === 'ArrowDown') movePlayer(0, 1);
-        if (e.key === 'ArrowLeft') movePlayer(-1, 0);
-        if (e.key === 'ArrowRight') movePlayer(1, 0);
-      };
 
       update();
     }
 
-    function startPool() {
+    /* REAL POOL LOGIC WITH POCKETS */
+    function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
-      let cueBall = { x: 80, y: 90, vx: 0, vy: 0, r: 7, color: '#fff' };
+      const pockets = [
+        { x: 15, y: 15 }, { x: 160, y: 12 }, { x: 305, y: 15 },
+        { x: 15, y: 165 }, { x: 160, y: 168 }, { x: 305, y: 165 }
+      ];
+
+      let cueBall = { x: 80, y: 90, vx: 0, vy: 0, r: 6, color: '#fff' };
       let aimAngle = 0;
       let balls = [
         cueBall,
-        { x: 220, y: 90, vx: 0, vy: 0, r: 7, color: '#ffcc00' },
-        { x: 235, y: 82, vx: 0, vy: 0, r: 7, color: '#ff3333' },
-        { x: 235, y: 98, vx: 0, vy: 0, r: 7, color: '#ffcc00' },
-        { x: 250, y: 74, vx: 0, vy: 0, r: 7, color: '#ff3333' },
-        { x: 250, y: 90, vx: 0, vy: 0, r: 7, color: '#111' },
-        { x: 250, y: 106, vx: 0, vy: 0, r: 7, color: '#ffcc00' }
+        { x: 220, y: 90, vx: 0, vy: 0, r: 6, color: '#ffcc00' },
+        { x: 232, y: 83, vx: 0, vy: 0, r: 6, color: '#ff3333' },
+        { x: 232, y: 97, vx: 0, vy: 0, r: 6, color: '#ffcc00' },
+        { x: 244, y: 76, vx: 0, vy: 0, r: 6, color: '#ff3333' },
+        { x: 244, y: 90, vx: 0, vy: 0, r: 6, color: '#111' },
+        { x: 244, y: 104, vx: 0, vy: 0, r: 6, color: '#ffcc00' }
       ];
 
       controlsContainer.innerHTML = `
         <div class="dpad-row">
-          <div class="btn-ctrl" onclick="rotateAim(-0.15)">↺ AIM</div>
-          <div class="btn-ctrl" onclick="rotateAim(0.15)">AIM ↻</div>
+          <div class="btn-ctrl" onclick="rotateAim(-0.1)">↺ AIM</div>
+          <div class="btn-ctrl" onclick="rotateAim(0.1)">AIM ↻</div>
         </div>
         <button class="btn-shoot" onclick="shootCue()">SHOOT!</button>
       `;
@@ -410,32 +387,45 @@
       window.rotateAim = (rad) => { aimAngle += rad; };
       window.shootCue = () => {
         if (Math.abs(cueBall.vx) < 0.1 && Math.abs(cueBall.vy) < 0.1) {
-          cueBall.vx = Math.cos(aimAngle) * 7;
-          cueBall.vy = Math.sin(aimAngle) * 7;
+          cueBall.vx = Math.cos(aimAngle) * 8;
+          cueBall.vy = Math.sin(aimAngle) * 8;
         }
       };
 
       function update() {
-        balls.forEach((b1, i) => {
-          b1.x += b1.vx; b1.y += b1.vy;
-          b1.vx *= 0.98; b1.vy *= 0.98;
+        for (let i = balls.length - 1; i >= 0; i--) {
+          let b = balls[i];
+          b.x += b.vx; b.y += b.vy;
+          b.vx *= 0.985; b.vy *= 0.985;
 
-          if (b1.x - b1.r < 10 || b1.x + b1.r > 310) b1.vx *= -1;
-          if (b1.y - b1.r < 10 || b1.y + b1.r > 170) b1.vy *= -1;
+          if (b.x - b.r < 18 || b.x + b.r > 302) b.vx *= -1;
+          if (b.y - b.r < 18 || b.y + b.r > 162) b.vy *= -1;
 
+          pockets.forEach(p => {
+            if (Math.hypot(b.x - p.x, b.y - p.y) < 12) {
+              if (b === cueBall) {
+                b.x = 80; b.y = 90; b.vx = 0; b.vy = 0;
+              } else {
+                balls.splice(i, 1);
+              }
+            }
+          });
+        }
+
+        for (let i = 0; i < balls.length; i++) {
           for (let j = i + 1; j < balls.length; j++) {
-            let b2 = balls[j];
+            let b1 = balls[i], b2 = balls[j];
             let dist = Math.hypot(b2.x - b1.x, b2.y - b1.y);
             if (dist < b1.r + b2.r) {
               let angle = Math.atan2(b2.y - b1.y, b2.x - b1.x);
-              let speed1 = Math.hypot(b1.vx, b1.vy);
-              b1.vx = -Math.cos(angle) * speed1 * 0.8;
-              b1.vy = -Math.sin(angle) * speed1 * 0.8;
-              b2.vx = Math.cos(angle) * speed1 * 0.8;
-              b2.vy = Math.sin(angle) * speed1 * 0.8;
+              let speed = Math.hypot(b1.vx, b1.vy);
+              b1.vx = -Math.cos(angle) * speed * 0.8;
+              b1.vy = -Math.sin(angle) * speed * 0.8;
+              b2.vx = Math.cos(angle) * speed * 0.8;
+              b2.vy = Math.sin(angle) * speed * 0.8;
             }
           }
-        });
+        }
 
         draw();
         activeGameLoop = requestAnimationFrame(update);
@@ -443,8 +433,13 @@
 
       function draw() {
         ctx.fillStyle = '#0f5220'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = '#5c3a21'; ctx.lineWidth = 10;
-        ctx.strokeRect(5, 5, 310, 170);
+        ctx.strokeStyle = '#5c3a21'; ctx.lineWidth = 14;
+        ctx.strokeRect(7, 7, 306, 166);
+
+        pockets.forEach(p => {
+          ctx.fillStyle = '#000'; ctx.beginPath();
+          ctx.arc(p.x, p.y, 10, 0, Math.PI * 2); ctx.fill();
+        });
 
         balls.forEach(b => {
           ctx.fillStyle = b.color; ctx.beginPath();
@@ -453,9 +448,9 @@
         });
 
         if (Math.abs(cueBall.vx) < 0.1 && Math.abs(cueBall.vy) < 0.1) {
-          ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath();
+          ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.beginPath();
           ctx.moveTo(cueBall.x, cueBall.y);
-          ctx.lineTo(cueBall.x + Math.cos(aimAngle) * 40, cueBall.y + Math.sin(aimAngle) * 40);
+          ctx.lineTo(cueBall.x + Math.cos(aimAngle) * 50, cueBall.y + Math.sin(aimAngle) * 50);
           ctx.stroke();
         }
       }
