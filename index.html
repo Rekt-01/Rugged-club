@@ -103,6 +103,18 @@
     .opensea-poster:hover, .opensea-poster:active { background: rgba(32, 129, 226, 0.15); border-radius: 6px; }
     .opensea-poster::after { content: 'OPENSEA'; background: #2081e2; color: #fff; }
 
+    /* Relocated, styled LED bar ticker mounted naturally on the back wall above the bar counter */
+    .bar-ticker-board {
+      position: absolute; top: 44.5%; left: 16%; width: 15%; 
+      background: rgba(5, 5, 5, 0.9); border: 2px solid #1a2e1e; border-radius: 4px;
+      padding: 3px 6px; z-index: 2; display: none; align-items: center; justify-content: space-between;
+      box-shadow: inset 0 0 6px rgba(0, 255, 102, 0.2), 0 2px 5px rgba(0,0,0,0.8);
+      pointer-events: none; font-family: monospace; transform: rotate(-1deg);
+    }
+    .bar-ticker-board .ticker-label { font-size: 0.45rem; color: #00ff66; font-weight: bold; letter-spacing: 0.5px; }
+    .bar-ticker-board .ticker-price { font-size: 0.5rem; font-weight: bold; color: #00ff66; text-shadow: 0 0 5px #00ff66; }
+
+    /* Top header badge */
     .door-ape-sign {
       position: absolute; top: 12%; left: 50%; transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.85); border: 2px solid #00ff66; border-radius: 6px;
@@ -118,7 +130,6 @@
       z-index: 3; display: flex; perspective: 1500px; cursor: pointer;
     }
 
-    /* Tavern-Style Double Doors with Iron Studs & Panels */
     .door {
       width: 50%; height: 100%; 
       background: #1c1008;
@@ -136,7 +147,6 @@
     .door-left { transform-origin: left center; border-right: 6px solid #080402; }
     .door-right { transform-origin: right center; border-left: 6px solid #080402; }
 
-    /* Heavy Iron Framing & Rivets Effect */
     .door::before {
       content: ''; position: absolute; top: 15px; bottom: 15px; width: 20px;
       background: repeating-linear-gradient(180deg, #2b2b2b, #2b2b2b 40px, #111 41px, #111 60px);
@@ -145,7 +155,6 @@
     .door-left::before { right: 15px; }
     .door-right::before { left: 15px; }
 
-    /* Long Vertical Industrial Pull Bar */
     .handle {
       position: absolute; top: 50%; width: 14px; height: 140px;
       background: linear-gradient(135deg, #444, #111);
@@ -156,7 +165,6 @@
     .door-left .handle { right: 45px; }
     .door-right .handle { left: 45px; }
 
-    /* Neon Color-Shifting Prompt Near Bottom */
     .enter-prompt {
       position: absolute; bottom: 8%; left: 50%;
       transform: translateX(-50%);
@@ -183,6 +191,7 @@
     .viewport.open .door-ape-sign { opacity: 0; }
     .viewport.open .doors-container { pointer-events: none; }
     .viewport.open .hotspot { display: flex; }
+    .viewport.open .bar-ticker-board { display: flex; }
 
     .modal {
       display: none; position: fixed; top: 0; left: 0;
@@ -253,6 +262,12 @@
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
+    <!-- Integrated Bar Wall Ticker Board -->
+    <div class="bar-ticker-board">
+      <span class="ticker-label">$APE</span>
+      <span class="ticker-price" id="wallTickerPrice">...</span>
+    </div>
+
     <div class="door-ape-sign">
       <span class="sign-label">$APE PRICE:</span>
       <span class="sign-price" id="signApePrice">...</span>
@@ -293,10 +308,12 @@
           const formattedPrice = '$' + data.apecoin.usd.toFixed(2);
           document.getElementById('barApePrice').innerText = formattedPrice;
           document.getElementById('signApePrice').innerText = formattedPrice;
+          document.getElementById('wallTickerPrice').innerText = formattedPrice;
         }
       } catch (e) {
         document.getElementById('barApePrice').innerText = '$APE';
         document.getElementById('signApePrice').innerText = '$APE';
+        document.getElementById('wallTickerPrice').innerText = '$APE';
       }
     }
     updateApePrice();
