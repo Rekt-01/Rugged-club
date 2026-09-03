@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar</title>
+  <title>The Rugged Bar - v14</title>
   <style>
     * {
       box-sizing: border-box;
@@ -349,6 +349,7 @@
     </div>
   </div>
 
+  <!-- Terminal Modal v14 -->
   <div class="modal" id="terminalModal">
     <div class="modal-content terminal-style">
       <span class="close-btn" onclick="closeTerminal()">&times;</span>
@@ -386,7 +387,7 @@
       </div>
 
       <div class="nft-list-scroll" id="nftListContainer">
-        <div class="terminal-loading">Loading ApeChain NFTs...</div>
+        <div class="terminal-loading">Loading Top ApeChain NFTs...</div>
       </div>
 
       <a href="https://opensea.io/collections?chains=ape_chain" target="_blank" class="terminal-footer-btn">EXPLORE APECHAIN ON OPENSEA 🌊</a>
@@ -472,7 +473,6 @@
     updateApePrice();
     setInterval(updateApePrice, 30000);
 
-    // Live Radio Station Tuner Logic
     function tuneRadioStation() {
       const audioStream = document.getElementById('internetRadioStream');
       const select = document.getElementById('radioGenreSelect');
@@ -524,58 +524,50 @@
     async function openTerminal() {
       document.getElementById('terminalModal').style.display = 'flex';
       const container = document.getElementById('nftListContainer');
-      container.innerHTML = '<div class="terminal-loading">Scanning ApeChain Collections...</div>';
+      container.innerHTML = '<div class="terminal-loading">Fetching Top ApeChain NFTs...</div>';
 
-      // Targeting the correct collection slug array (including legods)
-      const collectionsToTry = ['legods', 'curtis-by-apecoin', 'dengs-apechain'];
-      let nfts = [];
-
-      for (let slug of collectionsToTry) {
-        try {
-          const res = await fetch(`https://api.opensea.io/api/v2/collection/${slug}/nfts?limit=10`, {
-            headers: {
-              'accept': 'application/json',
-              'x-api-key': OPENSEA_API_KEY
-            }
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.nfts && data.nfts.length > 0) {
-              nfts = data.nfts;
-              break;
-            }
+      try {
+        const res = await fetch('https://api.opensea.io/api/v2/chain/ape_chain/nfts?limit=10', {
+          headers: {
+            'accept': 'application/json',
+            'x-api-key': OPENSEA_API_KEY
           }
-        } catch (e) {}
-      }
-
-      if (nfts.length > 0) {
-        container.innerHTML = '';
-        nfts.slice(0, 10).forEach(nft => {
-          const name = nft.name || `#${nft.identifier}`;
-          const collection = nft.collection || 'ApeChain NFT';
-          const imageUrl = nft.image_url || nft.display_image_url || '';
-          const openseaUrl = nft.opensea_url || 'https://opensea.io/collections?chains=ape_chain';
-
-          const card = document.createElement('a');
-          card.className = 'nft-item-card';
-          card.href = openseaUrl;
-          card.target = '_blank';
-
-          card.innerHTML = `
-            <img class="nft-thumb" src="${imageUrl}" alt="NFT" onerror="this.src='clubhouse.JPG'">
-            <div class="nft-info">
-              <div class="nft-name">${name}</div>
-              <div class="nft-collection">${collection}</div>
-              <div class="nft-price-tag">View Item ↗</div>
-            </div>
-          `;
-          container.appendChild(card);
         });
-      } else {
+        
+        if (res.ok) {
+          const data = await res.json();
+          if (data.nfts && data.nfts.length > 0) {
+            container.innerHTML = '';
+            data.nfts.slice(0, 10).forEach(nft => {
+              const name = nft.name || `#${nft.identifier}`;
+              const collection = nft.collection || 'ApeChain Top NFT';
+              const imageUrl = nft.image_url || nft.display_image_url || '';
+              const openseaUrl = nft.opensea_url || 'https://opensea.io/collections?chains=ape_chain';
+
+              const card = document.createElement('a');
+              card.className = 'nft-item-card';
+              card.href = openseaUrl;
+              card.target = '_blank';
+
+              card.innerHTML = `
+                <img class="nft-thumb" src="${imageUrl}" alt="NFT" onerror="this.src='clubhouse.JPG'">
+                <div class="nft-info">
+                  <div class="nft-name">${name}</div>
+                  <div class="nft-collection">${collection}</div>
+                  <div class="nft-price-tag">View Item ↗</div>
+                </div>
+              `;
+              container.appendChild(card);
+            });
+            return;
+          }
+        }
+        throw new Error('No items returned');
+      } catch (e) {
         container.innerHTML = `
           <div style="text-align: center; padding: 25px; font-size: 0.7rem; color: #00ff66;">
-            <p>OpenSea ApeChain Link Secure</p>
-            <p style="color: #aaa; margin-top: 6px;">Click the button below to view all live collections directly.</p>
+            <p>OpenSea ApeChain Live Feed Secure</p>
+            <p style="color: #aaa; margin-top: 6px;">Click below to browse all top-ranking collections directly on OpenSea.</p>
           </div>
         `;
       }
@@ -608,8 +600,17 @@
 
     function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
-      let pacman = { x: 30, y: 30, radius: 7.5, dirX: 0, dirY: 0, speed: 1.2 };
-      let ghost = { x: 150, y: 130, radius: 7.5, dirX: 0, dirY: -1, speed: 0.8, color: '#ff0000' };
+      let pacman = { x: 160, y: 160, radius: 10, dirX: 1, dirY: 0, speed: 1.5 };
+      let ghosts = [
+        { x: 40, y: 40, color: '#ff0000', dx: 1, dy: 0, speed: 1 },
+        { x: 280, y: 280, color: '#00ffff', dx: -1, dy: 0, speed: 1 }
+      ];
+      let dots = [];
+      for(let i=40; i<=280; i+=40) {
+        for(let j=40; j<=280; j+=40) {
+          dots.push({x: i, y: j, eaten: false});
+        }
+      }
 
       controlsContainer.innerHTML = `
         <div class="dpad-row"><div class="btn-ctrl" onmousedown="startPac(event, 0,-1)" ontouchstart="startPac(event, 0,-1)">▲</div></div>
@@ -620,14 +621,48 @@
         </div>
       `;
 
-      window.startPac = (e, dx, dy) => { if(e)e.preventDefault(); pacman.dirX=dx; pacman.dirY=dy; };
+      window.startPac = (e, dx, dy) => { if(e) e.preventDefault(); pacman.dirX = dx; pacman.dirY = dy; };
 
       function update() {
-        pacman.x += pacman.dirX * pacman.speed; pacman.y += pacman.dirY * pacman.speed;
-        ghost.x += ghost.dirX * ghost.speed; ghost.y += ghost.dirY * ghost.speed;
+        pacman.x += pacman.dirX * pacman.speed;
+        pacman.y += pacman.dirY * pacman.speed;
+        if(pacman.x < 10) pacman.x = 310;
+        if(pacman.x > 310) pacman.x = 10;
+        if(pacman.y < 10) pacman.y = 310;
+        if(pacman.y > 310) pacman.y = 10;
+
+        ghosts.forEach(g => {
+          g.x += g.dx * g.speed;
+          g.y += g.dy * g.speed;
+          if(Math.random() < 0.05) {
+            const dirs = [{dx:1, dy:0}, {dx:-1, dy:0}, {dx:0, dy:1}, {dx:0, dy:-1}];
+            const d = dirs[Math.floor(Math.random()*dirs.length)];
+            g.dx = d.dx; g.dy = d.dy;
+          }
+          if(g.x < 10 || g.x > 310) g.dx *= -1;
+          if(g.y < 10 || g.y > 310) g.dy *= -1;
+        });
+
+        dots.forEach(d => {
+          if(!d.eaten && Math.hypot(pacman.x - d.x, pacman.y - d.y) < 12) {
+            d.eaten = true;
+          }
+        });
+
         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        dots.forEach(d => {
+          if(!d.eaten) {
+            ctx.fillStyle = '#ffb8ae'; ctx.beginPath(); ctx.arc(d.x, d.y, 3, 0, Math.PI*2); ctx.fill();
+          }
+        });
+
         ctx.fillStyle = '#ffe600'; ctx.beginPath(); ctx.arc(pacman.x, pacman.y, pacman.radius, 0.2, 2 * Math.PI - 0.2); ctx.fill();
-        ctx.fillStyle = ghost.color; ctx.beginPath(); ctx.arc(ghost.x, ghost.y, ghost.radius, 0, Math.PI * 2); ctx.fill();
+
+        ghosts.forEach(g => {
+          ctx.fillStyle = g.color; ctx.beginPath(); ctx.arc(g.x, g.y, pacman.radius, 0, Math.PI * 2); ctx.fill();
+        });
+
         activeGameLoop = requestAnimationFrame(update);
       }
       update();
@@ -635,15 +670,57 @@
 
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
-      controlsContainer.innerHTML = `<button class="btn-shoot" onclick="shootCue()">SHOOT SHOT!</button>`;
-      window.shootCue = () => {};
+      let cueBall = { x: 80, y: 90, vx: 0, vy: 0, radius: 6 };
+      let targetBall = { x: 220, y: 90, radius: 6, active: true };
+      let power = 0;
+      let aiming = true;
+
+      controlsContainer.innerHTML = `
+        <button class="btn-shoot" id="poolPowerBtn" onmousedown="chargePool()" ontouchstart="chargePool()" onmouseup="releasePool()" ontouchend="releasePool()">HOLD TO CHARGE</button>
+      `;
+
+      window.chargePool = () => { if(aiming) power = Math.min(power + 0.4, 12); };
+      window.releasePool = () => {
+        if(aiming && power > 0) {
+          cueBall.vx = power;
+          cueBall.vy = (Math.random() - 0.5) * 2;
+          aiming = false;
+          power = 0;
+        }
+      };
+
       function update() {
+        cueBall.x += cueBall.vx;
+        cueBall.y += cueBall.vy;
+        cueBall.vx *= 0.98;
+        cueBall.vy *= 0.98;
+
+        if(cueBall.x < 15 || cueBall.x > 305) cueBall.vx *= -1;
+        if(cueBall.y < 15 || cueBall.y > 165) cueBall.vy *= -1;
+
+        if(targetBall.active && Math.hypot(cueBall.x - targetBall.x, cueBall.y - targetBall.y) < 12) {
+          targetBall.active = false;
+        }
+
         ctx.fillStyle = '#0f5220'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#2d1505'; ctx.lineWidth = 8; ctx.strokeRect(4, 4, 312, 172);
+
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(cueBall.x, cueBall.y, cueBall.radius, 0, Math.PI*2); ctx.fill();
+
+        if(targetBall.active) {
+          ctx.fillStyle = '#ffcc00'; ctx.beginPath(); ctx.arc(targetBall.x, targetBall.y, targetBall.radius, 0, Math.PI*2); ctx.fill();
+        }
+
+        if(Math.hypot(cueBall.vx, cueBall.vy) < 0.2 && !aiming) {
+          aiming = true;
+          cueBall.x = 80; cueBall.y = 90; cueBall.vx = 0; cueBall.vy = 0;
+          targetBall.active = true;
+        }
+
         activeGameLoop = requestAnimationFrame(update);
       }
       update();
     }
   </script>
-
 </body>
 </html>
