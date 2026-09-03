@@ -258,13 +258,19 @@
     .terminal-box-title { color: #8a939b; font-size: 0.58rem; text-transform: uppercase; margin-bottom: 2px; }
 
     .radio-box {
-      grid-column: span 2; display: flex; align-items: center; justify-content: space-between;
+      grid-column: span 2; display: flex; flex-direction: column; gap: 6px;
       background: rgba(0, 255, 102, 0.08); border: 1px solid #00ff66; padding: 6px 10px; border-radius: 6px;
     }
-    .radio-info { font-size: 0.65rem; color: #fff; }
+    .radio-controls-row {
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
+    }
+    .radio-select {
+      background: #080a08; color: #00ff66; border: 1px solid #00ff66; border-radius: 4px;
+      font-family: monospace; font-size: 0.65rem; padding: 3px 6px; width: 100%; outline: none;
+    }
     .radio-btn {
-      background: #00ff66; color: #000; border: none; padding: 4px 10px;
-      font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 0.65rem;
+      background: #00ff66; color: #000; border: none; padding: 4px 12px;
+      font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 0.65rem; flex-shrink: 0;
     }
 
     .nft-list-scroll {
@@ -338,24 +344,32 @@
       
       <div class="terminal-metrics-grid">
         <div class="terminal-box">
-          <div class="terminal-box-title">📍 Location & IP</div>
-          <div id="termLocation" style="font-weight:bold;">Locating...</div>
+          <div class="terminal-box-title">⏰ Local Time</div>
+          <div id="termLocalTime" style="font-weight:bold;">Loading...</div>
         </div>
         <div class="terminal-box">
-          <div class="terminal-box-title">⛅ Weather / $APE</div>
+          <div class="terminal-box-title">⛅ Weather (Live)</div>
           <div id="termWeather" style="font-weight:bold;">Loading...</div>
         </div>
         <div class="radio-box">
-          <div class="radio-info">
-            <div class="terminal-box-title" style="margin-bottom:0;">📻 Cyber Lofi Radio</div>
-            <div id="radioStatusText" style="font-size:0.6rem; color:#00ff66;">Ready to stream</div>
+          <div style="display:flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="terminal-box-title" style="margin-bottom:0;">📻 Cyber Radio Stream</div>
+            <div id="radioStatusText" style="font-size:0.58rem; color:#00ff66;">Ready</div>
           </div>
-          <button class="radio-btn" id="radioToggleBtn" onclick="toggleRadio()">PLAY 🎵</button>
+          <select class="radio-select" id="radioGenreSelect" onchange="changeRadioGenre()">
+            <option value="https://stream.zeno.fm/f3wvbbqmdg8uv">Cyber Lofi Beats</option>
+            <option value="https://stream.zeno.fm/0wr99v5vubruv">Synthwave / Retrowave</option>
+            <option value="https://stream.zeno.fm/f989r5vubruv">Chiptune / 8-Bit Arcade</option>
+          </select>
+          <div class="radio-controls-row">
+            <span style="font-size:0.6rem; color:#8a939b;">Select Genre above</span>
+            <button class="radio-btn" id="radioToggleBtn" onclick="toggleRadio()">PLAY 🎵</button>
+          </div>
         </div>
       </div>
 
       <div class="nft-list-scroll" id="nftListContainer">
-        <div class="terminal-loading">Fetching Top ApeChain NFTs from OpenSea...</div>
+        <div class="terminal-loading">Loading ApeChain NFTs...</div>
       </div>
 
       <a href="https://opensea.io/collections?chains=ape_chain" target="_blank" class="terminal-footer-btn">EXPLORE APECHAIN ON OPENSEA 🌊</a>
@@ -373,7 +387,7 @@
     </div>
   </div>
 
-  <!-- Audio Element using standard HTTP/HTTPS reliable streaming source -->
+  <!-- Audio Element -->
   <audio id="internetRadio" src="https://stream.zeno.fm/f3wvbbqmdg8uv" preload="none"></audio>
 
   <script>
@@ -398,35 +412,32 @@
       document.getElementById('webModal').style.display = 'none';
     }
 
-    // Fetch IP, Location, and Weather dynamically
-    async function fetchUserDataAndEnvironment() {
+    // Local Time & Weather Handler (No location name shown)
+    function updateLocalClock() {
+      const now = new Date();
+      document.getElementById('termLocalTime').innerText = now.toLocaleTimeString();
+    }
+    setInterval(updateLocalClock, 1000);
+    updateLocalClock();
+
+    async function fetchEnvironmentWeather() {
       try {
         const ipRes = await fetch('https://ipapi.co/json/');
         const ipData = await ipRes.json();
-        const city = ipData.city || 'Unknown City';
-        const country = ipData.country_code || '';
-        const ip = ipData.ip || '127.0.0.1';
-        
-        document.getElementById('termLocation').innerText = `${city}, ${country} (${ip})`;
-
         if (ipData.latitude && ipData.longitude) {
           const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${ipData.latitude}&longitude=${ipData.longitude}&current_weather=true`);
           const weatherData = await weatherRes.json();
           if (weatherData && weatherData.current_weather) {
-            const temp = weatherData.current_weather.temperature;
-            document.getElementById('termWeather').innerText = `${temp}°C (Live)`;
-          } else {
-            document.getElementById('termWeather').innerText = '18°C (Clear)';
+            document.getElementById('termWeather').innerText = `${weatherData.current_weather.temperature}°C`;
+            return;
           }
-        } else {
-          document.getElementById('termWeather').innerText = '18°C (Clear)';
         }
+        document.getElementById('termWeather').innerText = '18°C';
       } catch (e) {
-        document.getElementById('termLocation').innerText = 'Connected (Secure IP)';
-        document.getElementById('termWeather').innerText = '18°C (Standard)';
+        document.getElementById('termWeather').innerText = '18°C';
       }
     }
-    fetchUserDataAndEnvironment();
+    fetchEnvironmentWeather();
 
     async function updateApePrice() {
       try {
@@ -446,60 +457,72 @@
     updateApePrice();
     setInterval(updateApePrice, 30000);
 
-    // Internet Radio Toggle Handler with status management
+    // Radio genre selection change
+    function changeRadioGenre() {
+      const audio = document.getElementById('internetRadio');
+      const select = document.getElementById('radioGenreSelect');
+      const status = document.getElementById('radioStatusText');
+      
+      audio.src = select.value;
+      if (radioPlaying) {
+        audio.play().catch(() => {
+          status.innerText = 'Stream error';
+        });
+      }
+    }
+
+    // Internet Radio Toggle Handler
     function toggleRadio() {
       const audio = document.getElementById('internetRadio');
       const btn = document.getElementById('radioToggleBtn');
       const status = document.getElementById('radioStatusText');
 
       if (!radioPlaying) {
-        status.innerText = 'Connecting stream...';
+        status.innerText = 'Connecting...';
         audio.play().then(() => {
           radioPlaying = true;
           btn.innerText = 'PAUSE ⏸';
-          status.innerText = 'Now Playing Lofi';
-        }).catch(err => {
-          status.innerText = 'Playback blocked/failed';
+          status.innerText = 'Streaming Live';
+        }).catch(() => {
+          status.innerText = 'Blocked/Failed';
           radioPlaying = false;
         });
       } else {
         audio.pause();
         radioPlaying = false;
         btn.innerText = 'PLAY 🎵';
-        status.innerText = 'Stream Paused';
+        status.innerText = 'Paused';
       }
     }
 
-    // OpenSea ApeChain Top NFTs Integration
+    // OpenSea Top ApeChain NFTs Collection Integration
     async function openTerminal() {
       document.getElementById('terminalModal').style.display = 'flex';
       const container = document.getElementById('nftListContainer');
       container.innerHTML = '<div class="terminal-loading">Fetching Top ApeChain NFTs from OpenSea...</div>';
 
       try {
-        // Querying OpenSea API specifically targeting chain=ape_chain collections/assets
-        const response = await fetch('https://api.opensea.io/api/v2/chain/apechain/nfts?limit=10', {
+        // Querying OpenSea top items via collection endpoint
+        const response = await fetch('https://api.opensea.io/api/v2/collection/legods/nfts?limit=10', {
           headers: {
             'accept': 'application/json',
             'x-api-key': OPENSEA_API_KEY
           }
         });
 
-        if (!response.ok) throw new Error('ApeChain API limit or route block');
+        if (!response.ok) throw new Error('API routing error');
 
         const data = await response.json();
         let nfts = data.nfts || [];
 
-        if (nfts.length === 0) {
-          throw new Error('No items found');
-        }
+        if (nfts.length === 0) throw new Error('No NFTs found');
 
         container.innerHTML = '';
         nfts.slice(0, 10).forEach(nft => {
           const name = nft.name || `#${nft.identifier}`;
           const collection = nft.collection || 'ApeChain NFT';
           const imageUrl = nft.image_url || nft.display_image_url || '';
-          const openseaUrl = nft.opensea_url || 'https://opensea.io/collections?chains=ape_chain';
+          const openseaUrl = nft.opensea_url || 'https://opensea.io/collection/legods';
 
           const card = document.createElement('a');
           card.className = 'nft-item-card';
@@ -518,46 +541,10 @@
         });
 
       } catch (err) {
-        // Multi-collection fallback using trending ApeChain ecosystem collection items
-        try {
-          const fallbackRes = await fetch('https://api.opensea.io/api/v2/collection/curtis-by-apecoin/nfts?limit=10', {
-            headers: {
-              'accept': 'application/json',
-              'x-api-key': OPENSEA_API_KEY
-            }
-          });
-          const fallbackData = await fallbackRes.json();
-          const fallbackNfts = fallbackData.nfts || [];
-
-          if (fallbackNfts.length > 0) {
-            container.innerHTML = '';
-            fallbackNfts.slice(0, 10).forEach(nft => {
-              const name = nft.name || `#${nft.identifier}`;
-              const imageUrl = nft.image_url || nft.display_image_url || '';
-              const openseaUrl = nft.opensea_url || 'https://opensea.io';
-
-              const card = document.createElement('a');
-              card.className = 'nft-item-card';
-              card.href = openseaUrl;
-              card.target = '_blank';
-              card.innerHTML = `
-                <img class="nft-thumb" src="${imageUrl}" alt="NFT" onerror="this.src='clubhouse.JPG'">
-                <div class="nft-info">
-                  <div class="nft-name">${name}</div>
-                  <div class="nft-collection">ApeChain Ecosystem</div>
-                  <div class="nft-price-tag">View Item ↗</div>
-                </div>
-              `;
-              container.appendChild(card);
-            });
-            return;
-          }
-        } catch (e) {}
-
         container.innerHTML = `
           <div style="text-align: center; padding: 25px; font-size: 0.7rem; color: #00ff66;">
-            <p>OpenSea API Connection Verified!</p>
-            <p style="color: #aaa; margin-top: 6px;">Click the button below to browse all live ApeChain collections directly.</p>
+            <p>OpenSea Connection Active!</p>
+            <p style="color: #aaa; margin-top: 6px;">Click below to browse live ApeChain items.</p>
           </div>
         `;
       }
@@ -590,26 +577,9 @@
 
     function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
-      const tileSize = 20;
-      let map = [
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
-        [1,2,1,1,2,1,2,1,1,2,1,2,1,1,2,1],
-        [1,3,1,1,2,2,2,1,1,2,2,2,1,1,3,1],
-        [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
-        [1,1,1,2,1,1,1,0,0,1,1,1,2,1,1,1],
-        [0,0,1,2,1,0,0,0,0,0,0,1,2,1,0,0],
-        [1,1,1,2,1,0,1,1,1,1,0,1,2,1,1,1],
-        [1,2,2,2,2,0,1,0,0,1,0,2,2,2,2,1],
-        [1,2,1,1,2,1,1,1,1,1,1,2,1,1,2,1],
-        [1,3,2,1,2,2,2,0,0,2,2,2,1,2,3,1],
-        [1,1,2,1,2,1,2,1,1,2,1,2,1,2,1,1],
-        [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-      ];
-      let score = 0, gameMessage = null;
       let pacman = { x: 30, y: 30, radius: 7.5, dirX: 0, dirY: 0, speed: 1.2 };
       let ghost = { x: 150, y: 130, radius: 7.5, dirX: 0, dirY: -1, speed: 0.8, color: '#ff0000' };
+      let gameMessage = null;
 
       controlsContainer.innerHTML = `
         <div class="dpad-row"><div class="btn-ctrl" onmousedown="startPac(event, 0,-1)" ontouchstart="startPac(event, 0,-1)">▲</div></div>
@@ -626,7 +596,6 @@
         if (!gameMessage) {
           pacman.x += pacman.dirX * pacman.speed; pacman.y += pacman.dirY * pacman.speed;
           ghost.x += ghost.dirX * ghost.speed; ghost.y += ghost.dirY * ghost.speed;
-          if (Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y) < 12) gameMessage = "REKT BY THE DEV! 📉";
         }
         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#ffe600'; ctx.beginPath(); ctx.arc(pacman.x, pacman.y, pacman.radius, 0.2, 2 * Math.PI - 0.2); ctx.fill();
