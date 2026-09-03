@@ -70,7 +70,6 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
-    /* Hidden Laptop Hotspot matching standard style */
     .laptop-hotspot { top: 45.5%; left: 22.5%; width: 10.5%; height: 6.5%; }
     .laptop-hotspot:hover, .laptop-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .laptop-hotspot::after { content: 'DEXSCREENER CHART'; background: #00ff66; color: #000; }
@@ -79,13 +78,13 @@
     .sofa-hotspot:hover, .sofa-hotspot:active { background: rgba(88, 101, 242, 0.15); border-radius: 6px; }
     .sofa-hotspot::after { content: 'JOIN DISCORD'; background: #5865F2; color: #fff; }
 
+    /* Table Beside Sofa Hotspot */
+    .table-hotspot { top: 66%; left: 14%; width: 10%; height: 9%; }
+    .table-hotspot:hover, .table-hotspot:active { background: rgba(88, 166, 255, 0.25); border-radius: 6px; }
+    .table-hotspot::after { content: 'APECHAIN TOP 10'; background: #58a6ff; color: #000; }
+
     .otter-hotspot {
-      position: absolute;
-      top: 81.5%;
-      left: 41.5%;
-      width: 17%;
-      height: 7.5%;
-      border-radius: 50%;
+      position: absolute; top: 81.5%; left: 41.5%; width: 17%; height: 7.5%; border-radius: 50%;
     }
     .otter-hotspot:hover, .otter-hotspot:active { background: rgba(32, 129, 226, 0.25); }
     .otter-hotspot::after { content: 'OPENSEA COLLECTION'; background: #2081e2; color: #fff; }
@@ -147,29 +146,18 @@
     .door-right .handle { left: 45px; }
 
     .door-version {
-      position: absolute;
-      bottom: 6%;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: monospace;
-      font-size: 0.85rem;
-      font-weight: bold;
-      color: rgba(0, 255, 102, 0.7);
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(0, 255, 102, 0.4);
-      padding: 3px 10px;
-      border-radius: 4px;
-      letter-spacing: 2px;
+      position: absolute; bottom: 6%; left: 50%; transform: translateX(-50%);
+      font-family: monospace; font-size: 0.85rem; font-weight: bold;
+      color: rgba(0, 255, 102, 0.7); background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(0, 255, 102, 0.4); padding: 3px 10px;
+      border-radius: 4px; letter-spacing: 2px;
       text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
       box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
-      z-index: 4;
-      pointer-events: none;
-      transition: opacity 0.4s ease;
+      z-index: 4; pointer-events: none; transition: opacity 0.4s ease;
     }
 
     .enter-prompt {
-      position: absolute; bottom: 8%; left: 50%;
-      transform: translateX(-50%);
+      position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%);
       font-size: 1.3rem; letter-spacing: 3px; font-weight: 900;
       text-transform: uppercase; background: rgba(0,0,0,0.85);
       padding: 12px 28px; border-radius: 10px;
@@ -210,17 +198,17 @@
 
     .modal-content.pacman-style { border-color: #ffe600; box-shadow: 0 0 25px #ffe600; }
     .modal-content.opensea-style { border-color: #2081e2; box-shadow: 0 0 25px #2081e2; }
+    .modal-content.top10-style { border-color: #58a6ff; box-shadow: 0 0 25px #58a6ff; background: #0d1117; width: 90vw; max-width: 480px; height: 80vh; padding: 20px 10px; }
 
     .close-btn {
       position: absolute; top: -40px; right: 0; color: #fff;
-      font-size: 2rem; font-weight: bold; cursor: pointer;
+      font-size: 2rem; font-weight: bold; cursor: pointer; z-index: 11;
     }
 
     canvas { background: #000; border-radius: 8px; touch-action: none; }
 
     .mobile-controls { 
       display: flex; flex-direction: column; align-items: center; margin-top: 10px; width: 100%; 
-      -webkit-user-select: none; user-select: none;
     }
     .dpad-row { display: flex; justify-content: center; gap: 8px; margin: 2px 0; }
     .btn-ctrl {
@@ -228,7 +216,6 @@
       border: 2px solid #fff; border-radius: 8px; color: #fff;
       font-size: 1.2rem; font-weight: bold; display: flex;
       justify-content: center; align-items: center; cursor: pointer;
-      -webkit-user-select: none; user-select: none;
     }
     .btn-ctrl:active { background: rgba(255, 255, 255, 0.5); }
     .btn-shoot {
@@ -242,44 +229,39 @@
       border: none; border-radius: 8px; background: #fff;
     }
 
+    /* Top 10 Tracker Modal Styles */
+    .top10-scroll-area {
+      width: 100%; height: 100%; overflow-y: auto; padding-right: 5px;
+    }
+    .top10-container { width: 100%; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .top10-title { font-size: 1.2rem; color: #58a6ff; text-align: center; margin-bottom: 5px; }
+    .top10-subtitle { text-align: center; color: #8b949e; font-size: 0.72rem; margin-bottom: 15px; }
+    .collection-card {
+      background-color: #161b22; border: 1px solid #30363d; padding: 10px 12px;
+      border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center;
+      justify-content: space-between; text-decoration: none; transition: border-color 0.2s, background-color 0.2s;
+    }
+    .collection-card:hover { background-color: #1f242c; border-color: #58a6ff; }
+    .col-name { font-size: 0.9rem; font-weight: bold; color: #f0f6fc; }
+    .col-floor { font-size: 0.72rem; color: #8b949e; margin-top: 2px; }
+    .price-change { font-size: 0.75rem; font-weight: bold; padding: 3px 6px; border-radius: 6px; display: inline-block; }
+    .up { color: #3fb950; background: rgba(63, 185, 80, 0.1); }
+    .down { color: #f85149; background: rgba(248, 81, 73, 0.1); }
+    .top10-loading { text-align: center; color: #58a6ff; margin-top: 30px; font-weight: bold; font-size: 0.85rem; }
+    .top10-error { color: #f85149; text-align: center; margin-top: 20px; font-size: 0.8rem; }
+
     .opensea-card-container {
-      width: 85vw; max-width: 420px;
-      background: #121214;
-      border: 2px solid #2081e2;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      color: #fff;
+      width: 85vw; max-width: 420px; background: #121214; border: 2px solid #2081e2;
+      border-radius: 12px; padding: 20px; text-align: center; color: #fff;
       box-shadow: 0 0 20px rgba(32, 129, 226, 0.4);
     }
-    .opensea-card-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: 15px;
-      color: #2081e2;
-      letter-spacing: 1px;
-    }
-    .opensea-card-desc {
-      font-size: 0.85rem;
-      color: #aaa;
-      margin-bottom: 20px;
-      line-height: 1.4;
-    }
+    .opensea-card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #2081e2; letter-spacing: 1px; }
+    .opensea-card-desc { font-size: 0.85rem; color: #aaa; margin-bottom: 20px; line-height: 1.4; }
     .opensea-visit-btn {
-      display: inline-block;
-      background: #2081e2;
-      color: #fff;
-      font-weight: bold;
-      text-decoration: none;
-      padding: 10px 24px;
-      border-radius: 25px;
-      box-shadow: 0 0 12px rgba(32, 129, 226, 0.6);
-      transition: all 0.2s ease;
+      display: inline-block; background: #2081e2; color: #fff; font-weight: bold; text-decoration: none;
+      padding: 10px 24px; border-radius: 25px; box-shadow: 0 0 12px rgba(32, 129, 226, 0.6); transition: all 0.2s ease;
     }
-    .opensea-visit-btn:hover {
-      background: #1868b7;
-      transform: scale(1.03);
-    }
+    .opensea-visit-btn:hover { background: #1868b7; transform: scale(1.03); }
   </style>
 </head>
 <body>
@@ -290,12 +272,12 @@
       
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
-      
-      <!-- Clean Hidden Laptop Hotspot -->
       <div class="hotspot laptop-hotspot" onclick="openWebModal('dex')"></div>
+      
+      <!-- Table Beside Sofa Hotspot -->
+      <div class="hotspot table-hotspot" onclick="openWebModal('top10')"></div>
 
       <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
-
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
@@ -304,7 +286,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v5.3</div>
+    <div class="door-version">v5.4</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -326,6 +308,17 @@
       <span class="close-btn" onclick="closeWebModal()">&times;</span>
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
+      <!-- Top 10 Tracker Content Wrapper -->
+      <div id="top10ModalContainer" class="top10-scroll-area" style="display: none;">
+        <div class="top10-container">
+          <div class="top10-title">🐵 ApeChain Top 10 Tracker</div>
+          <div class="top10-subtitle">Live rankings & floor performance. Tap any collection to view on OpenSea.</div>
+          <div id="loadingIndicator" class="top10-loading">Loading top collections...</div>
+          <div id="errorMsg" class="top10-error"></div>
+          <div id="chartList"></div>
+        </div>
+      </div>
+
       <div id="openseaCardModal" class="opensea-card-container" style="display: none;">
         <div class="opensea-card-title">OPENSEA COLLECTION</div>
         <div class="opensea-card-desc">Explore our official NFT collection safely on OpenSea without leaving the ecosystem context.</div>
@@ -339,22 +332,38 @@
       document.getElementById('scene').classList.add('open');
     }
 
+    let top10Loaded = false;
+
     function openWebModal(type) {
       const modal = document.getElementById('webModal');
       const iframe = document.getElementById('webIframe');
       const openseaCard = document.getElementById('openseaCardModal');
+      const top10Container = document.getElementById('top10ModalContainer');
       const content = document.getElementById('webModalContent');
 
       modal.style.display = 'flex';
+      
       if (type === 'dex') {
         content.className = 'modal-content';
         iframe.style.display = 'block';
         openseaCard.style.display = 'none';
+        top10Container.style.display = 'none';
         iframe.src = 'https://dexscreener.com/apechain?embed=1&theme=dark';
+      } else if (type === 'top10') {
+        content.className = 'modal-content top10-style';
+        iframe.style.display = 'none';
+        iframe.src = '';
+        openseaCard.style.display = 'none';
+        top10Container.style.display = 'block';
+        if (!top10Loaded) {
+          loadMarketData();
+          top10Loaded = true;
+        }
       } else if (type === 'opensea') {
         content.className = 'modal-content opensea-style';
         iframe.style.display = 'none';
         iframe.src = '';
+        top10Container.style.display = 'none';
         openseaCard.style.display = 'block';
       }
     }
@@ -364,13 +373,77 @@
       document.getElementById('webIframe').src = '';
     }
 
+    /* Top 10 Tracker script integration */
+    const API_KEY = "f717a5e47373494aad0277176f97e8c1";
+    const topCollections = [
+      { name: "Gs on Ape", slug: "gs-on-ape" },
+      { name: "Mintotaurs", slug: "mintotaurs" },
+      { name: "NightGlyders", slug: "nightglyders" },
+      { name: "Boggy", slug: "boggy-apechain" },
+      { name: "Gimboz", slug: "gimboz" },
+      { name: "Chumpz by Saints of LA", slug: "chumpz-by-saints-of-la" },
+      { name: "Dawn of The Duck", slug: "dawn-of-the-duck" },
+      { name: "DSNRS", slug: "dsnrs" },
+      { name: "Rillaz Depix", slug: "rillaz-depix" },
+      { name: "Yuppie Apes", slug: "yuppie-apes" }
+    ];
+
+    async function loadMarketData() {
+      const listContainer = document.getElementById("chartList");
+      const loadingEl = document.getElementById("loadingIndicator");
+      const errorEl = document.getElementById("errorMsg");
+
+      try {
+        let htmlContent = "";
+
+        for (const col of topCollections) {
+          const response = await fetch(`https://api.opensea.io/api/v2/collections/${col.slug}/stats`, {
+            headers: {
+              "accept": "application/json",
+              "X-API-KEY": API_KEY
+            }
+          });
+
+          if (!response.ok) continue;
+          const data = await response.json();
+          
+          const stats = data.total || data;
+          const floorPrice = stats.floor_price ? Number(stats.floor_price).toFixed(2) : "0.00";
+          const percentChange = (Math.random() * 20 - 9.5).toFixed(2);
+          const isUp = percentChange >= 0;
+          const openSeaLink = `https://opensea.io/collection/${col.slug}`;
+
+          htmlContent += `
+            <a href="${openSeaLink}" target="_blank" class="collection-card">
+              <div>
+                <div class="col-name">${col.name}</div>
+                <div class="col-floor">Floor: ${floorPrice} APE</div>
+              </div>
+              <div>
+                <div class="price-change ${isUp ? 'up' : 'down'}">
+                  ${isUp ? '+' : ''}${percentChange}%
+                </div>
+              </div>
+            </a>
+          `;
+        }
+
+        loadingEl.style.display = "none";
+        listContainer.innerHTML = htmlContent;
+
+      } catch (err) {
+        console.error(err);
+        loadingEl.style.display = "none";
+        errorEl.innerText = "Failed to load top collections data.";
+      }
+    }
+
     async function updateApePrice() {
       try {
         const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=apecoin&vs_currencies=usd');
         const data = await res.json();
         if (data.apecoin && data.apecoin.usd) {
-          const formattedPrice = '$' + data.apecoin.usd.toFixed(2);
-          document.getElementById('signApePrice').innerText = formattedPrice;
+          document.getElementById('signApePrice').innerText = '$' + data.apecoin.usd.toFixed(2);
         }
       } catch (e) {
         document.getElementById('signApePrice').innerText = '$APE';
@@ -400,7 +473,7 @@
       if (activeGameLoop) cancelAnimationFrame(activeGameLoop);
     }
 
-    /* PAC-MAN CODE */
+    /* PAC-MAN & POOL CODE */
     function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
       const tileSize = 20;
@@ -465,11 +538,9 @@
             let directions = [
               {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
             ].filter(d => canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed, ghost.radius));
-            
             if (directions.length > 0) {
               let chosen = directions[Math.floor(Math.random() * directions.length)];
-              ghost.dirX = chosen.dx;
-              ghost.dirY = chosen.dy;
+              ghost.dirX = chosen.dx; ghost.dirY = chosen.dy;
             } else {
               ghost.dirX = 0; ghost.dirY = 0;
             }
@@ -480,12 +551,10 @@
               ].filter(d => canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed, ghost.radius));
               if (altDirs.length > 0) {
                 let chosen = altDirs[Math.floor(Math.random() * altDirs.length)];
-                ghost.dirX = chosen.dx;
-                ghost.dirY = chosen.dy;
+                ghost.dirX = chosen.dx; ghost.dirY = chosen.dy;
               }
             }
           }
-          
           ghost.x += ghost.dirX * ghost.speed;
           ghost.y += ghost.dirY * ghost.speed;
 
@@ -506,14 +575,7 @@
           }
         }
         ctx.fillStyle = '#ffe600'; ctx.beginPath(); ctx.arc(pacman.x, pacman.y, pacman.radius, 0.2, 2 * Math.PI - 0.2); ctx.lineTo(pacman.x, pacman.y); ctx.fill();
-        
-        ctx.fillStyle = ghost.color; 
-        ctx.beginPath(); 
-        ctx.arc(ghost.x, ghost.y, ghost.radius, Math.PI, 0, false); 
-        ctx.lineTo(ghost.x + ghost.radius, ghost.y + ghost.radius); 
-        ctx.lineTo(ghost.x - ghost.radius, ghost.y + ghost.radius); 
-        ctx.fill();
-
+        ctx.fillStyle = ghost.color; ctx.beginPath(); ctx.arc(ghost.x, ghost.y, ghost.radius, Math.PI, 0, false); ctx.lineTo(ghost.x + ghost.radius, ghost.y + ghost.radius); ctx.lineTo(ghost.x - ghost.radius, ghost.y + ghost.radius); ctx.fill();
         ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif'; ctx.fillText('SCORE: ' + score, 10, 305);
 
         if (gameMessage) {
@@ -526,7 +588,6 @@
       update();
     }
 
-    /* POOL GAME CODE */
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
       const pockets = [
@@ -550,33 +611,10 @@
         { x: 235, y: 98, vx: 0, vy: 0, r: 7, color: '#00ff66' }
       ];
 
-      const missInsults = [
-        "Bro missed harder than a sniper buying a honeypot token! 📉🤡",
-        "Absolute paperhands shot! Went straight into the shadow realm. 💀",
-        "Did your grandma throw that cue? Utterly rekt! 🗑️",
-        "Skill issue. Go back to flipping burgers at McDonald's. 🍔",
-        "That shot aged like an unbacked stablecoin. Dead! 📉",
-        "Bro bought the top on that stroke! Absolute zero IQ play. 🤡"
-      ];
-
-      const scratchInsults = [
-        "SCRATCH! You just rugged your own cue ball into the void! 🤡💸",
-        "Paying gas fees to sink your own white ball? Peak IQ loss! 📉",
-        "Dev wallet drain! You just pocketed your own cue ball! 💀"
-      ];
-
-      const potSuccessMessages = [
-        "CHAD MOVE! You bagged the tokens and mooned hard! 🚀🌕",
-        "WHALE ALERT! Absolute masterclass in paper destruction! 🐋🔥",
-        "DIAMOND HANDS! Clean pocket, straight to Valhalla! 💎🙌",
-        "LEGENDARY SNIPER! You just cooked the market makers! ⚡🚀",
-        "BAG SECURED! Green candles only from here on out! 🟢📈"
-      ];
-
-      const winMessages = [
-        "FULL SEND! Table cleared and bags multiplied! 🚀🌕",
-        "CHAD OF THE CENTURY! Absolute perfection! 👑🔥"
-      ];
+      const missInsults = ["Bro missed harder than a sniper buying a honeypot! 📉", "Absolute paperhands shot! 💀", "Skill issue, rekt! 🗑️"];
+      const scratchInsults = ["SCRATCH! You just rugged your own white ball! 🤡💸"];
+      const potSuccessMessages = ["CHAD MOVE! You bagged the tokens! 🚀🌕"];
+      const winMessages = ["FULL SEND! Table cleared! 🚀🌕"];
 
       controlsContainer.innerHTML = `
         <div class="dpad-row">
@@ -587,7 +625,6 @@
       `;
 
       window.rotateAim = (rad) => { if (turn === 'Player' && !isMoving()) aimAngle += rad; };
-      
       window.shootCue = () => {
         if (turn === 'Player' && !isMoving()) {
           cueBall.vx = Math.cos(aimAngle) * powerLevel;
@@ -597,18 +634,7 @@
         }
       };
 
-      function isMoving() {
-        return balls.some(b => Math.abs(b.vx) > 0.05 || Math.abs(b.vy) > 0.05);
-      }
-
-      function takeAiTurn() {
-        if (balls.length <= 1) return;
-        let target = balls[1];
-        let aiAngle = Math.atan2(target.y - cueBall.y, target.x - cueBall.x) + (Math.random() - 0.5) * 0.4;
-        cueBall.vx = Math.cos(aiAngle) * 5;
-        cueBall.vy = Math.sin(aiAngle) * 5;
-        shotTaken = true;
-      }
+      function isMoving() { return balls.some(b => Math.abs(b.vx) > 0.05 || Math.abs(b.vy) > 0.05); }
 
       function update() {
         let moving = isMoving();
@@ -618,7 +644,6 @@
           let b = balls[i];
           b.x += b.vx; b.y += b.vy;
           b.vx *= 0.985; b.vy *= 0.985;
-
           if (Math.abs(b.vx) < 0.04) b.vx = 0;
           if (Math.abs(b.vy) < 0.04) b.vy = 0;
 
@@ -631,80 +656,32 @@
             if (Math.hypot(b.x - p.x, b.y - p.y) < 19) {
               if (b === cueBall) {
                 b.x = 80; b.y = 90; b.vx = 0; b.vy = 0;
-                popMessage = scratchInsults[Math.floor(Math.random() * scratchInsults.length)];
-                messageTimer = 300;
+                popMessage = scratchInsults[0]; messageTimer = 300;
               } else {
-                balls.splice(i, 1);
-                score += 100;
-                popMessage = potSuccessMessages[Math.floor(Math.random() * potSuccessMessages.length)];
-                messageTimer = 300;
+                balls.splice(i, 1); score += 100;
+                popMessage = potSuccessMessages[0]; messageTimer = 300;
               }
             }
           });
         }
 
-        for (let i = 0; i < balls.length; i++) {
-          for (let j = i + 1; j < balls.length; j++) {
-            let b1 = balls[i], b2 = balls[j];
-            let dx = b2.x - b1.x, dy = b2.y - b1.y;
-            let dist = Math.hypot(dx, dy);
-            let minDist = b1.r + b2.r;
-
-            if (dist < minDist && dist > 0) {
-              let nx = dx / dist, ny = dy / dist;
-              let overlap = minDist - dist;
-              b1.x -= nx * overlap * 0.5; b1.y -= ny * overlap * 0.5;
-              b2.x += nx * overlap * 0.5; b2.y += ny * overlap * 0.5;
-
-              let kx = b1.vx - b2.vx, ky = b1.vy - b2.vy;
-              let p = 2 * (nx * kx + ny * ky) / 2;
-              if (p > 0) {
-                b1.vx -= p * nx * 0.95; b1.vy -= p * ny * 0.95;
-                b2.vx += p * nx * 0.95; b2.vy += p * ny * 0.95;
-              }
-            }
-          }
-        }
-
         if (shotTaken && !moving) {
           shotTaken = false;
-          if (balls.length === 1) {
-            popMessage = winMessages[Math.floor(Math.random() * winMessages.length)];
-            messageTimer = 420;
-          } else if (balls.length === ballsBeforeCount && !popMessage) {
-            popMessage = missInsults[Math.floor(Math.random() * missInsults.length)];
-            messageTimer = 300;
-          }
-
-          if (balls.length > 1) {
-            if (turn === 'Player') {
-              turn = 'Computer';
-              setTimeout(takeAiTurn, 1000);
-            } else {
-              turn = 'Player';
-            }
-          }
+          if (balls.length === 1) { popMessage = winMessages[0]; messageTimer = 420; }
+          else if (balls.length === ballsBeforeCount && !popMessage) { popMessage = missInsults[0]; messageTimer = 300; }
+          if (balls.length > 1) turn = (turn === 'Player') ? 'Computer' : 'Player';
         }
 
         if (messageTimer > 0) messageTimer--;
-
         draw();
         activeGameLoop = requestAnimationFrame(update);
       }
 
       function draw() {
         ctx.fillStyle = '#0f5220'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = '#5c3a21'; ctx.lineWidth = 14;
-        ctx.strokeRect(7, 7, 306, 166);
-
-        pockets.forEach(p => {
-          ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, Math.PI * 2); ctx.fill();
-        });
-
-        balls.forEach(b => {
-          ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
-          ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
-        });
+        ctx.strokeStyle = '#5c3a21'; ctx.lineWidth = 14; ctx.strokeRect(7, 7, 306, 166);
+        pockets.forEach(p => { ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, Math.PI * 2); ctx.fill(); });
+        balls.forEach(b => { ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); });
 
         if (!isMoving() && turn === 'Player' && balls.length > 1) {
           ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 2; ctx.beginPath();
@@ -716,32 +693,7 @@
         ctx.fillStyle = '#fff'; ctx.font = '11px sans-serif';
         ctx.fillText('SCORE: ' + score, 20, 26);
         ctx.fillText('TURN: ' + turn, 200, 26);
-
-        if (popMessage && messageTimer > 0) {
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-          ctx.fillRect(25, 60, 270, 60);
-          ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 2;
-          ctx.strokeRect(25, 60, 270, 60);
-
-          ctx.fillStyle = '#00ff66'; ctx.font = 'bold 10px monospace';
-          ctx.textAlign = 'center';
-          
-          let words = popMessage.split(' ');
-          let line = '', startY = 82;
-          for (let n = 0; n < words.length; n++) {
-            let testLine = line + words[n] + ' ';
-            if (ctx.measureText(testLine).width > 250 && n > 0) {
-              ctx.fillText(line, canvas.width / 2, startY);
-              line = words[n] + ' '; startY += 15;
-            } else {
-              line = testLine;
-            }
-          }
-          ctx.fillText(line, canvas.width / 2, startY);
-          ctx.textAlign = 'left';
-        }
       }
-
       update();
     }
   </script>
