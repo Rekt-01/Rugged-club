@@ -78,7 +78,6 @@
     .sofa-hotspot:hover, .sofa-hotspot:active { background: rgba(88, 101, 242, 0.15); border-radius: 6px; }
     .sofa-hotspot::after { content: 'JOIN DISCORD'; background: #5865F2; color: #fff; }
 
-    /* Table Beside Sofa Hotspot */
     .table-hotspot { top: 66%; left: 14%; width: 10%; height: 9%; }
     .table-hotspot:hover, .table-hotspot:active { background: rgba(88, 166, 255, 0.25); border-radius: 6px; }
     .table-hotspot::after { content: 'APECHAIN TOP 10'; background: #58a6ff; color: #000; }
@@ -229,7 +228,6 @@
       border: none; border-radius: 8px; background: #fff;
     }
 
-    /* Top 10 Tracker Modal Styles */
     .top10-scroll-area {
       width: 100%; height: 100%; overflow-y: auto; padding-right: 5px;
     }
@@ -273,10 +271,7 @@
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
       <div class="hotspot laptop-hotspot" onclick="openWebModal('dex')"></div>
-      
-      <!-- Table Beside Sofa Hotspot -->
       <div class="hotspot table-hotspot" onclick="openWebModal('top10')"></div>
-
       <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
@@ -286,7 +281,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v5.4</div>
+    <div class="door-version">v5.5</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -308,7 +303,6 @@
       <span class="close-btn" onclick="closeWebModal()">&times;</span>
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
-      <!-- Top 10 Tracker Content Wrapper -->
       <div id="top10ModalContainer" class="top10-scroll-area" style="display: none;">
         <div class="top10-container">
           <div class="top10-title">🐵 ApeChain Top 10 Tracker</div>
@@ -373,7 +367,6 @@
       document.getElementById('webIframe').src = '';
     }
 
-    /* Top 10 Tracker script integration */
     const API_KEY = "f717a5e47373494aad0277176f97e8c1";
     const topCollections = [
       { name: "Gs on Ape", slug: "gs-on-ape" },
@@ -473,7 +466,7 @@
       if (activeGameLoop) cancelAnimationFrame(activeGameLoop);
     }
 
-    /* PAC-MAN & POOL CODE */
+    /* PAC-MAN */
     function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
       const tileSize = 20;
@@ -588,6 +581,7 @@
       update();
     }
 
+    /* RESTORED POOL GAME LOOP */
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
       const pockets = [
@@ -611,10 +605,21 @@
         { x: 235, y: 98, vx: 0, vy: 0, r: 7, color: '#00ff66' }
       ];
 
-      const missInsults = ["Bro missed harder than a sniper buying a honeypot! 📉", "Absolute paperhands shot! 💀", "Skill issue, rekt! 🗑️"];
-      const scratchInsults = ["SCRATCH! You just rugged your own white ball! 🤡💸"];
-      const potSuccessMessages = ["CHAD MOVE! You bagged the tokens! 🚀🌕"];
-      const winMessages = ["FULL SEND! Table cleared! 🚀🌕"];
+      const missInsults = [
+        "Bro missed harder than a sniper buying a honeypot token! 📉🤡",
+        "Absolute paperhands shot! Went straight into the shadow realm. 💀",
+        "Did your grandma throw that cue? Utterly rekt! 🗑️"
+      ];
+      const scratchInsults = [
+        "SCRATCH! You just rugged your own cue ball into the void! 🤡💸"
+      ];
+      const potSuccessMessages = [
+        "CHAD MOVE! You bagged the tokens and mooned hard! 🚀🌕",
+        "WHALE ALERT! Absolute masterclass in paper destruction! 🐋🔥"
+      ];
+      const winMessages = [
+        "FULL SEND! Table cleared and bags multiplied! 🚀🌕"
+      ];
 
       controlsContainer.innerHTML = `
         <div class="dpad-row">
@@ -634,7 +639,18 @@
         }
       };
 
-      function isMoving() { return balls.some(b => Math.abs(b.vx) > 0.05 || Math.abs(b.vy) > 0.05); }
+      function isMoving() {
+        return balls.some(b => Math.abs(b.vx) > 0.05 || Math.abs(b.vy) > 0.05);
+      }
+
+      function takeAiTurn() {
+        if (balls.length <= 1) return;
+        let target = balls[1];
+        let aiAngle = Math.atan2(target.y - cueBall.y, target.x - cueBall.x) + (Math.random() - 0.5) * 0.4;
+        cueBall.vx = Math.cos(aiAngle) * 5;
+        cueBall.vy = Math.sin(aiAngle) * 5;
+        shotTaken = true;
+      }
 
       function update() {
         let moving = isMoving();
@@ -644,6 +660,7 @@
           let b = balls[i];
           b.x += b.vx; b.y += b.vy;
           b.vx *= 0.985; b.vy *= 0.985;
+
           if (Math.abs(b.vx) < 0.04) b.vx = 0;
           if (Math.abs(b.vy) < 0.04) b.vy = 0;
 
@@ -656,32 +673,80 @@
             if (Math.hypot(b.x - p.x, b.y - p.y) < 19) {
               if (b === cueBall) {
                 b.x = 80; b.y = 90; b.vx = 0; b.vy = 0;
-                popMessage = scratchInsults[0]; messageTimer = 300;
+                popMessage = scratchInsults[0];
+                messageTimer = 300;
               } else {
-                balls.splice(i, 1); score += 100;
-                popMessage = potSuccessMessages[0]; messageTimer = 300;
+                balls.splice(i, 1);
+                score += 100;
+                popMessage = potSuccessMessages[Math.floor(Math.random() * potSuccessMessages.length)];
+                messageTimer = 300;
               }
             }
           });
         }
 
+        for (let i = 0; i < balls.length; i++) {
+          for (let j = i + 1; j < balls.length; j++) {
+            let b1 = balls[i], b2 = balls[j];
+            let dx = b2.x - b1.x, dy = b2.y - b1.y;
+            let dist = Math.hypot(dx, dy);
+            let minDist = b1.r + b2.r;
+
+            if (dist < minDist && dist > 0) {
+              let nx = dx / dist, ny = dy / dist;
+              let overlap = minDist - dist;
+              b1.x -= nx * overlap * 0.5; b1.y -= ny * overlap * 0.5;
+              b2.x += nx * overlap * 0.5; b2.y += ny * overlap * 0.5;
+
+              let kx = b1.vx - b2.vx, ky = b1.vy - b2.vy;
+              let p = 2 * (nx * kx + ny * ky) / 2;
+              if (p > 0) {
+                b1.vx -= p * nx * 0.95; b1.vy -= p * ny * 0.95;
+                b2.vx += p * nx * 0.95; b2.vy += p * ny * 0.95;
+              }
+            }
+          }
+        }
+
         if (shotTaken && !moving) {
           shotTaken = false;
-          if (balls.length === 1) { popMessage = winMessages[0]; messageTimer = 420; }
-          else if (balls.length === ballsBeforeCount && !popMessage) { popMessage = missInsults[0]; messageTimer = 300; }
-          if (balls.length > 1) turn = (turn === 'Player') ? 'Computer' : 'Player';
+          if (balls.length === 1) {
+            popMessage = winMessages[0];
+            messageTimer = 420;
+          } else if (balls.length === ballsBeforeCount && !popMessage) {
+            popMessage = missInsults[Math.floor(Math.random() * missInsults.length)];
+            messageTimer = 300;
+          }
+
+          if (balls.length > 1) {
+            if (turn === 'Player') {
+              turn = 'Computer';
+              setTimeout(takeAiTurn, 1000);
+            } else {
+              turn = 'Player';
+            }
+          }
         }
 
         if (messageTimer > 0) messageTimer--;
+
         draw();
         activeGameLoop = requestAnimationFrame(update);
       }
 
       function draw() {
         ctx.fillStyle = '#0f5220'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = '#5c3a21'; ctx.lineWidth = 14; ctx.strokeRect(7, 7, 306, 166);
-        pockets.forEach(p => { ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, Math.PI * 2); ctx.fill(); });
-        balls.forEach(b => { ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); });
+        ctx.strokeStyle = '#5c3a21'; ctx.lineWidth = 14;
+        ctx.strokeRect(7, 7, 306, 166);
+
+        pockets.forEach(p => {
+          ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, Math.PI * 2); ctx.fill();
+        });
+
+        balls.forEach(b => {
+          ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
+        });
 
         if (!isMoving() && turn === 'Player' && balls.length > 1) {
           ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 2; ctx.beginPath();
@@ -693,7 +758,20 @@
         ctx.fillStyle = '#fff'; ctx.font = '11px sans-serif';
         ctx.fillText('SCORE: ' + score, 20, 26);
         ctx.fillText('TURN: ' + turn, 200, 26);
+
+        if (popMessage && messageTimer > 0) {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+          ctx.fillRect(25, 60, 270, 60);
+          ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 2;
+          ctx.strokeRect(25, 60, 270, 60);
+
+          ctx.fillStyle = '#00ff66'; ctx.font = 'bold 10px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(popMessage, canvas.width / 2, 95);
+          ctx.textAlign = 'left';
+        }
       }
+
       update();
     }
   </script>
