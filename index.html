@@ -70,7 +70,6 @@
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
 
-    /* Laptop Hotspot - matches screen size of laptop precisely with flashing neon text */
     .laptop-hotspot {
       position: absolute;
       top: 50.3%;
@@ -243,7 +242,7 @@
 
     .modal-content.pacman-style { border-color: #ffe600; box-shadow: 0 0 25px #ffe600; }
     .modal-content.opensea-style { border-color: #2081e2; box-shadow: 0 0 25px #2081e2; }
-    .modal-content.dex-dashboard-style { border-color: #00ff66; box-shadow: 0 0 30px rgba(0,255,102,0.6); width: 92vw; max-width: 480px; padding: 16px; }
+    .modal-content.dex-dashboard-style { border-color: #00ff66; box-shadow: 0 0 30px rgba(0,255,102,0.6); width: 94vw; max-width: 440px; padding: 12px; max-height: 94vh; overflow-y: auto; }
 
     .close-btn {
       position: absolute; top: -38px; right: 0; color: #fff;
@@ -294,44 +293,51 @@
     }
     .opensea-visit-btn:hover { background: #1868b7; transform: scale(1.03); }
 
-    /* Dex Dashboard Modal Styling */
+    /* Terminal UI Styles */
     .dex-dash-header {
-      font-size: 1rem; font-weight: bold; color: #00ff66; text-align: center;
-      margin-bottom: 8px; letter-spacing: 1px; font-family: monospace;
+      font-size: 0.95rem; font-weight: bold; color: #00ff66; text-align: center;
+      margin-bottom: 6px; letter-spacing: 1px; font-family: monospace;
     }
     .dex-dash-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; width: 100%;
     }
     .dex-dash-box {
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(0,255,102,0.3);
-      border-radius: 6px; padding: 6px; text-align: center;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(0,255,102,0.3);
+      border-radius: 6px; padding: 5px; text-align: center;
     }
-    .dex-dash-box-title { font-size: 0.62rem; color: #888; text-transform: uppercase; margin-bottom: 3px; font-family: monospace; }
-    .dex-dash-box-val { font-size: 0.8rem; font-weight: bold; color: #fff; font-family: monospace; }
+    .dex-dash-box-title { font-size: 0.58rem; color: #888; text-transform: uppercase; margin-bottom: 2px; font-family: monospace; }
+    .dex-dash-box-val { font-size: 0.75rem; font-weight: bold; color: #fff; font-family: monospace; }
     
     .radio-player-box {
-      background: rgba(0,255,102,0.08); border: 1px solid #00ff66; border-radius: 6px;
-      padding: 6px 10px; text-align: center; width: 100%; margin-bottom: 8px;
+      background: rgba(0,255,102,0.06); border: 1px solid #00ff66; border-radius: 6px;
+      padding: 6px 8px; text-align: center; width: 100%; margin-bottom: 6px;
     }
-    .radio-title { font-size: 0.68rem; color: #00ff66; font-weight: bold; margin-bottom: 4px; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .radio-controls { display: flex; justify-content: center; gap: 8px; align-items: center; }
+    .radio-select-row {
+      display: flex; gap: 6px; align-items: center; justify-content: space-between; margin-bottom: 5px;
+    }
+    .radio-select {
+      flex: 1; background: #0b0c10; color: #00ff66; border: 1px solid #00ff66;
+      border-radius: 4px; padding: 4px 6px; font-size: 0.68rem; font-family: monospace; outline: none;
+    }
+    .radio-controls { display: flex; justify-content: space-between; align-items: center; }
     .radio-btn {
-      background: #00ff66; color: #000; border: none; padding: 3px 10px;
+      background: #00ff66; color: #000; border: none; padding: 4px 12px;
       border-radius: 12px; font-weight: bold; font-size: 0.7rem; cursor: pointer;
     }
+    .radio-status { font-size: 0.65rem; color: #aaa; font-family: monospace; }
     
     .dex-iframe-container {
-      width: 100%; height: 185px; border-radius: 6px; overflow: hidden;
-      border: 1px solid rgba(0,255,102,0.4); background: #000; margin-bottom: 8px;
+      width: 100%; height: 170px; border-radius: 6px; overflow: hidden;
+      border: 1px solid rgba(0,255,102,0.4); background: #000; margin-bottom: 6px;
     }
     .dex-iframe-container iframe {
-      width: 100%; height: 100%; border: none; display: block;
+      width: 100%; height: 100%; border: none; display: block; background: #000;
     }
 
     .dex-link-btn {
       display: block; width: 100%; text-align: center; background: #00ff66; color: #000;
-      font-weight: bold; text-decoration: none; padding: 8px; border-radius: 18px;
-      font-size: 0.78rem; font-family: monospace; box-shadow: 0 0 10px rgba(0,255,102,0.4);
+      font-weight: bold; text-decoration: none; padding: 7px; border-radius: 16px;
+      font-size: 0.75rem; font-family: monospace; box-shadow: 0 0 10px rgba(0,255,102,0.4);
     }
     .dex-link-btn:hover { background: #00cc52; }
   </style>
@@ -358,7 +364,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v9</div>
+    <div class="door-version">v10</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -392,10 +398,18 @@
       </div>
 
       <div class="radio-player-box">
-        <div class="radio-title" id="radioStationTitle">📻 Station: Scanning Radio-Browser...</div>
+        <div class="radio-select-row">
+          <select class="radio-select" id="stationSelector" onchange="changeRadioStation()">
+            <option value="https://stream.zeno.fm/f3wvbbqmdg8uv">📻 Lofi Chill Beats (Global)</option>
+            <option value="https://live.hunter.fm/lofi">📻 Hunter FM Lofi Hits</option>
+            <option value="https://stream.zeno.fm/0wr9tpz09uhvv">📻 Synthwave Cyberpunk Radio</option>
+            <option value="https://icecast.vrtcdn.be/stubru-high.mp3">📻 Studio Brussels (IE/EU Rock)</option>
+            <option value="https://edge.audio.thisisdax.com/thisisdax/capitalireland.mp3">📻 Capital Ireland (Hits)</option>
+          </select>
+        </div>
         <div class="radio-controls">
           <button class="radio-btn" id="radioPlayBtn" onclick="toggleRadio()">▶ PLAY</button>
-          <span style="font-size:0.7rem; color:#aaa;" id="radioStatus">Ready</span>
+          <span class="radio-status" id="radioStatus">Ready</span>
         </div>
         <audio id="localRadioAudio" preload="none" crossorigin="anonymous"></audio>
       </div>
@@ -456,16 +470,23 @@
     updateApePrice();
     setInterval(updateApePrice, 30000);
 
-    /* Integrated Radio-Browser API & Weather / Geo Location Logic */
+    /* Terminal & Radio Logic */
     let radioPlaying = false;
-    let currentAudioUrl = '';
 
     async function openDexDashboard() {
       document.getElementById('dexDashboardModal').style.display = 'flex';
       
+      // Fixed iframe embedding link for DexScreener
       const iframe = document.getElementById('dexIframe');
       if (!iframe.src || iframe.src === 'about:blank' || iframe.src === '') {
         iframe.src = 'https://dexscreener.com/apechain?embed=1&loadChartSettings=0&tabs=0&chartLeftToolbar=0&chartTheme=dark&theme=dark';
+      }
+
+      // Initialize default radio audio source from dropdown selection
+      const selector = document.getElementById('stationSelector');
+      const audio = document.getElementById('localRadioAudio');
+      if (selector && selector.value) {
+        audio.src = selector.value;
       }
 
       try {
@@ -473,7 +494,6 @@
         const ipData = await ipRes.json();
         const city = ipData.city || 'Unknown';
         const country = ipData.country_name || '';
-        const countryCode = ipData.country_code || 'US';
         document.getElementById('dashLocation').innerText = `${city}, ${country}`;
 
         if (ipData.latitude && ipData.longitude) {
@@ -487,55 +507,29 @@
         } else {
           document.getElementById('dashWeather').innerText = '18°C';
         }
-
-        // Fetch local station from Radio-Browser API matching country code
-        await fetchRadioBrowserStation(countryCode);
       } catch (e) {
         document.getElementById('dashLocation').innerText = 'Global Node';
         document.getElementById('dashWeather').innerText = '18°C';
-        setupFallbackRadio();
       }
     }
 
-    async function fetchRadioBrowserStation(countryCode) {
-      const titleEl = document.getElementById('radioStationTitle');
-      const statusEl = document.getElementById('radioStatus');
+    function changeRadioStation() {
+      const selector = document.getElementById('stationSelector');
       const audio = document.getElementById('localRadioAudio');
-
-      try {
-        // Query Radio-Browser API for working stations in the user's country with HTTPS stream URLs
-        const rbRes = await fetch(`https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/${countryCode}?limit=10&order=votes&reverse=true`);
-        const stations = await rbRes.json();
-
-        // Filter for valid secure HTTPS streams to avoid browser mixed-content blockage
-        const secureStation = stations.find(s => s.url_resolved && s.url_resolved.startsWith('https://'));
-
-        if (secureStation) {
-          currentAudioUrl = secureStation.url_resolved;
-          audio.src = currentAudioUrl;
-          titleEl.innerText = `📻 Station: ${secureStation.name} (${countryCode})`;
-          statusEl.innerText = 'Ready';
-        } else {
-          setupFallbackRadio();
-        }
-      } catch (err) {
-        setupFallbackRadio();
-      }
-    }
-
-    function setupFallbackRadio() {
-      const audio = document.getElementById('localRadioAudio');
-      // Secure fallback stream that avoids CORS/mixed content issues
-      currentAudioUrl = 'https://stream.zeno.fm/f3wvbbqmdg8uv';
-      audio.src = currentAudioUrl;
-      document.getElementById('radioStationTitle').innerText = '📻 Station: Global Lofi / Chill Vibe';
-      document.getElementById('radioStatus').innerText = 'Ready';
+      const status = document.getElementById('radioStatus');
+      
+      audio.pause();
+      radioPlaying = false;
+      audio.src = selector.value;
+      document.getElementById('radioPlayBtn').innerText = '▶ PLAY';
+      status.innerText = 'Ready';
     }
 
     function toggleRadio() {
       const audio = document.getElementById('localRadioAudio');
       const btn = document.getElementById('radioPlayBtn');
       const status = document.getElementById('radioStatus');
+      const selector = document.getElementById('stationSelector');
 
       if (radioPlaying) {
         audio.pause();
@@ -545,14 +539,14 @@
       } else {
         status.innerText = 'Connecting...';
         if (!audio.src || audio.src === '') {
-          audio.src = currentAudioUrl || 'https://stream.zeno.fm/f3wvbbqmdg8uv';
+          audio.src = selector.value;
         }
         audio.play().then(() => {
           radioPlaying = true;
           btn.innerText = '⏸ PAUSE';
-          status.innerText = 'Live Streaming';
+          status.innerText = 'Streaming Live';
         }).catch(err => {
-          status.innerText = 'Stream Error (Tap Play Again)';
+          status.innerText = 'Stream Blocked (Try Another)';
           radioPlaying = false;
           btn.innerText = '▶ PLAY';
         });
