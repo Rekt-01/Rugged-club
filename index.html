@@ -21,16 +21,14 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Scene Viewport */
     .viewport {
       position: relative;
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      perspective: 1200px; /* Gives depth to the 3D door rotation */
+      perspective: 1200px;
     }
 
-    /* Clubhouse Background Image */
     .clubhouse-bg {
       position: absolute;
       top: 0;
@@ -42,20 +40,62 @@
       z-index: 1;
     }
 
-    /* Door Container with 3D Perspective */
+    /* Interactive Arcade Hotspot */
+    .arcade-hotspot {
+      position: absolute;
+      top: 42%;
+      left: 51%;
+      width: 6%;
+      height: 18%;
+      z-index: 2;
+      cursor: pointer;
+      display: none; /* Hidden until doors open */
+      border: 2px dashed rgba(255, 230, 0, 0);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .arcade-hotspot:hover {
+      border-color: #ffe600;
+      box-shadow: 0 0 15px #ffe600;
+      background: rgba(255, 230, 0, 0.15);
+    }
+
+    .arcade-hotspot::after {
+      content: 'PLAY PAC-MAN';
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffe600;
+      color: #000;
+      font-weight: bold;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .arcade-hotspot:hover::after {
+      opacity: 1;
+    }
+
+    /* Doors & Entrance Setup */
     .doors-container {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: 2;
+      z-index: 3;
       display: flex;
       perspective: 1500px;
       cursor: pointer;
     }
 
-    /* Individual Door Panels */
     .door {
       width: 50%;
       height: 100%;
@@ -79,7 +119,6 @@
       border-left: 4px solid #1a0f08;
     }
 
-    /* Handles */
     .handle {
       position: absolute;
       top: 50%;
@@ -94,7 +133,6 @@
     .door-left .handle { right: 30px; }
     .door-right .handle { left: 30px; }
 
-    /* Click Prompt Overlay */
     .enter-prompt {
       position: absolute;
       top: 50%;
@@ -109,26 +147,61 @@
       border: 2px solid #ff007f;
       border-radius: 8px;
       box-shadow: 0 0 15px #ff007f;
-      z-index: 3;
+      z-index: 4;
       pointer-events: none;
       transition: opacity 0.5s ease;
     }
 
-    /* OPEN STATE ANIMATIONS */
-    .viewport.open .door-left {
-      transform: rotateY(-105deg);
+    /* Open States */
+    .viewport.open .door-left { transform: rotateY(-105deg); }
+    .viewport.open .door-right { transform: rotateY(105deg); }
+    .viewport.open .clubhouse-bg { transform: scale(1.15); }
+    .viewport.open .enter-prompt { opacity: 0; }
+    .viewport.open .doors-container { pointer-events: none; }
+    .viewport.open .arcade-hotspot { display: block; }
+
+    /* Game Modal Window */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
     }
 
-    .viewport.open .door-right {
-      transform: rotateY(105deg);
+    .modal-content {
+      position: relative;
+      width: 90%;
+      max-width: 480px;
+      height: 600px;
+      background: #000;
+      border: 4px solid #ffe600;
+      border-radius: 12px;
+      box-shadow: 0 0 25px #ffe600;
+      overflow: hidden;
     }
 
-    .viewport.open .clubhouse-bg {
-      transform: scale(1.15); /* Walk-in forward movement effect */
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      color: #fff;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 11;
     }
 
-    .viewport.open .enter-prompt {
-      opacity: 0;
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
   </style>
 </head>
@@ -136,7 +209,10 @@
 
   <div class="viewport" id="scene">
     <div class="clubhouse-bg"></div>
-    <div class="enter-prompt" id="prompt">Click to Enter</div>
+    
+    <div class="arcade-hotspot" onclick="openGame()"></div>
+
+    <div class="enter-prompt">Click to Enter</div>
     <div class="doors-container" onclick="openDoors()">
       <div class="door door-left">
         <div class="handle"></div>
@@ -147,10 +223,24 @@
     </div>
   </div>
 
+  <div class="modal" id="gameModal">
+    <span class="close-btn" onclick="closeGame()">&times;</span>
+    <div class="modal-content">
+      <iframe src="https://pacman.place" title="Pac-Man Game"></iframe>
+    </div>
+  </div>
+
   <script>
     function openDoors() {
-      const scene = document.getElementById('scene');
-      scene.classList.add('open');
+      document.getElementById('scene').classList.add('open');
+    }
+
+    function openGame() {
+      document.getElementById('gameModal').style.display = 'flex';
+    }
+
+    function closeGame() {
+      document.getElementById('gameModal').style.display = 'none';
     }
   </script>
 
