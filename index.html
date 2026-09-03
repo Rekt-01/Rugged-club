@@ -25,84 +25,49 @@
 
     .viewport {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      perspective: 1200px;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      overflow: hidden; perspective: 1200px;
     }
 
     .scene-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100vw;
-      height: 177.78vw;
-      max-height: 100vh;
-      max-width: 56.25vh;
+      position: absolute; top: 50%; left: 50%;
+      width: 100vw; height: 177.78vw;
+      max-height: 100vh; max-width: 56.25vh;
       transform: translate(-50%, -50%);
     }
 
     @media (min-aspect-ratio: 9/16) {
-      .scene-container {
-        width: 56.25vh;
-        height: 100vh;
-      }
+      .scene-container { width: 56.25vh; height: 100vh; }
     }
 
     .clubhouse-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: url('clubhouse.JPG') center center / cover no-repeat;
       transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
       z-index: 1;
     }
 
     .nft-frame-img {
-      position: absolute;
-      top: 48.5%;
-      left: 72.8%;
-      width: 10%;
-      height: 5.5%;
-      object-fit: cover;
-      border-radius: 4px;
-      z-index: 1;
-      pointer-events: none;
+      position: absolute; top: 48.5%; left: 72.8%;
+      width: 10%; height: 5.5%; object-fit: cover;
+      border-radius: 4px; z-index: 1; pointer-events: none;
       transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     .hotspot {
-      position: absolute;
-      z-index: 2;
-      cursor: pointer;
-      display: none;
-      border: 2px dashed rgba(0, 255, 102, 0.4);
-      border-radius: 6px;
+      position: absolute; z-index: 2; cursor: pointer; display: none;
+      border: 2px dashed rgba(0, 255, 102, 0.4); border-radius: 6px;
       transition: all 0.3s ease;
     }
 
     .hotspot::after {
-      position: absolute;
-      top: -28px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-weight: bold;
-      font-size: 0.7rem;
-      padding: 3px 6px;
-      border-radius: 4px;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
+      position: absolute; top: -28px; left: 50%;
+      transform: translateX(-50%); font-weight: bold; font-size: 0.7rem;
+      padding: 3px 6px; border-radius: 4px; white-space: nowrap;
+      opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
     }
 
-    @media (hover: hover) {
-      .hotspot:hover::after { opacity: 1; }
-    }
+    @media (hover: hover) { .hotspot:hover::after { opacity: 1; } }
 
     .arcade-hotspot { top: 50%; left: 51.5%; width: 15%; height: 8%; }
     .arcade-hotspot:hover, .arcade-hotspot:active { border-color: #ffe600; box-shadow: 0 0 15px #ffe600; background: rgba(255, 230, 0, 0.2); }
@@ -111,6 +76,25 @@
     .pool-hotspot { top: 55.5%; left: 58.5%; width: 26%; height: 6.5%; }
     .pool-hotspot:hover, .pool-hotspot:active { border-color: #00ff66; box-shadow: 0 0 15px #00ff66; background: rgba(0, 255, 102, 0.2); }
     .pool-hotspot::after { content: 'PLAY POOL'; background: #00ff66; color: #000; }
+
+    /* LAPTOP ON THE BAR */
+    .laptop-hotspot {
+      top: 53.5%; left: 37.5%; width: 8.5%; height: 4.8%;
+      background: #050b07; border: 1.5px solid #00ff66; border-radius: 3px;
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.6); display: none;
+      flex-direction: column; justify-content: center; align-items: center;
+      padding: 2px;
+    }
+    .laptop-hotspot:hover, .laptop-hotspot:active { border-color: #33ff88; box-shadow: 0 0 18px #00ff66; }
+    .laptop-hotspot::after { content: 'APE CHAIN DEX'; background: #00ff66; color: #000; }
+
+    .laptop-screen-content {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; width: 100%; height: 100%;
+      font-family: monospace; color: #00ff66; text-align: center;
+    }
+    .laptop-title { font-size: 0.4rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+    .laptop-price { font-size: 0.55rem; font-weight: bold; margin-top: 1px; color: #fff; }
 
     .sofa-hotspot { top: 60.5%; left: 24%; width: 52%; height: 12%; }
     .sofa-hotspot:hover, .sofa-hotspot:active { border-color: #5865F2; box-shadow: 0 0 15px #5865F2; background: rgba(88, 101, 242, 0.2); }
@@ -121,8 +105,7 @@
     .opensea-poster::after { content: 'OPENSEA'; background: #2081e2; color: #fff; }
 
     .doors-container {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 3; display: flex; perspective: 1500px; cursor: pointer;
     }
 
@@ -165,7 +148,7 @@
     .viewport.open .nft-frame-img { transform: scale(1.05); }
     .viewport.open .enter-prompt { opacity: 0; }
     .viewport.open .doors-container { pointer-events: none; }
-    .viewport.open .hotspot { display: block; }
+    .viewport.open .hotspot { display: flex; }
 
     .modal {
       display: none; position: fixed; top: 0; left: 0;
@@ -181,9 +164,7 @@
       box-shadow: 0 0 25px #00ff66; padding: 12px; max-width: 95vw;
     }
 
-    .modal-content.pacman-style {
-      border-color: #ffe600; box-shadow: 0 0 25px #ffe600;
-    }
+    .modal-content.pacman-style { border-color: #ffe600; box-shadow: 0 0 25px #ffe600; }
 
     .close-btn {
       position: absolute; top: -40px; right: 0; color: #fff;
@@ -210,6 +191,12 @@
       font-weight: bold; font-size: 1rem; border: none; border-radius: 25px;
       margin-top: 8px; cursor: pointer; box-shadow: 0 0 10px #00ff66;
     }
+
+    /* DEXSCREENER IFRAME MODAL */
+    .dex-iframe {
+      width: 85vw; max-width: 600px; height: 70vh; max-height: 500px;
+      border: none; border-radius: 8px;
+    }
   </style>
 </head>
 <body>
@@ -221,6 +208,14 @@
       
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
+      
+      <div class="hotspot laptop-hotspot" onclick="openLaptopModal()">
+        <div class="laptop-screen-content">
+          <span class="laptop-title">$APE</span>
+          <span class="laptop-price" id="barApePrice">...</span>
+        </div>
+      </div>
+
       <a href="https://opensea.io/collection/legods" target="_blank" class="hotspot opensea-poster"></a>
       <a href="https://discord.gg/your-invite-code" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
@@ -240,9 +235,39 @@
     </div>
   </div>
 
+  <div class="modal" id="laptopModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeLaptopModal()">&times;</span>
+      <iframe class="dex-iframe" src="https://dexscreener.com/apechain?embed=1&theme=dark"></iframe>
+    </div>
+  </div>
+
   <script>
     function openDoors() {
       document.getElementById('scene').classList.add('open');
+    }
+
+    /* LIVE APE PRICE FETCH */
+    async function updateApePrice() {
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=apecoin&vs_currencies=usd');
+        const data = await res.json();
+        if (data.apecoin && data.apecoin.usd) {
+          document.getElementById('barApePrice').innerText = '$' + data.apecoin.usd.toFixed(2);
+        }
+      } catch (e) {
+        document.getElementById('barApePrice').innerText = '$APE';
+      }
+    }
+    updateApePrice();
+    setInterval(updateApePrice, 30000);
+
+    function openLaptopModal() {
+      document.getElementById('laptopModal').style.display = 'flex';
+    }
+
+    function closeLaptopModal() {
+      document.getElementById('laptopModal').style.display = 'none';
     }
 
     let activeGameLoop = null;
@@ -389,7 +414,7 @@
       update();
     }
 
-    /* POOL WITH VECTOR IMPULSE PHYSICS (NO STICKING) AND AI */
+    /* POOL */
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
       const pockets = [
@@ -451,11 +476,9 @@
           b.x += b.vx; b.y += b.vy;
           b.vx *= 0.985; b.vy *= 0.985;
 
-          // Stop near zero velocity
           if (Math.abs(b.vx) < 0.05) b.vx = 0;
           if (Math.abs(b.vy) < 0.05) b.vy = 0;
 
-          // Wall cushion bounces
           if (b.x - b.r < 18) { b.x = 18 + b.r; b.vx *= -1; }
           if (b.x + b.r > 302) { b.x = 302 - b.r; b.vx *= -1; }
           if (b.y - b.r < 18) { b.y = 18 + b.r; b.vy *= -1; }
@@ -473,7 +496,6 @@
           });
         }
 
-        // 2D Impulse physics (resolves direction vectors & forces separation)
         for (let i = 0; i < balls.length; i++) {
           for (let j = i + 1; j < balls.length; j++) {
             let b1 = balls[i], b2 = balls[j];
@@ -486,14 +508,12 @@
               let nx = dx / dist;
               let ny = dy / dist;
 
-              // Static positional resolution (prevents sticking)
               let overlap = minDist - dist;
               b1.x -= nx * overlap * 0.5;
               b1.y -= ny * overlap * 0.5;
               b2.x += nx * overlap * 0.5;
               b2.y += ny * overlap * 0.5;
 
-              // Dynamic impulse velocity transfer
               let kx = b1.vx - b2.vx;
               let ky = b1.vy - b2.vy;
               let p = 2 * (nx * kx + ny * ky) / 2;
@@ -508,7 +528,6 @@
           }
         }
 
-        // Turn Handshake
         if (shotTaken && !moving) {
           shotTaken = false;
           if (turn === 'Player') {
