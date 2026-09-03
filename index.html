@@ -54,7 +54,6 @@
       transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    /* CLEAN HOTSPOTS WITH NO VISIBLE OUTLINES */
     .hotspot {
       position: absolute; z-index: 2; cursor: pointer; display: none;
       border: none; background: transparent;
@@ -289,10 +288,11 @@
       if (activeGameLoop) cancelAnimationFrame(activeGameLoop);
     }
 
+    /* PAC-MAN: Fixed Ghost Maze Pathfinding & Victory Rugged Message */
     function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
       const tileSize = 20;
-      const map = [
+      let initialMap = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
         [1,2,1,1,2,1,2,1,1,2,1,2,1,1,2,1],
@@ -308,10 +308,14 @@
         [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
       ];
+      
+      // Deep clone map so dots respawn on restart
+      let map = initialMap.map(row => [...row]);
 
       let score = 0;
+      let gameOverMessage = null;
       let pacman = { x: 30, y: 30, dirX: 0, dirY: 0, speed: 1.2 };
-      let ghost = { x: 150, y: 130, dirX: 1, dirY: 0, speed: 1, color: '#ff0000' };
+      let ghost = { x: 150, y: 130, dirX: 0, dirY: -1, speed: 0.9, color: '#ff0000' };
 
       controlsContainer.innerHTML = `
         <div class="dpad-row"><div class="btn-ctrl" onmousedown="startPac(event, 0,-1)" onmouseup="stopPac(event)" ontouchstart="startPac(event, 0,-1)" ontouchend="stopPac(event)">▲</div></div>
@@ -332,9 +336,9 @@
         pacman.dirX = 0; pacman.dirY = 0;
       };
 
-      function canMove(x, y, dx, dy) {
-        let targetX = x + dx * pacman.speed;
-        let targetY = y + dy * pacman.speed;
+      function canMove(x, y, dx, dy, speed) {
+        let targetX = x + dx * speed;
+        let targetY = y + dy * speed;
         let gX1 = Math.floor((targetX - 7) / tileSize);
         let gX2 = Math.floor((targetX + 7) / tileSize);
         let gY1 = Math.floor((targetY - 7) / tileSize);
@@ -347,25 +351,66 @@
         return true;
       }
 
+      function hasRemainingDots() {
+        for (let r = 0; r < map.length; r++) {
+          for (let c = 0; c < map[r].length; c++) {
+            if (map[r][c] === 2 || map[r][c] === 3) return true;
+          }
+        }
+        return false;
+      }
+
       function update() {
-        if (canMove(pacman.x, pacman.y, pacman.dirX, pacman.dirY)) {
-          pacman.x += pacman.dirX * pacman.speed;
-          pacman.y += pacman.dirY * pacman.speed;
-        }
+        if (!gameOverMessage) {
+          if (canMove(pacman.x, pacman.y, pacman.dirX, pacman.dirY, pacman.speed)) {
+            pacman.x += pacman.dirX * pacman.speed;
+            pacman.y += pacman.dirY * pacman.speed;
+          }
 
-        let cX = Math.floor(pacman.x / tileSize);
-        let cY = Math.floor(pacman.y / tileSize);
+          let cX = Math.floor(pacman.x / tileSize);
+          let cY = Math.floor(pacman.y / tileSize);
 
-        if (map[cY] && map[cY][cX] > 1) {
-          score += map[cY][cX] === 3 ? 50 : 10;
-          map[cY][cX] = 0;
-        }
+          if (map[cY] && map[cY][cX] > 1) {
+            score += map[cY][cX] === 3 ? 50 : 10;
+            map[cY][cX] = 0;
 
-        ghost.x += ghost.dirX * ghost.speed;
-        if (ghost.x <= 40 || ghost.x >= 280) ghost.dirX *= -1;
+            if (!hasRemainingDots()) {
+              gameOverMessage = "CONGRATS! YOU ATE ALL THE LIQUIDITY. FULLY & PERMANENTLY RUGGED! 💀💸";
+            }
+          }
 
-        if (Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y) < 14) {
-          pacman.x = 30; pacman.y = 30; stopPac();
+          // Ghost Maze AI Pathfinding (turns at intersections or reverses when blocked)
+          if (!canMove(ghost.x, ghost.y, ghost.dirX, ghost.dirY, ghost.speed)) {
+            let possibleDirs = [
+              {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
+            ].filter(d => !(d.dx === -ghost.dirX && d.dy === -ghost.dirY) && canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed));
+
+            if (possibleDirs.length === 0) {
+              ghost.dirX *= -1; ghost.dirY *= -1;
+            } else {
+              let chosen = possibleDirs[Math.floor(Math.random() * possibleDirs.length)];
+              ghost.dirX = chosen.dx; ghost.dirY = chosen.dy;
+            }
+          } else {
+            // At exact tile centers, give ghost a chance to switch paths organically
+            let atTileCenter = Math.abs((ghost.x % tileSize) - 10) < 1 && Math.abs((ghost.y % tileSize) - 10) < 1;
+            if (atTileCenter && Math.random() < 0.4) {
+              let possibleDirs = [
+                {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
+              ].filter(d => canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed));
+              if (possibleDirs.length > 0) {
+                let chosen = possibleDirs[Math.floor(Math.random() * possibleDirs.length)];
+                ghost.dirX = chosen.dx; ghost.dirY = chosen.dy;
+              }
+            }
+          }
+
+          ghost.x += ghost.dirX * ghost.speed;
+          ghost.y += ghost.dirY * ghost.speed;
+
+          if (Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y) < 14) {
+            pacman.x = 30; pacman.y = 30; stopPac();
+          }
         }
 
         draw();
@@ -406,6 +451,32 @@
 
         ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
         ctx.fillText('SCORE: ' + score, 10, 305);
+
+        if (gameOverMessage) {
+          ctx.fillStyle = 'rgba(0,0,0,0.85)';
+          ctx.fillRect(0, 80, canvas.width, 160);
+          ctx.fillStyle = '#00ff66';
+          ctx.font = 'bold 13px monospace';
+          ctx.textAlign = 'center';
+          
+          // Wrap text into multiple lines inside canvas overlay
+          let words = gameOverMessage.split(' ');
+          let line = '';
+          let startY = 115;
+          for(let n = 0; n < words.length; n++) {
+            let testLine = line + words[n] + ' ';
+            let metrics = ctx.measureText(testLine);
+            if (metrics.width > 280 && n > 0) {
+              ctx.fillText(line, canvas.width / 2, startY);
+              line = words[n] + ' ';
+              startY += 20;
+            } else {
+              line = testLine;
+            }
+          }
+          ctx.fillText(line, canvas.width / 2, startY);
+          ctx.textAlign = 'left';
+        }
       }
 
       update();
