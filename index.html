@@ -192,13 +192,17 @@
 
     canvas { background: #000; border-radius: 8px; touch-action: none; }
 
-    .mobile-controls { display: flex; flex-direction: column; align-items: center; margin-top: 10px; width: 100%; }
+    .mobile-controls { 
+      display: flex; flex-direction: column; align-items: center; margin-top: 10px; width: 100%; 
+      -webkit-user-select: none; user-select: none;
+    }
     .dpad-row { display: flex; justify-content: center; gap: 8px; margin: 2px 0; }
     .btn-ctrl {
       width: 48px; height: 48px; background: rgba(255, 255, 255, 0.15);
       border: 2px solid #fff; border-radius: 8px; color: #fff;
       font-size: 1.2rem; font-weight: bold; display: flex;
       justify-content: center; align-items: center; cursor: pointer;
+      -webkit-user-select: none; user-select: none;
     }
     .btn-ctrl:active { background: rgba(255, 255, 255, 0.5); }
     .btn-shoot {
@@ -262,7 +266,7 @@
       if (activeGameLoop) cancelAnimationFrame(activeGameLoop);
     }
 
-    /* PAC-MAN LOGIC WITH HOLD-TO-MOVE CONTROLS */
+    /* PAC-MAN */
     function startArcadePacman() {
       canvas.width = 320; canvas.height = 320;
       const tileSize = 20;
@@ -288,16 +292,23 @@
       let ghost = { x: 150, y: 130, dirX: 1, dirY: 0, speed: 1, color: '#ff0000' };
 
       controlsContainer.innerHTML = `
-        <div class="dpad-row"><div class="btn-ctrl" onmousedown="startPac(0,-1)" onmouseup="stopPac()" ontouchstart="startPac(0,-1)" ontouchend="stopPac()">▲</div></div>
+        <div class="dpad-row"><div class="btn-ctrl" onmousedown="startPac(event, 0,-1)" onmouseup="stopPac(event)" ontouchstart="startPac(event, 0,-1)" ontouchend="stopPac(event)">▲</div></div>
         <div class="dpad-row">
-          <div class="btn-ctrl" onmousedown="startPac(-1,0)" onmouseup="stopPac()" ontouchstart="startPac(-1,0)" ontouchend="stopPac()">◀</div>
-          <div class="btn-ctrl" onmousedown="startPac(0,1)" onmouseup="stopPac()" ontouchstart="startPac(0,1)" ontouchend="stopPac()">▼</div>
-          <div class="btn-ctrl" onmousedown="startPac(1,0)" onmouseup="stopPac()" ontouchstart="startPac(1,0)" ontouchend="stopPac()">▶</div>
+          <div class="btn-ctrl" onmousedown="startPac(event, -1,0)" onmouseup="stopPac(event)" ontouchstart="startPac(event, -1,0)" ontouchend="stopPac(event)">◀</div>
+          <div class="btn-ctrl" onmousedown="startPac(event, 0,1)" onmouseup="stopPac(event)" ontouchstart="startPac(event, 0,1)" ontouchend="stopPac(event)">▼</div>
+          <div class="btn-ctrl" onmousedown="startPac(event, 1,0)" onmouseup="stopPac(event)" ontouchstart="startPac(event, 1,0)" ontouchend="stopPac(event)">▶</div>
         </div>
       `;
 
-      window.startPac = (dx, dy) => { pacman.dirX = dx; pacman.dirY = dy; };
-      window.stopPac = () => { pacman.dirX = 0; pacman.dirY = 0; };
+      window.startPac = (e, dx, dy) => {
+        if (e && e.preventDefault) e.preventDefault();
+        pacman.dirX = dx; pacman.dirY = dy;
+      };
+
+      window.stopPac = (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        pacman.dirX = 0; pacman.dirY = 0;
+      };
 
       function canMove(x, y, dx, dy) {
         let targetX = x + dx * pacman.speed;
@@ -378,7 +389,7 @@
       update();
     }
 
-    /* POOL LOGIC WITH SCORES, AI OPPONENT, AND RESOLVED BALL-STICKING PHYSICS */
+    /* POOL WITH VECTOR IMPULSE PHYSICS (NO STICKING) AND AI */
     function startArcadePool() {
       canvas.width = 320; canvas.height = 180;
       const pockets = [
@@ -388,6 +399,7 @@
 
       let score = 0;
       let turn = 'Player';
+      let shotTaken = false;
       let cueBall = { x: 80, y: 90, vx: 0, vy: 0, r: 6, color: '#fff' };
       let aimAngle = 0;
       let balls = [
@@ -408,27 +420,28 @@
         <button class="btn-shoot" id="shootBtn" onclick="shootCue()">SHOOT!</button>
       `;
 
-      window.rotateAim = (rad) => { if(turn === 'Player') aimAngle += rad; };
+      window.rotateAim = (rad) => { if (turn === 'Player' && !isMoving()) aimAngle += rad; };
+      
       window.shootCue = () => {
-        if (turn === 'Player' && isMoving() === false) {
+        if (turn === 'Player' && !isMoving()) {
           cueBall.vx = Math.cos(aimAngle) * 7;
           cueBall.vy = Math.sin(aimAngle) * 7;
+          shotTaken = true;
         }
       };
 
       function isMoving() {
-        return balls.some(b => Math.abs(b.vx) > 0.05 || Math.abs(b.vy) > 0.05);
+        return balls.some(b => Math.abs(b.vx) > 0.08 || Math.abs(b.vy) > 0.08);
       }
 
-      function aiTurn() {
+      function takeAiTurn() {
         if (balls.length <= 1) return;
         let target = balls[1];
         let aiAngle = Math.atan2(target.y - cueBall.y, target.x - cueBall.x);
         cueBall.vx = Math.cos(aiAngle) * 6;
         cueBall.vy = Math.sin(aiAngle) * 6;
+        shotTaken = true;
       }
-
-      let hasSwappedTurn = false;
 
       function update() {
         let moving = isMoving();
@@ -436,10 +449,17 @@
         for (let i = balls.length - 1; i >= 0; i--) {
           let b = balls[i];
           b.x += b.vx; b.y += b.vy;
-          b.vx *= 0.98; b.vy *= 0.98;
+          b.vx *= 0.985; b.vy *= 0.985;
 
-          if (b.x - b.r < 18 || b.x + b.r > 302) b.vx *= -1;
-          if (b.y - b.r < 18 || b.y + b.r > 162) b.vy *= -1;
+          // Stop near zero velocity
+          if (Math.abs(b.vx) < 0.05) b.vx = 0;
+          if (Math.abs(b.vy) < 0.05) b.vy = 0;
+
+          // Wall cushion bounces
+          if (b.x - b.r < 18) { b.x = 18 + b.r; b.vx *= -1; }
+          if (b.x + b.r > 302) { b.x = 302 - b.r; b.vx *= -1; }
+          if (b.y - b.r < 18) { b.y = 18 + b.r; b.vy *= -1; }
+          if (b.y + b.r > 162) { b.y = 162 - b.r; b.vy *= -1; }
 
           pockets.forEach(p => {
             if (Math.hypot(b.x - p.x, b.y - p.y) < 12) {
@@ -453,36 +473,50 @@
           });
         }
 
-        // Elastic collisions with anti-sticking overlap correction
+        // 2D Impulse physics (resolves direction vectors & forces separation)
         for (let i = 0; i < balls.length; i++) {
           for (let j = i + 1; j < balls.length; j++) {
             let b1 = balls[i], b2 = balls[j];
-            let dist = Math.hypot(b2.x - b1.x, b2.y - b1.y);
+            let dx = b2.x - b1.x;
+            let dy = b2.y - b1.y;
+            let dist = Math.hypot(dx, dy);
             let minDist = b1.r + b2.r;
 
-            if (dist < minDist) {
-              let angle = Math.atan2(b2.y - b1.y, b2.x - b1.x);
+            if (dist < minDist && dist > 0) {
+              let nx = dx / dist;
+              let ny = dy / dist;
+
+              // Static positional resolution (prevents sticking)
               let overlap = minDist - dist;
+              b1.x -= nx * overlap * 0.5;
+              b1.y -= ny * overlap * 0.5;
+              b2.x += nx * overlap * 0.5;
+              b2.y += ny * overlap * 0.5;
 
-              // Separate balls so they don't stick
-              b1.x -= Math.cos(angle) * overlap * 0.5;
-              b1.y -= Math.sin(angle) * overlap * 0.5;
-              b2.x += Math.cos(angle) * overlap * 0.5;
-              b2.y += Math.sin(angle) * overlap * 0.5;
+              // Dynamic impulse velocity transfer
+              let kx = b1.vx - b2.vx;
+              let ky = b1.vy - b2.vy;
+              let p = 2 * (nx * kx + ny * ky) / 2;
 
-              let speed1 = Math.hypot(b1.vx, b1.vy);
-              b1.vx = -Math.cos(angle) * (speed1 || 2) * 0.8;
-              b1.vy = -Math.sin(angle) * (speed1 || 2) * 0.8;
-              b2.vx = Math.cos(angle) * (speed1 || 2) * 0.8;
-              b2.vy = Math.sin(angle) * (speed1 || 2) * 0.8;
+              if (p > 0) {
+                b1.vx -= p * nx * 0.95;
+                b1.vy -= p * ny * 0.95;
+                b2.vx += p * nx * 0.95;
+                b2.vy += p * ny * 0.95;
+              }
             }
           }
         }
 
-        if (!moving && !hasSwappedTurn) {
-          hasSwappedTurn = true;
-        } else if (moving) {
-          hasSwappedTurn = false;
+        // Turn Handshake
+        if (shotTaken && !moving) {
+          shotTaken = false;
+          if (turn === 'Player') {
+            turn = 'Computer';
+            setTimeout(takeAiTurn, 1000);
+          } else {
+            turn = 'Player';
+          }
         }
 
         draw();
@@ -514,7 +548,7 @@
 
         ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif';
         ctx.fillText('SCORE: ' + score, 20, 28);
-        ctx.fillText('TURN: ' + turn, 220, 28);
+        ctx.fillText('TURN: ' + turn, 200, 28);
       }
 
       update();
