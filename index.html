@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v6.3</title>
+  <title>The Rugged Bar v6.5</title>
   <style>
     * {
       box-sizing: border-box;
@@ -47,53 +47,31 @@
       z-index: 1;
     }
 
-    /* Degen Flashing Animation */
-    @keyframes degenFlash {
-      0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
-      50% { opacity: 0.25; transform: translateX(-50%) scale(1.06); }
-    }
-
     .hotspot {
       position: absolute; z-index: 2; cursor: pointer; display: none;
       border: none; background: transparent;
-      transition: all 0.3s ease;
-    }
-
-    /* Borderless Flashing Degen Tags */
-    .hotspot::after {
-      position: absolute; top: -28px; left: 50%;
-      transform: translateX(-50%); font-weight: bold; font-size: 0.62rem;
-      white-space: nowrap; pointer-events: none;
-      text-transform: uppercase; letter-spacing: 1px;
-      animation: degenFlash 1.2s infinite ease-in-out;
-      text-shadow: 0 0 6px currentColor;
+      transition: background 0.3s ease;
     }
 
     .arcade-hotspot { top: 50%; left: 51.5%; width: 15%; height: 8%; }
     .arcade-hotspot:hover, .arcade-hotspot:active { background: rgba(255, 230, 0, 0.15); border-radius: 6px; }
-    .arcade-hotspot::after { content: 'PLAY PAC-MAN'; color: #ffe600; }
 
     .pool-hotspot { top: 55.5%; left: 58.5%; width: 26%; height: 6.5%; }
     .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
-    .pool-hotspot::after { content: 'PLAY POOL'; color: #00ff66; }
 
     .laptop-hotspot { top: 45.5%; left: 22.5%; width: 10.5%; height: 6.5%; }
     .laptop-hotspot:hover, .laptop-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
-    .laptop-hotspot::after { content: 'DEXSCREENER CHART'; color: #00ff66; }
 
     .sofa-hotspot { top: 60.5%; left: 24%; width: 52%; height: 12%; }
     .sofa-hotspot:hover, .sofa-hotspot:active { background: rgba(88, 101, 242, 0.15); border-radius: 6px; }
-    .sofa-hotspot::after { content: 'JOIN DISCORD'; color: #5865F2; }
 
     .table-hotspot { top: 66%; left: 14%; width: 10%; height: 9%; }
     .table-hotspot:hover, .table-hotspot:active { background: rgba(255, 0, 122, 0.25); border-radius: 6px; }
-    .table-hotspot::after { content: 'PURE COPIUM'; color: #ff007a; }
 
     .otter-hotspot {
       position: absolute; top: 81.5%; left: 41.5%; width: 17%; height: 7.5%; border-radius: 50%;
     }
     .otter-hotspot:hover, .otter-hotspot:active { background: rgba(32, 129, 226, 0.25); }
-    .otter-hotspot::after { content: 'OPENSEA COLLECTION'; color: #2081e2; }
 
     .door-ape-sign {
       position: absolute; top: 12%; left: 50%; transform: translateX(-50%);
@@ -210,9 +188,9 @@
       border-color: #ff007a;
       box-shadow: 0 0 25px #ff007a;
       background: #0d0d12;
-      width: 90vw;
+      width: 92vw;
       max-width: 440px;
-      padding: 30px 20px;
+      padding: 25px 15px;
       text-align: center;
     }
 
@@ -245,12 +223,23 @@
       border: none; border-radius: 8px; background: #fff;
     }
 
-    /* Desk / Copium Terminal Styles */
-    .desk-terminal-title { font-size: 1.15rem; color: #ff007a; font-family: monospace; font-weight: bold; margin-bottom: 15px; text-shadow: 0 0 8px rgba(255, 0, 122, 0.5); }
-    .desk-terminal-screen { background: #121218; border: 1px solid #333; border-radius: 8px; padding: 20px; min-height: 110px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
-    .desk-terminal-text { font-family: monospace; font-size: 0.9rem; color: #00ffcc; line-height: 1.5; text-shadow: 0 0 5px rgba(0, 255, 204, 0.4); }
-    .desk-cycle-btn { background: #ff007a; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-family: monospace; cursor: pointer; box-shadow: 0 0 10px rgba(255, 0, 122, 0.6); transition: transform 0.1s; }
-    .desk-cycle-btn:active { transform: scale(0.95); }
+    /* Desk / Copium Terminal Enhanced Styles */
+    .desk-terminal-title { font-size: 1.1rem; color: #ff007a; font-family: monospace; font-weight: bold; margin-bottom: 12px; text-shadow: 0 0 8px rgba(255, 0, 122, 0.5); }
+    .desk-terminal-screen { background: #121218; border: 1px solid #333; border-radius: 8px; padding: 15px; min-height: 95px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+    .desk-terminal-text { font-family: monospace; font-size: 0.85rem; color: #00ffcc; line-height: 1.4; text-shadow: 0 0 5px rgba(0, 255, 204, 0.4); }
+    
+    .desk-btn-group { display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; width: 100%; }
+    .desk-cycle-btn { background: #ff007a; color: #fff; border: none; padding: 8px 14px; border-radius: 18px; font-weight: bold; font-family: monospace; font-size: 0.8rem; cursor: pointer; box-shadow: 0 0 8px rgba(255, 0, 122, 0.6); transition: transform 0.1s; }
+    .desk-ticker-btn { background: #1a1a2e; color: #00ffcc; border: 1px solid #00ffcc; padding: 8px 14px; border-radius: 18px; font-weight: bold; font-family: monospace; font-size: 0.8rem; cursor: pointer; box-shadow: 0 0 8px rgba(0, 255, 204, 0.2); transition: all 0.1s; }
+    .desk-ticker-btn.active { background: #00ffcc; color: #000; box-shadow: 0 0 12px rgba(0, 255, 204, 0.8); }
+    .desk-cycle-btn:active, .desk-ticker-btn:active { transform: scale(0.95); }
+
+    .token-scanner-box { border-top: 1px dashed #333; padding-top: 12px; width: 100%; display: flex; flex-direction: column; gap: 8px; }
+    .scanner-label { font-family: monospace; font-size: 0.75rem; color: #aaa; text-align: left; }
+    .scanner-input-row { display: flex; gap: 8px; }
+    .scanner-input { flex: 1; background: #0b0c10; border: 1px solid #ff007a; border-radius: 6px; padding: 6px 10px; color: #fff; font-family: monospace; font-size: 0.85rem; outline: none; }
+    .scanner-submit-btn { background: #00ff66; color: #000; border: none; border-radius: 6px; padding: 0 12px; font-family: monospace; font-weight: bold; font-size: 0.8rem; cursor: pointer; }
+    .scanner-submit-btn:active { transform: scale(0.95); }
 
     .opensea-card-container {
       width: 85vw; max-width: 420px; background: #121214; border: 2px solid #2081e2;
@@ -285,7 +274,7 @@
       <span class="sign-price" id="signApePrice">...</span>
     </a>
 
-    <div class="door-version">v6.3</div>
+    <div class="door-version">v6.5</div>
 
     <div class="enter-prompt">Click Here to Enter</div>
     <div class="doors-container" onclick="openDoors()">
@@ -307,13 +296,22 @@
       <span class="close-btn" onclick="closeWebModal()">&times;</span>
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
-      <!-- Desk Terminal Info Feed Container -->
       <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL</div>
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v6.5</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
-        <button class="desk-cycle-btn" onclick="cycleDeskMessage()">NEXT ALPHA 🔄</button>
+        <div class="desk-btn-group">
+          <button class="desk-cycle-btn" onclick="cycleDeskMessage()">NEXT ALPHA 🔄</button>
+          <button class="desk-ticker-btn" id="tickerToggleBtn" onclick="toggleAutoTicker()">⚡ AUTO TICKER: OFF</button>
+        </div>
+        <div class="token-scanner-box">
+          <div class="scanner-label">SIMULATE TOKEN AUDIT:</div>
+          <div class="scanner-input-row">
+            <input type="text" id="tokenScannerInput" class="scanner-input" placeholder="e.g. $MOON, $SCAM" maxlength="8">
+            <button class="scanner-submit-btn" onclick="runTokenScan()">SCAN COIN</button>
+          </div>
+        </div>
       </div>
 
       <div id="openseaCardModal" class="opensea-card-container" style="display: none;">
@@ -325,24 +323,112 @@
   </div>
 
   <script>
+    // Web Audio API Sound Synthesizer (No external assets required)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTerminalSound(type) {
+      if (!audioCtx) return;
+      if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+      
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      let now = audioCtx.currentTime;
+      if (type === 'click') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+        gainNode.gain.setValueAtTime(0.08, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'scan') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.linearRampToValueAtTime(600, now + 0.2);
+        gainNode.gain.setValueAtTime(0.1, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } else if (type === 'alert') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.setValueAtTime(300, now + 0.1);
+        gainNode.gain.setValueAtTime(0.12, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      }
+    }
+
     function openDoors() {
       document.getElementById('scene').classList.add('open');
     }
 
-    // Desk terminal quotes generator logic
+    // Massively expanded Degen Terminal quotes generator logic
     const deskMessages = [
       "BARTENDER: 'Bro, I swear bottom is in, my cousin's barber told me.'",
       "AUDIT: Token score: 0/100. Liquidity pooled straight into the dev's vacation fund.",
       "ALPHA LEAK: Buying high, selling low, and blaming the multi-sig team by Tuesday.",
       "BARTENDER: 'Have another shot of hopium, the macro chart looks fine.'",
       "AUDIT: Smart contract check: 100% guaranteed stealth tax applied.",
-      "ALPHA LEAK: Next green candle is sponsored by your last remaining savings."
+      "ALPHA LEAK: Next green candle is sponsored by your last remaining savings.",
+      "BARTENDER: 'Relax man, liquidity is just resting in another wallet.'",
+      "AUDIT: Mint function detected: Dev can mint a trillion tokens while you sleep.",
+      "ALPHA LEAK: The whales are accumulating... your exit liquidity.",
+      "BARTENDER: 'Paper hands get flushed, diamond hands get rugged. Such is life.'",
+      "AUDIT: Honeypot analysis: You can buy all you want, but selling requires a blood sacrifice.",
+      "ALPHA LEAK: Just inverse whatever your brain tells you to do at 3 AM.",
+      "BARTENDER: 'Stop looking at the 1-minute chart and look at the ceiling vent instead. Way more bullish.'",
+      "AUDIT: Ownership not renounced. The dev has the keys to your financial future.",
+      "WHALE ALERT: A sleeping giant just transferred 50,000,000 tokens to a dead address. Total panic ensues.",
+      "GAS WARS: Current network fee is 450 Gwei. You just paid $40 in gas to swap a $15 meme coin.",
+      "DISCORD MOD: 'Please stop opening support tickets about your hacked wallet, have you tried turning your private keys off and on again?'",
+      "TECHNICAL ANALYSIS: We are currently forming an inverse toilet-bowl head-and-shoulders fractal pattern pointing straight to zero.",
+      "ALPHA LEAK: Your favorite influencer just quietly dumped their bags while tweeting bullish rocket emojis.",
+      "BARTENDER: 'If the chart looks like a dying heartbeat, that just means high volatility incoming!'"
     ];
     let currentDeskIndex = 0;
+    let autoTickerTimer = null;
+    let isAutoTickerRunning = false;
 
     function cycleDeskMessage() {
+      playTerminalSound('click');
       currentDeskIndex = (currentDeskIndex + 1) % deskMessages.length;
       document.getElementById('deskMessageDisplay').innerText = deskMessages[currentDeskIndex];
+    }
+
+    function toggleAutoTicker() {
+      playTerminalSound('alert');
+      isAutoTickerRunning = !isAutoTickerRunning;
+      const btn = document.getElementById('tickerToggleBtn');
+      if (isAutoTickerRunning) {
+        btn.innerText = '⚡ AUTO TICKER: ON';
+        btn.classList.add('active');
+        autoTickerTimer = setInterval(cycleDeskMessage, 4500);
+      } else {
+        btn.innerText = '⚡ AUTO TICKER: OFF';
+        btn.classList.remove('active');
+        clearInterval(autoTickerTimer);
+      }
+    }
+
+    function runTokenScan() {
+      playTerminalSound('scan');
+      let inputVal = document.getElementById('tokenScannerInput').value.trim();
+      if (!inputVal) inputVal = "$RANDOM";
+      if (!inputVal.startsWith('$')) inputVal = '$' + inputVal.toUpperCase();
+
+      const risks = [
+        `SCAN (${inputVal}): Liquidity locked in a kitchen blender. Rug probability: 99.4%.`,
+        `SCAN (${inputVal}): Verified 100% pure scam. Dev team spotted buying luxury yachts in Ohio.`,
+        `SCAN (${inputVal}): Honeypot status: CONFIRMED. You can buy, but your tokens live here forever.",`,
+        `SCAN (${inputVal}): Audit score: 4/100. Looks extremely bullish, proceed directly to zero.`,
+        `SCAN (${inputVal}): Tax rate: 99% buy / 99% sell. The ultimate tax farm!`
+      ];
+      let randomAudit = risks[Math.floor(Math.random() * risks.length)];
+      document.getElementById('deskMessageDisplay').innerText = randomAudit;
     }
 
     function openWebModal(type) {
@@ -377,6 +463,9 @@
     }
 
     function closeWebModal() {
+      if (isAutoTickerRunning) {
+        toggleAutoTicker(); // Turn off auto ticker when closing modal
+      }
       document.getElementById('webModal').style.display = 'none';
       document.getElementById('webIframe').src = '';
     }
