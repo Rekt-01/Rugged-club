@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v10.0</title>
+  <title>The Rugged Bar v11.0</title>
   <style>
     * {
       box-sizing: border-box;
@@ -244,6 +244,8 @@
       background: rgba(0, 0, 0, 0.9); padding: 12px 16px; border-radius: 10px;
       text-decoration: none; cursor: pointer; transition: all 0.25s ease;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+      border: none;
+      width: 100%;
     }
     .degen-action-btn:hover { transform: scale(1.03); }
 
@@ -254,9 +256,9 @@
     .enter-btn .btn-main-text { color: #00ff66; text-shadow: 0 0 8px #00ff66; }
     .enter-btn:hover { background: rgba(0, 255, 102, 0.15); box-shadow: 0 0 25px rgba(0,255,102,0.7); }
 
-    .pump-btn { border: 2px solid #ff00de; box-shadow: 0 0 20px rgba(255,0,222,0.4); }
-    .pump-btn .btn-main-text { color: #ff00de; text-shadow: 0 0 8px #ff00de; }
-    .pump-btn:hover { background: rgba(255, 0, 222, 0.15); box-shadow: 0 0 25px rgba(255,0,222,0.7); }
+    .grass-btn { border: 2px solid #00ffcc; box-shadow: 0 0 20px rgba(0,255,204,0.4); }
+    .grass-btn .btn-main-text { color: #00ffcc; text-shadow: 0 0 8px #00ffcc; }
+    .grass-btn:hover { background: rgba(0, 255, 204, 0.15); box-shadow: 0 0 25px rgba(0,255,204,0.7); }
 
     .viewport.open .door-left { transform: rotateY(-105deg); }
     .viewport.open .door-right { transform: rotateY(105deg); }
@@ -291,6 +293,16 @@
       width: 92vw;
       max-width: 440px;
       padding: 25px 15px;
+      text-align: center;
+    }
+
+    .modal-content.grass-style {
+      border-color: #00ffcc;
+      box-shadow: 0 0 30px #00ffcc;
+      background: #0d1210;
+      width: 92vw;
+      max-width: 500px;
+      padding: 20px;
       text-align: center;
     }
 
@@ -352,6 +364,13 @@
       padding: 10px 24px; border-radius: 25px; box-shadow: 0 0 12px rgba(32, 129, 226, 0.6); transition: all 0.2s ease;
     }
     .opensea-visit-btn:hover { background: #1868b7; transform: scale(1.03); }
+
+    /* Grass Toucher Cam View */
+    .grass-cam-title { font-family: monospace; color: #00ffcc; font-size: 1.05rem; font-weight: bold; margin-bottom: 8px; text-shadow: 0 0 8px rgba(0, 255, 204, 0.6); }
+    .grass-cam-subtitle { font-family: monospace; color: #aaa; font-size: 0.72rem; margin-bottom: 14px; line-height: 1.3; }
+    .grass-iframe { width: 84vw; max-width: 460px; height: 260px; border: 2px solid #00ffcc; border-radius: 8px; background: #000; box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); margin-bottom: 12px; }
+    .grass-back-btn { background: #00ffcc; color: #000; border: none; padding: 8px 20px; border-radius: 18px; font-weight: bold; font-family: monospace; font-size: 0.8rem; cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
+    .grass-back-btn:active { transform: scale(0.95); }
   </style>
 </head>
 <body>
@@ -368,6 +387,7 @@
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
+    <!-- Top Navigation Controls Bar -->
     <div class="top-controls-bar">
       <a href="https://dexscreener.com/apechain" target="_blank" class="door-ape-sign">
         <span class="sign-label">$APE:</span>
@@ -379,22 +399,24 @@
       </div>
     </div>
 
+    <!-- Rekt Light Warning Popup -->
     <div class="rekt-speech-bubble" id="rektBubble">
       Bro wtf turn the lights back on before I get REKT!
     </div>
 
     <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-    <div class="door-version">v10.0</div>
+    <div class="door-version">v11.0</div>
 
+    <!-- Front Page Dual Buttons with Touch Grass Webcam Switch -->
     <div class="front-buttons-container">
-      <div class="degen-action-btn enter-btn" onclick="openDoors()">
+      <button class="degen-action-btn enter-btn" onclick="openDoors()">
         <span class="btn-main-text">ENTER THE BAR</span>
         <span class="btn-sub-text">"Ready to get rugged? Grab a seat."</span>
-      </div>
-      <a href="https://pump.fun" target="_blank" class="degen-action-btn pump-btn">
-        <span class="btn-main-text">APE ON PUMP.FUN</span>
-        <span class="btn-sub-text">"Zero to hero or straight to zero."</span>
-      </a>
+      </button>
+      <button class="degen-action-btn grass-btn" onclick="openTouchGrassModal()">
+        <span class="btn-main-text">TOUCH GRASS</span>
+        <span class="btn-sub-text">"Look at actual trees for once."</span>
+      </button>
     </div>
 
     <div class="doors-container">
@@ -403,6 +425,7 @@
     </div>
   </div>
 
+  <!-- Panic Modal -->
   <div class="panic-modal" id="panicModal">
     <div class="panic-card">
       <div class="panic-title">⚠️ PAPER HANDS DETECTED</div>
@@ -425,7 +448,7 @@
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
       <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v10.0</div>
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v11.0</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
@@ -446,6 +469,14 @@
         <div class="opensea-card-title">OPENSEA COLLECTION</div>
         <div class="opensea-card-desc">Explore our official NFT collection safely on OpenSea without leaving the ecosystem context.</div>
         <a href="https://opensea.io/collection/legods" target="_blank" class="opensea-visit-btn">OPEN COLLECTION 🌊</a>
+      </div>
+
+      <div id="grassCardModal" class="grass-style" style="display: none;">
+        <div class="grass-cam-title">🌿 EMERGENCY GRASS FEED</div>
+        <div class="grass-cam-subtitle">WARNING: Exposure to natural sunlight and real-world outdoor items may cause sudden clarity and shock.</div>
+        <!-- Embedded live public park/nature cam stream -->
+        <iframe class="grass-iframe" src="https://www.youtube-nocookie.com/embed/jfKfPfyJRdk?autoplay=1&mute=0" allow="autoplay"></iframe>
+        <button class="grass-back-btn" onclick="closeWebModal()">I'VE SEEN ENOUGH, TAKE ME BACK TO THE CHARTS 📉</button>
       </div>
     </div>
   </div>
@@ -550,6 +581,24 @@
       document.getElementById('scene').classList.add('open');
     }
 
+    function openTouchGrassModal() {
+      playTerminalSound('click');
+      const modal = document.getElementById('webModal');
+      const iframe = document.getElementById('webIframe');
+      const openseaCard = document.getElementById('openseaCardModal');
+      const deskContainer = document.getElementById('deskModalContainer');
+      const grassContainer = document.getElementById('grassCardModal');
+      const content = document.getElementById('webModalContent');
+
+      modal.style.display = 'flex';
+      content.className = 'modal-content grass-style';
+      iframe.style.display = 'none';
+      iframe.src = '';
+      openseaCard.style.display = 'none';
+      deskContainer.style.display = 'none';
+      grassContainer.style.display = 'block';
+    }
+
     const deskMessages = [
       "BARTENDER: 'Bro, I swear bottom is in, my cousin's barber told me.'",
       "AUDIT: Token score: 0/100. Liquidity pooled straight into the dev's vacation fund.",
@@ -619,6 +668,7 @@
       const iframe = document.getElementById('webIframe');
       const openseaCard = document.getElementById('openseaCardModal');
       const deskContainer = document.getElementById('deskModalContainer');
+      const grassContainer = document.getElementById('grassCardModal');
       const content = document.getElementById('webModalContent');
 
       modal.style.display = 'flex';
@@ -628,12 +678,14 @@
         iframe.style.display = 'block';
         openseaCard.style.display = 'none';
         deskContainer.style.display = 'none';
+        grassContainer.style.display = 'none';
         iframe.src = 'https://dexscreener.com/apechain?embed=1&theme=dark';
       } else if (type === 'desk') {
         content.className = 'modal-content desk-style';
         iframe.style.display = 'none';
         iframe.src = '';
         openseaCard.style.display = 'none';
+        grassContainer.style.display = 'none';
         deskContainer.style.display = 'block';
         document.getElementById('deskMessageDisplay').innerText = deskMessages[currentDeskIndex];
       } else if (type === 'opensea') {
@@ -641,6 +693,7 @@
         iframe.style.display = 'none';
         iframe.src = '';
         deskContainer.style.display = 'none';
+        grassContainer.style.display = 'none';
         openseaCard.style.display = 'block';
       }
     }
@@ -651,6 +704,13 @@
       }
       document.getElementById('webModal').style.display = 'none';
       document.getElementById('webIframe').src = '';
+      // Reset grass iframe source to stop background streaming audio when closed
+      const grassIframe = document.querySelector('.grass-iframe');
+      if (grassIframe) {
+        let src = grassIframe.src;
+        grassIframe.src = '';
+        grassIframe.src = src;
+      }
     }
 
     async function updateApePrice() {
