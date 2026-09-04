@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v11.0</title>
+  <title>The Rugged Bar v12.0</title>
   <style>
     * {
       box-sizing: border-box;
@@ -137,7 +137,6 @@
     .panic-btn { border-color: #ff3333; color: #ff3333; box-shadow: 0 0 12px rgba(255, 51, 51, 0.4); }
     .panic-btn:hover { background: rgba(255, 51, 51, 0.2); box-shadow: 0 0 20px rgba(255, 51, 51, 0.8); }
 
-    /* Rekt Light Warning Popup */
     .rekt-speech-bubble {
       position: absolute; top: 31%; left: 50%; transform: translateX(-50%) scale(0.9);
       background: rgba(0, 0, 0, 0.95); border: 2px solid #ff007a; border-radius: 8px;
@@ -147,7 +146,6 @@
     }
     .rekt-speech-bubble.show { opacity: 1; transform: translateX(-50%) scale(1); }
 
-    /* Panic Modal */
     .panic-modal {
       display: none; position: fixed; top: 0; left: 0;
       width: 100vw; height: 100vh; background: rgba(255, 0, 0, 0.25);
@@ -203,7 +201,6 @@
     .door-left .handle { right: 45px; }
     .door-right .handle { left: 45px; }
 
-    /* Degen Saying Banner */
     .degen-saying-banner {
       position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
       font-family: monospace; font-size: 0.75rem; font-weight: bold;
@@ -232,7 +229,6 @@
       z-index: 5; pointer-events: none; transition: opacity 0.4s ease;
     }
 
-    /* Dual Front Page Buttons Container */
     .front-buttons-container {
       position: absolute; bottom: 17%; left: 50%; transform: translateX(-50%);
       width: 90%; max-width: 380px; display: flex; flex-direction: column; gap: 12px;
@@ -301,7 +297,7 @@
       box-shadow: 0 0 30px #00ffcc;
       background: #0d1210;
       width: 92vw;
-      max-width: 500px;
+      max-width: 440px;
       padding: 20px;
       text-align: center;
     }
@@ -365,11 +361,37 @@
     }
     .opensea-visit-btn:hover { background: #1868b7; transform: scale(1.03); }
 
-    /* Grass Toucher Cam View */
-    .grass-cam-title { font-family: monospace; color: #00ffcc; font-size: 1.05rem; font-weight: bold; margin-bottom: 8px; text-shadow: 0 0 8px rgba(0, 255, 204, 0.6); }
-    .grass-cam-subtitle { font-family: monospace; color: #aaa; font-size: 0.72rem; margin-bottom: 14px; line-height: 1.3; }
-    .grass-iframe { width: 84vw; max-width: 460px; height: 260px; border: 2px solid #00ffcc; border-radius: 8px; background: #000; box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); margin-bottom: 12px; }
-    .grass-back-btn { background: #00ffcc; color: #000; border: none; padding: 8px 20px; border-radius: 18px; font-weight: bold; font-family: monospace; font-size: 0.8rem; cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
+    /* Grass GIF Cam View */
+    .grass-cam-title { font-family: monospace; color: #00ffcc; font-size: 1.05rem; font-weight: bold; margin-bottom: 4px; text-shadow: 0 0 8px rgba(0, 255, 204, 0.6); }
+    .grass-cam-subtitle { font-family: monospace; color: #aaa; font-size: 0.7rem; margin-bottom: 10px; line-height: 1.3; }
+    
+    .retro-cam-frame {
+      position: relative; width: 100%; height: 210px; border: 2px solid #00ffcc;
+      border-radius: 8px; background: #000; overflow: hidden; margin-bottom: 10px;
+      box-shadow: inset 0 0 15px rgba(0, 255, 204, 0.2);
+    }
+    .retro-cam-frame img {
+      width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) brightness(0.9);
+    }
+    /* CRT Scanlines Overlay */
+    .retro-cam-frame::after {
+      content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 2; background-size: 100% 3px, 3px 100%; pointer-events: none;
+    }
+    .cam-hud-overlay {
+      position: absolute; top: 8px; left: 10px; z-index: 3; font-family: monospace;
+      font-size: 0.65rem; color: #00ffcc; text-shadow: 0 0 4px #00ffcc; display: flex; gap: 8px; align-items: center;
+    }
+    .live-dot { width: 7px; height: 7px; background: #ff3333; border-radius: 50%; box-shadow: 0 0 6px #ff3333; animation: liveBlink 1s infinite; }
+    @keyframes liveBlink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+    .grass-counter-box {
+      font-family: monospace; font-size: 0.75rem; color: #ffe600; margin-bottom: 12px;
+      background: rgba(255, 230, 0, 0.08); border: 1px dashed rgba(255, 230, 0, 0.4);
+      padding: 6px; border-radius: 6px;
+    }
+    .grass-back-btn { background: #00ffcc; color: #000; border: none; padding: 9px 20px; border-radius: 18px; font-weight: bold; font-family: monospace; font-size: 0.8rem; cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
     .grass-back-btn:active { transform: scale(0.95); }
   </style>
 </head>
@@ -387,7 +409,6 @@
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
-    <!-- Top Navigation Controls Bar -->
     <div class="top-controls-bar">
       <a href="https://dexscreener.com/apechain" target="_blank" class="door-ape-sign">
         <span class="sign-label">$APE:</span>
@@ -399,15 +420,13 @@
       </div>
     </div>
 
-    <!-- Rekt Light Warning Popup -->
     <div class="rekt-speech-bubble" id="rektBubble">
       Bro wtf turn the lights back on before I get REKT!
     </div>
 
     <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-    <div class="door-version">v11.0</div>
+    <div class="door-version">v12.0</div>
 
-    <!-- Front Page Dual Buttons with Touch Grass Webcam Switch -->
     <div class="front-buttons-container">
       <button class="degen-action-btn enter-btn" onclick="openDoors()">
         <span class="btn-main-text">ENTER THE BAR</span>
@@ -425,7 +444,6 @@
     </div>
   </div>
 
-  <!-- Panic Modal -->
   <div class="panic-modal" id="panicModal">
     <div class="panic-card">
       <div class="panic-title">⚠️ PAPER HANDS DETECTED</div>
@@ -448,7 +466,7 @@
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
       <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v11.0</div>
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v12.0</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
@@ -472,11 +490,22 @@
       </div>
 
       <div id="grassCardModal" class="grass-style" style="display: none;">
-        <div class="grass-cam-title">🌿 EMERGENCY GRASS FEED</div>
-        <div class="grass-cam-subtitle">WARNING: Exposure to natural sunlight and real-world outdoor items may cause sudden clarity and shock.</div>
-        <!-- Embedded live public park/nature cam stream -->
-        <iframe class="grass-iframe" src="https://www.youtube-nocookie.com/embed/jfKfPfyJRdk?autoplay=1&mute=0" allow="autoplay"></iframe>
-        <button class="grass-back-btn" onclick="closeWebModal()">I'VE SEEN ENOUGH, TAKE ME BACK TO THE CHARTS 📉</button>
+        <div class="grass-cam-title">🌿 CAM-04: OUTSIDE WORLD</div>
+        <div class="grass-cam-subtitle">WARNING: Natural sunlight may cause temporary trader disorientation.</div>
+        
+        <div class="retro-cam-frame">
+          <div class="cam-hud-overlay">
+            <div class="live-dot"></div>
+            <span>REC // NATURE_FEED.GIF</span>
+          </div>
+          <img src="https://media.giphy.com/media/l41lLuV3nRmJ0DxCw/giphy.gif" alt="Touching Grass Security Feed">
+        </div>
+
+        <div class="grass-counter-box" id="grassCounterDisplay">
+          🌱 Degens rehabilitated today: <span id="grassCountNum">1,428</span>
+        </div>
+
+        <button class="grass-back-btn" onclick="closeWebModal()">TAKE ME BACK TO THE CHARTS 📉</button>
       </div>
     </div>
   </div>
@@ -589,6 +618,12 @@
       const deskContainer = document.getElementById('deskModalContainer');
       const grassContainer = document.getElementById('grassCardModal');
       const content = document.getElementById('webModalContent');
+
+      // Increment live local counter for grass touching
+      let currentCount = parseInt(localStorage.getItem('grassTouches') || '1428');
+      currentCount++;
+      localStorage.setItem('grassTouches', currentCount);
+      document.getElementById('grassCountNum').innerText = currentCount.toLocaleString();
 
       modal.style.display = 'flex';
       content.className = 'modal-content grass-style';
@@ -704,13 +739,6 @@
       }
       document.getElementById('webModal').style.display = 'none';
       document.getElementById('webIframe').src = '';
-      // Reset grass iframe source to stop background streaming audio when closed
-      const grassIframe = document.querySelector('.grass-iframe');
-      if (grassIframe) {
-        let src = grassIframe.src;
-        grassIframe.src = '';
-        grassIframe.src = src;
-      }
     }
 
     async function updateApePrice() {
