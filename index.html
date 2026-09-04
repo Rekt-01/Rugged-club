@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v12.0</title>
+  <title>The Rugged Bar v12.1</title>
   <style>
     * {
       box-sizing: border-box;
@@ -409,6 +409,7 @@
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
+    <!-- Top Navigation Controls Bar -->
     <div class="top-controls-bar">
       <a href="https://dexscreener.com/apechain" target="_blank" class="door-ape-sign">
         <span class="sign-label">$APE:</span>
@@ -420,13 +421,15 @@
       </div>
     </div>
 
+    <!-- Rekt Light Warning Popup -->
     <div class="rekt-speech-bubble" id="rektBubble">
       Bro wtf turn the lights back on before I get REKT!
     </div>
 
     <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-    <div class="door-version">v12.0</div>
+    <div class="door-version">v12.1</div>
 
+    <!-- Front Page Dual Buttons -->
     <div class="front-buttons-container">
       <button class="degen-action-btn enter-btn" onclick="openDoors()">
         <span class="btn-main-text">ENTER THE BAR</span>
@@ -444,6 +447,7 @@
     </div>
   </div>
 
+  <!-- Panic Modal -->
   <div class="panic-modal" id="panicModal">
     <div class="panic-card">
       <div class="panic-title">⚠️ PAPER HANDS DETECTED</div>
@@ -466,7 +470,7 @@
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
       <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v12.0</div>
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v12.1</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
@@ -498,7 +502,8 @@
             <div class="live-dot"></div>
             <span>REC // NATURE_FEED.GIF</span>
           </div>
-          <img src="https://media.giphy.com/media/l41lLuV3nRmJ0DxCw/giphy.gif" alt="Touching Grass Security Feed">
+          <!-- Direct raw GIF link for trees & nature -->
+          <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY5bTlzN254NWVtd2JpcWZ4cDF6ZHE4aW9nOHpnb3R2bTN2bjB0aiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Lq0h93752f6J9tijrh/giphy.gif" alt="Touching Grass Security Feed">
         </div>
 
         <div class="grass-counter-box" id="grassCounterDisplay">
@@ -619,7 +624,6 @@
       const grassContainer = document.getElementById('grassCardModal');
       const content = document.getElementById('webModalContent');
 
-      // Increment live local counter for grass touching
       let currentCount = parseInt(localStorage.getItem('grassTouches') || '1428');
       currentCount++;
       localStorage.setItem('grassTouches', currentCount);
