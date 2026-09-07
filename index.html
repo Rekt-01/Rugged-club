@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v12.3</title>
+  <title>The Rugged Bar v13.0 - Space Command</title>
   <style>
     * {
       box-sizing: border-box;
@@ -14,7 +14,7 @@
     }
 
     body {
-      background-color: #0b0c10;
+      background-color: #020205;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -34,18 +34,156 @@
       width: 100vw; height: 177.78vw;
       max-height: 100vh; max-width: 56.25vh;
       transform: translate(-50%, -50%);
+      overflow: hidden;
+      background: #000;
     }
 
     @media (min-aspect-ratio: 9/16) {
       .scene-container { width: 56.25vh; height: 100vh; }
     }
 
+    /* --- SPACESHIP COCKPIT ENVIRONMENT --- */
+    .space-view {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at center, #0f1026 0%, #05050a 60%, #000000 100%);
+      z-index: 1;
+      overflow: hidden;
+      transition: transform 1.8s cubic-bezier(0.5, 0, 0.1, 1), filter 1.5s ease;
+    }
+
+    /* Starfield background elements */
+    .stars {
+      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background-image: 
+        radial-gradient(1px 1.5px at 20px 30px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 90px 40px, #00ffcc, rgba(0,0,0,0)),
+        radial-gradient(1px 1.5px at 160px 120px, #fff, rgba(0,0,0,0));
+      background-repeat: repeat;
+      background-size: 200px 200px;
+      opacity: 0.7;
+      animation: spaceDrift 100s linear infinite;
+    }
+    @keyframes spaceDrift {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(200px); }
+    }
+
+    /* Earth in the distance */
+    .earth-planet {
+      position: absolute; top: 22%; left: 50%; transform: translateX(-50%);
+      width: 130px; height: 130px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #4da6ff 0%, #0044cc 40%, #001a66 80%, #000511 100%);
+      box-shadow: 0 0 30px rgba(77, 166, 255, 0.4), inset -15px -15px 25px rgba(0,0,0,0.8);
+      z-index: 2;
+      transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 3s ease;
+    }
+    /* Earth atmosphere glow */
+    .earth-planet::after {
+      content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
+      border-radius: 50%; box-shadow: 0 0 15px rgba(0, 153, 255, 0.6);
+      pointer-events: none; opacity: 0.8;
+    }
+
+    /* Cockpit HUD Overlay & Dashboard Frame */
+    .cockpit-dashboard {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 52%;
+      background: linear-gradient(0deg, #111216 0%, #1a1b24 85%, rgba(26,27,36,0) 100%);
+      border-top: 4px solid #2a2c3d;
+      z-index: 4;
+      clip-path: polygon(0% 15%, 15% 0%, 85% 0%, 100% 15%, 100% 100%, 0% 100%);
+      padding: 15px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      box-shadow: inset 0 15px 25px rgba(0,255,204,0.05);
+    }
+
+    .cockpit-windows-frame {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      border: 12px solid rgba(17, 18, 22, 0.95);
+      border-bottom: none; z-index: 3; pointer-events: none;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.9);
+    }
+
+    /* Spaceship Interactive Terminal Screen */
+    .spaceship-terminal {
+      background: rgba(5, 7, 12, 0.92);
+      border: 2px solid #00ffcc;
+      border-radius: 8px;
+      height: 160px;
+      padding: 10px 12px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.3), inset 0 0 10px rgba(0, 255, 204, 0.15);
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .terminal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: monospace; font-size: 0.65rem; color: #00ffcc;
+      border-bottom: 1px dashed rgba(0, 255, 204, 0.3); padding-bottom: 4px; margin-bottom: 6px;
+    }
+
+    .terminal-screen-content {
+      flex: 1; overflow-y: auto; font-family: monospace; font-size: 0.7rem;
+      color: #e0e0e0; line-height: 1.35; white-space: pre-wrap;
+      text-shadow: 0 0 3px rgba(255,255,255,0.2);
+    }
+    .terminal-screen-content::-webkit-scrollbar { width: 4px; }
+    .terminal-screen-content::-webkit-scrollbar-thumb { background: #00ffcc; border-radius: 2px; }
+
+    /* Cockpit Control Buttons Row */
+    .cockpit-controls {
+      display: flex; gap: 8px; width: 100%; margin-bottom: 5px;
+    }
+
+    .cockpit-btn {
+      flex: 1; background: #161821; border: 2px solid #ff007a; border-radius: 6px;
+      padding: 10px 6px; font-family: monospace; font-size: 0.75rem; font-weight: bold;
+      color: #ff007a; text-transform: uppercase; cursor: pointer; text-align: center;
+      box-shadow: 0 0 10px rgba(255, 0, 122, 0.3); transition: all 0.2s ease;
+    }
+    .cockpit-btn:hover { background: rgba(255, 0, 122, 0.15); box-shadow: 0 0 18px rgba(255, 0, 122, 0.6); transform: translateY(-1px); }
+
+    .cockpit-btn.lfg-btn {
+      border-color: #00ff66; color: #00ff66; box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+      opacity: 0.4; pointer-events: none;
+    }
+    .cockpit-btn.lfg-btn.active {
+      opacity: 1; pointer-events: auto; animation: lfgPulse 1.2s infinite alternate;
+    }
+    @keyframes lfgPulse {
+      0% { box-shadow: 0 0 10px rgba(0,255,102,0.4); border-color: #00ff66; }
+      100% { box-shadow: 0 0 25px rgba(0,255,102,0.9); border-color: #fff; }
+    }
+
+    /* HYPERDRIVE WARP ANIMATION STATE */
+    .viewport.hyperdrive .space-view {
+      transform: scale(8);
+      filter: brightness(3) contrast(1.5);
+      transition: transform 2.2s cubic-bezier(0.7, 0, 0.9, 1), filter 1s ease;
+    }
+    .viewport.hyperdrive .earth-planet {
+      transform: translateX(-50%) scale(15);
+      box-shadow: 0 0 100px #fff, 0 0 200px #4da6ff;
+      transition: transform 2.2s cubic-bezier(0.7, 0, 0.9, 1);
+    }
+    .viewport.hyperdrive .cockpit-dashboard {
+      transform: translateY(120%);
+      transition: transform 1.2s ease-in;
+    }
+    .viewport.hyperdrive .stars {
+      animation-duration: 0.3s;
+    }
+
+
+    /* --- ORIGINAL CLUBHOUSE BAR ENVIRONMENT (Revealed after jump) --- */
     .clubhouse-bg {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: url('clubhouse.JPG') center center / cover no-repeat;
       transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1), filter 0.5s ease;
-      z-index: 1;
+      z-index: 1; opacity: 0;
     }
+    .viewport.bar-active .clubhouse-bg { opacity: 1; }
 
     .viewport.lights-off .clubhouse-bg {
       filter: brightness(0.25) contrast(1.4) hue-rotate(-15deg);
@@ -160,8 +298,10 @@
 
     .doors-container {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 4; display: flex; perspective: 1500px;
+      z-index: 4; display: flex; perspective: 1500px; pointer-events: none; opacity: 0;
+      transition: opacity 0.3s ease;
     }
+    .viewport.bar-active .doors-container { opacity: 1; pointer-events: auto; }
 
     .door {
       width: 50%; height: 100%; 
@@ -206,9 +346,9 @@
       border-radius: 6px; letter-spacing: 1.5px;
       text-shadow: 0 0 8px rgba(255, 230, 0, 0.8);
       box-shadow: 0 0 15px rgba(255, 230, 0, 0.3);
-      z-index: 5; pointer-events: none; transition: opacity 0.4s ease;
-      animation: keepClickingPulse 2s infinite alternate;
+      z-index: 5; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
     }
+    .viewport.bar-active .degen-saying-banner { opacity: 1; animation: keepClickingPulse 2s infinite alternate; }
 
     @keyframes keepClickingPulse {
       0% { border-color: rgba(255, 230, 0, 0.3); box-shadow: 0 0 10px rgba(255, 230, 0, 0.2); }
@@ -223,22 +363,22 @@
       border-radius: 4px; letter-spacing: 2px;
       text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
       box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
-      z-index: 5; pointer-events: none; transition: opacity 0.4s ease;
+      z-index: 5; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
     }
+    .viewport.bar-active .door-version { opacity: 1; }
 
     .front-buttons-container {
       position: absolute; bottom: 17%; left: 50%; transform: translateX(-50%);
       width: 90%; max-width: 380px; display: flex; flex-direction: column; gap: 12px;
-      z-index: 5; text-align: center; transition: opacity 0.4s ease; pointer-events: auto;
+      z-index: 5; text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
     }
+    .viewport.bar-active .front-buttons-container { opacity: 1; pointer-events: auto; }
 
     .degen-action-btn {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       background: rgba(0, 0, 0, 0.9); padding: 12px 16px; border-radius: 10px;
       text-decoration: none; cursor: pointer; transition: all 0.25s ease;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-      border: none;
-      width: 100%;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); border: none; width: 100%;
     }
     .degen-action-btn:hover { transform: scale(1.03); }
 
@@ -280,23 +420,13 @@
     .modal-content.opensea-style { border-color: #2081e2; box-shadow: 0 0 25px #2081e2; }
     
     .modal-content.desk-style {
-      border-color: #ff007a;
-      box-shadow: 0 0 25px #ff007a;
-      background: #0d0d12;
-      width: 92vw;
-      max-width: 440px;
-      padding: 25px 15px;
-      text-align: center;
+      border-color: #ff007a; box-shadow: 0 0 25px #ff007a; background: #0d0d12;
+      width: 92vw; max-width: 440px; padding: 25px 15px; text-align: center;
     }
 
     .modal-content.grass-style {
-      border-color: #00ffcc;
-      box-shadow: 0 0 30px #00ffcc;
-      background: #0d1210;
-      width: 92vw;
-      max-width: 440px;
-      padding: 20px;
-      text-align: center;
+      border-color: #00ffcc; box-shadow: 0 0 30px #00ffcc; background: #0d1210;
+      width: 92vw; max-width: 440px; padding: 20px; text-align: center;
     }
 
     .close-btn {
@@ -394,6 +524,30 @@
 
   <div class="viewport" id="scene">
     <div class="scene-container">
+      
+      <!-- SPACESHIP COCKPIT LAYER -->
+      <div class="space-view" id="spaceView">
+        <div class="stars"></div>
+        <div class="earth-planet" id="earthPlanet"></div>
+        <div class="cockpit-windows-frame"></div>
+        
+        <div class="cockpit-dashboard">
+          <div class="spaceship-terminal">
+            <div class="terminal-header">
+              <span>SYS_CORE // MANIFESTO_FEED.log</span>
+              <span id="terminalStatus">STANDBY</span>
+            </div>
+            <div class="terminal-screen-content" id="terminalText">Press [ LORE ] to initialize block-archive stream...</div>
+          </div>
+          
+          <div class="cockpit-controls">
+            <button class="cockpit-btn" id="loreBtn" onclick="startLoreStream()">📜 LORE</button>
+            <button class="cockpit-btn lfg-btn" id="lfgBtn" onclick="triggerHyperdrive()">LFG 🚀</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLUBHOUSE BAR BACKGROUND & HOTSPOTS -->
       <div class="clubhouse-bg"></div>
       
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
@@ -404,6 +558,7 @@
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
+    <!-- BAR CONTROLS -->
     <div class="top-controls-bar">
       <a href="https://dexscreener.com/apechain" target="_blank" class="door-ape-sign">
         <span class="sign-label">$APE:</span>
@@ -420,7 +575,7 @@
     </div>
 
     <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-    <div class="door-version">v12.3</div>
+    <div class="door-version">v13.0</div>
 
     <div class="front-buttons-container">
       <button class="degen-action-btn enter-btn" onclick="openDoors()">
@@ -461,7 +616,7 @@
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
       <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v12.3</div>
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v13.0</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
@@ -525,6 +680,13 @@
         gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
         osc.start(now);
         osc.stop(now + 0.08);
+      } else if (type === 'type') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(800 + Math.random() * 200, now);
+        gainNode.gain.setValueAtTime(0.02, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+        osc.start(now);
+        osc.stop(now + 0.03);
       } else if (type === 'scan') {
         osc.type = 'square';
         osc.frequency.setValueAtTime(200, now);
@@ -549,6 +711,14 @@
         gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
         osc.start(now);
         osc.stop(now + 0.1);
+      } else if (type === 'warp') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(100, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 2.0);
+        gainNode.gain.setValueAtTime(0.2, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+        osc.start(now);
+        osc.stop(now + 2.2);
       } else if (type === 'panic') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(800, now);
@@ -558,6 +728,58 @@
         osc.start(now);
         osc.stop(now + 0.4);
       }
+    }
+
+    const fullLoreText = "In the dark, rekt depths of the blockchain, where scammers and ruggers thought they owned the narrative, a legend awakened. We faced that pit-of-the-stomach panic when the red candles struck, living on instant noodles and pure copium, but we refused to let their greed destroy us. We built a sanctuary on absolute honesty. We bought the tops, sold the bottoms, and somehow still have enough diamond hands to hold the moon. Here, all are welcome, so long as you bring no scams, harassment, or hate. We have no room for racism, sell-shaming, or any toxicity; kindness is the only currency we accept. We aren't rich, we aren't the best developers in the space, but we're trying, and that’s what makes us real. We will weather the storms of future crypto cycles together, standing together in our strength to build the biggest community in the space, make ApeChain the greatest chain of all time, and prove that even we can make it, despite having portfolio strategies that belong in a comedy club, a trading history that reads like a tragic novel, and a risk management style that involves screaming at green candles—all within a community built on trust, friendship, fun times, bad times, and where everyone is truly part of the shape, future, and direction of our project, under the glorious banner of ApeChain.";
+
+    let isTyping = false;
+
+    function startLoreStream() {
+      if (isTyping) return;
+      isTyping = true;
+      document.getElementById('loreBtn').style.opacity = '0.5';
+      document.getElementById('loreBtn').style.pointerEvents = 'none';
+      document.getElementById('terminalStatus').innerText = 'STREAMING...';
+      
+      const terminalBox = document.getElementById('terminalText');
+      terminalBox.innerText = "";
+      
+      let charIndex = 0;
+      function typeNextChar() {
+        if (charIndex < fullLoreText.length) {
+          terminalBox.innerText += fullLoreText.charAt(charIndex);
+          terminalBox.scrollTop = terminalBox.scrollHeight;
+          if (charIndex % 3 === 0) playTerminalSound('type');
+          charIndex++;
+          setTimeout(typeNextChar, 18);
+        } else {
+          // Finished printing lore
+          terminalBox.innerText += "\n\n> INPUTTING CORDS FOR EARTH...";
+          playTerminalSound('alert');
+          document.getElementById('terminalStatus').innerText = 'READY FOR WARP';
+          
+          setTimeout(() => {
+            terminalBox.innerText += "\n> TARGET LOCKED. HYPERDRIVE SYSTEMS ONLINE.";
+            terminalBox.scrollTop = terminalBox.scrollHeight;
+            document.getElementById('lfgBtn').classList.add('active');
+          }, 800);
+        }
+      }
+      typeNextChar();
+    }
+
+    function triggerHyperdrive() {
+      playTerminalSound('warp');
+      const scene = document.getElementById('scene');
+      scene.classList.add('hyperdrive');
+      
+      setTimeout(() => {
+        // Transition from cockpit view to Clubhouse Bar view
+        scene.classList.remove('hyperdrive');
+        scene.classList.add('bar-active');
+        // Clean up cockpit element display if needed
+        document.getElementById('spaceView').style.display = 'none';
+      }, 2100);
     }
 
     let isLightsOff = false;
