@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v14.1 - Space Command</title>
+  <title>The Rugged Bar v14.2 - Space Command</title>
   <style>
     * {
       box-sizing: border-box;
@@ -51,7 +51,6 @@
       transition: filter 1.5s ease;
     }
 
-    /* Starfield background elements */
     .stars {
       position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
       background-image: 
@@ -69,7 +68,6 @@
       100% { transform: translateY(200px); }
     }
 
-    /* Earth Planet in the distance */
     .earth-planet {
       position: absolute; top: 20%; left: 50%; transform: translateX(-50%) scale(1);
       font-size: 75px;
@@ -78,7 +76,6 @@
       transition: transform 2.4s cubic-bezier(0.7, 0, 0.2, 1), filter 2s ease;
     }
 
-    /* Cockpit HUD Overlay & Dashboard Frame */
     .cockpit-dashboard {
       position: absolute; bottom: 0; left: 0; width: 100%; height: 56%;
       background: linear-gradient(0deg, #111216 0%, #1a1b24 85%, rgba(26,27,36,0) 100%);
@@ -98,7 +95,6 @@
       box-shadow: inset 0 0 40px rgba(0,0,0,0.9);
     }
 
-    /* Telemetry HUD Panel */
     .telemetry-hud {
       background: rgba(20, 0, 0, 0.6);
       border: 1px solid rgba(255, 51, 51, 0.5);
@@ -119,7 +115,6 @@
       text-shadow: 0 0 5px #ff3333;
     }
 
-    /* Spaceship Interactive Terminal Screen */
     .spaceship-terminal {
       background: rgba(5, 7, 12, 0.92);
       border: 2px solid #00ffcc;
@@ -146,7 +141,6 @@
     .terminal-screen-content::-webkit-scrollbar { width: 4px; }
     .terminal-screen-content::-webkit-scrollbar-thumb { background: #00ffcc; border-radius: 2px; }
 
-    /* Cockpit Control Buttons Row */
     .cockpit-controls {
       display: flex; gap: 8px; width: 100%; margin-bottom: 5px;
     }
@@ -172,7 +166,6 @@
       100% { box-shadow: 0 0 25px rgba(0,255,102,0.9); border-color: #fff; }
     }
 
-    /* HYPERDRIVE WARP ANIMATION STATE */
     .viewport.hyperdrive .earth-planet {
       transform: translateX(-50%) scale(22);
       filter: drop-shadow(0 0 50px #fff) drop-shadow(0 0 100px #4da6ff);
@@ -184,7 +177,7 @@
       animation-duration: 0.25s;
     }
 
-    /* --- ORIGINAL CLUBHOUSE BAR ENVIRONMENT --- */
+    /* --- CLUBHOUSE BAR ENVIRONMENT --- */
     .clubhouse-bg {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: url('clubhouse.JPG') center center / cover no-repeat;
@@ -539,7 +532,7 @@
         <div class="cockpit-windows-frame"></div>
         
         <div class="cockpit-dashboard" id="cockpitDashboard">
-          <!-- Live Moon Telemetry Header (Mission Failed: The Dev Rugged) -->
+          <!-- Live Moon Telemetry Header -->
           <div class="telemetry-hud">
             <span>MISSION FAILED: THE DEV RUGGED</span>
             <span>DIST FROM MOON: <span class="val" id="moonDistanceVal">238,900</span> MILES</span>
@@ -554,8 +547,8 @@
           </div>
           
           <div class="cockpit-controls">
-            <!-- Fixed LORE button markup optimized for touch/click handling -->
-            <button class="cockpit-btn" id="loreBtn">📜 LORE</button>
+            <!-- Bound explicitly via inline onclick/ontouchend and DOM listeners -->
+            <button class="cockpit-btn" id="loreBtn" onclick="startLoreStream(event)" ontouchend="event.preventDefault(); startLoreStream(event);">📜 LORE</button>
             <button class="cockpit-btn lfg-btn" id="lfgBtn" onclick="triggerHyperdrive()" ontouchend="event.preventDefault(); triggerHyperdrive();">LFG 🚀</button>
           </div>
         </div>
@@ -589,7 +582,7 @@
     </div>
 
     <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-    <div class="door-version">v14.1</div>
+    <div class="door-version">v14.2</div>
 
     <div class="front-buttons-container">
       <button class="degen-action-btn enter-btn" onclick="openDoors()">
@@ -630,7 +623,7 @@
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
       <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.1</div>
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.2</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
@@ -688,10 +681,14 @@
 
       isTyping = true;
       const loreBtn = document.getElementById('loreBtn');
-      loreBtn.style.opacity = '0.5';
-      document.getElementById('terminalStatus').innerText = 'STREAMING...';
+      if (loreBtn) loreBtn.style.opacity = '0.5';
+      
+      const statusEl = document.getElementById('terminalStatus');
+      if (statusEl) statusEl.innerText = 'STREAMING...';
       
       const terminalBox = document.getElementById('terminalText');
+      if (!terminalBox) return;
+      
       terminalBox.innerText = "";
       
       let charIndex = 0;
@@ -704,28 +701,31 @@
         } else {
           terminalBox.innerText += "\n\n> INPUTTING CORDS FOR EARTH...";
           terminalBox.scrollTop = terminalBox.scrollHeight;
-          document.getElementById('terminalStatus').innerText = 'READY FOR WARP';
+          if (statusEl) statusEl.innerText = 'READY FOR WARP';
           
           setTimeout(() => {
             terminalBox.innerText += "\n> TARGET LOCKED. HYPERDRIVE SYSTEMS ONLINE.";
             terminalBox.scrollTop = terminalBox.scrollHeight;
-            document.getElementById('lfgBtn').classList.add('active');
+            const lfgBtn = document.getElementById('lfgBtn');
+            if (lfgBtn) lfgBtn.classList.add('active');
           }, 600);
         }
       }
       typeNextChar();
     }
 
-    // Attach explicit click & touch listeners to avoid mobile/desktop event gaps
+    // Secondary safety binding listener to guarantee responsiveness across devices
     document.addEventListener('DOMContentLoaded', () => {
       const loreBtn = document.getElementById('loreBtn');
       if (loreBtn) {
         loreBtn.addEventListener('click', startLoreStream);
-        loreBtn.addEventListener('touchend', startLoreStream);
+        loreBtn.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          startLoreStream(e);
+        });
       }
     });
 
-    // Live Moon Distance Telemetry simulation counter
     let moonMiles = 238900;
     setInterval(() => {
       if (moonMiles > 235000) {
@@ -742,7 +742,8 @@
       setTimeout(() => {
         scene.classList.remove('hyperdrive');
         scene.classList.add('bar-active');
-        document.getElementById('spaceView').style.display = 'none';
+        const spaceView = document.getElementById('spaceView');
+        if (spaceView) spaceView.style.display = 'none';
       }, 2300);
     }
 
