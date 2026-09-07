@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Spaceship Cockpit to The Rugged Bar v12.3</title>
+  <title>The Rugged Bar v12.3</title>
   <style>
     * {
       box-sizing: border-box;
@@ -14,167 +14,13 @@
     }
 
     body {
-      background-color: #05050a;
+      background-color: #0b0c10;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       overflow: hidden;
-      font-family: 'Courier New', Courier, monospace;
-    }
-
-    /* --- SPACESHIP COCKPIT STYLES --- */
-    .cockpit {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: radial-gradient(circle at center, #0f1123 0%, #020205 100%);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px;
-      border: 10px solid #111;
-      box-shadow: inset 0 0 50px rgba(0, 255, 204, 0.1);
-      z-index: 20;
-      transition: opacity 1s ease;
-    }
-
-    .cockpit.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .starfield {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      overflow: hidden;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .star {
-      position: absolute;
-      background: #fff;
-      border-radius: 50%;
-      animation: moveStar linear infinite;
-    }
-
-    @keyframes moveStar {
-      from { transform: translateY(0); opacity: 0.2; }
-      to { transform: translateY(100vh); opacity: 1; }
-    }
-
-    .hyperdrive .star {
-      animation: hyperDrive 0.2s linear infinite !important;
-      background: #00ffcc;
-      width: 2px !important;
-    }
-
-    @keyframes hyperDrive {
-      from { transform: translateY(0) scaleY(1); }
-      to { transform: translateY(100vh) scaleY(10); opacity: 1; }
-    }
-
-    .viewport-terminal {
-      position: relative;
-      z-index: 2;
-      flex: 1;
-      margin: 20px;
-      background: rgba(0, 10, 15, 0.85);
-      border: 2px solid #00ffcc;
-      border-radius: 8px;
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .terminal-header {
-      font-size: 0.9rem;
-      border-bottom: 1px dashed #00ffcc;
-      padding-bottom: 8px;
-      margin-bottom: 15px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #00ffcc;
-    }
-
-    .terminal-body {
-      font-size: 1.05rem;
-      color: #00ffcc;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .dashboard {
-      position: relative;
-      z-index: 2;
-      height: 120px;
-      background: rgba(15, 20, 30, 0.9);
-      border-top: 4px solid #333;
-      border-radius: 8px 8px 0 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 30px;
-      padding: 0 20px;
-      box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
-    }
-
-    .btn-space {
-      background-color: #1a1a2e;
-      color: #00ffcc;
-      border: 2px solid #00ffcc;
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      font-family: 'Courier New', Courier, monospace;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 6px;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
-      text-transform: uppercase;
-    }
-
-    .btn-space:hover:not(:disabled) {
-      background-color: #00ffcc;
-      color: #05050a;
-      box-shadow: 0 0 20px #00ffcc;
-    }
-
-    .btn-space:disabled {
-      background-color: #111;
-      color: #444;
-      border-color: #333;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-
-    /* --- THE RUGGED BAR STYLES --- */
-    .bar-main-wrapper {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background-color: #0b0c10;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 1s ease;
-      z-index: 10;
-    }
-
-    .bar-main-wrapper.active {
-      opacity: 1;
-      pointer-events: auto;
     }
 
     .viewport {
@@ -194,43 +40,23 @@
       .scene-container { width: 56.25vh; height: 100vh; }
     }
 
-    /* FALLBACK CLUBHOUSE BACKGROUND (Styled CSS Lounge Interior incase clubhouse.JPG is missing) */
     .clubhouse-bg {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: 
-        radial-gradient(circle at 50% 40%, #2a1b3d 0%, #120b1e 60%, #050308 100%),
-        repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(0,0,0,0.15) 40px, rgba(0,0,0,0.15) 80px);
+      background: url('clubhouse.JPG') center center / cover no-repeat;
       transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1), filter 0.5s ease;
       z-index: 1;
     }
-    
-    /* Neon wall accents to simulate the club interior vibe */
-    .clubhouse-bg::before {
-      content: '';
-      position: absolute;
-      top: 35%; left: 10%; right: 10%; height: 4px;
-      background: #ff007a;
-      box-shadow: 0 0 15px #ff007a, 0 0 30px #ff007a;
-      opacity: 0.8;
-    }
-    .clubhouse-bg::after {
-      content: 'THE RUGGED BAR';
-      position: absolute;
-      top: 28%; left: 50%; transform: translateX(-50%);
-      font-family: monospace; font-size: 1.1rem; font-weight: bold; color: #00ffcc;
-      letter-spacing: 4px; text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
-      opacity: 0.9;
-    }
 
     .viewport.lights-off .clubhouse-bg {
-      filter: brightness(0.2) contrast(1.4) hue-rotate(-15deg);
+      filter: brightness(0.25) contrast(1.4) hue-rotate(-15deg);
     }
-    .viewport.lights-off::after-overlay {
+    .viewport.lights-off::after {
       content: '';
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.6);
       z-index: 2;
       pointer-events: none;
+      transition: opacity 0.5s ease;
     }
 
     .viewport.panic-active .clubhouse-bg {
@@ -296,17 +122,14 @@
     .door-ape-sign .sign-label { font-size: 0.6rem; color: #00ff66; font-weight: bold; text-transform: uppercase; }
     .door-ape-sign .sign-price { font-size: 0.75rem; font-weight: bold; color: #fff; text-shadow: 0 0 6px #00ff66; }
 
-    .lights-toggle-btn, .panic-btn, .lore-btn-bar {
+    .lights-toggle-btn, .panic-btn {
       background: rgba(0, 0, 0, 0.85); border: 2px solid #ffe600; border-radius: 6px;
       padding: 6px 8px; color: #ffe600; font-family: monospace; font-size: 0.65rem;
       font-weight: bold; cursor: pointer; box-shadow: 0 0 12px rgba(255, 230, 0, 0.4);
       transition: all 0.3s ease; display: flex; align-items: center; gap: 3px;
     }
-    .lights-toggle-btn:hover, .panic-btn:hover, .lore-btn-bar:hover { background: rgba(255, 230, 0, 0.2); box-shadow: 0 0 20px rgba(255, 230, 0, 0.7); transform: scale(1.03); }
+    .lights-toggle-btn:hover, .panic-btn:hover { background: rgba(255, 230, 0, 0.2); box-shadow: 0 0 20px rgba(255, 230, 0, 0.7); transform: scale(1.03); }
     .viewport.lights-off .lights-toggle-btn { border-color: #ff007a; color: #ff007a; box-shadow: 0 0 12px rgba(255, 0, 122, 0.4); }
-
-    .lore-btn-bar { border-color: #00ffcc; color: #00ffcc; box-shadow: 0 0 12px rgba(0, 255, 204, 0.4); }
-    .lore-btn-bar:hover { background: rgba(0, 255, 204, 0.2); box-shadow: 0 0 20px rgba(0, 255, 204, 0.8); }
 
     .panic-btn { border-color: #ff3333; color: #ff3333; box-shadow: 0 0 12px rgba(255, 51, 51, 0.4); }
     .panic-btn:hover { background: rgba(255, 51, 51, 0.2); box-shadow: 0 0 20px rgba(255, 51, 51, 0.8); }
@@ -442,7 +265,7 @@
     .modal {
       display: none; position: fixed; top: 0; left: 0;
       width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95);
-      z-index: 25; justify-content: center; align-items: center;
+      z-index: 10; justify-content: center; align-items: center;
       flex-direction: column;
     }
 
@@ -466,16 +289,6 @@
       text-align: center;
     }
 
-    .modal-content.lore-style {
-      border-color: #00ffcc;
-      box-shadow: 0 0 35px rgba(0, 255, 204, 0.6);
-      background: #0b0f14;
-      width: 92vw;
-      max-width: 520px;
-      padding: 25px 20px;
-      text-align: left;
-    }
-
     .modal-content.grass-style {
       border-color: #00ffcc;
       box-shadow: 0 0 30px #00ffcc;
@@ -488,7 +301,7 @@
 
     .close-btn {
       position: absolute; top: -40px; right: 0; color: #fff;
-      font-size: 2rem; font-weight: bold; cursor: pointer; z-index: 26;
+      font-size: 2rem; font-weight: bold; cursor: pointer; z-index: 11;
     }
 
     canvas { background: #000; border-radius: 8px; touch-action: none; }
@@ -531,12 +344,6 @@
     .scanner-input { flex: 1; background: #0b0c10; border: 1px solid #ff007a; border-radius: 6px; padding: 6px 10px; color: #fff; font-family: monospace; font-size: 0.85rem; outline: none; }
     .scanner-submit-btn { background: #00ff66; color: #000; border: none; border-radius: 6px; padding: 0 12px; font-family: monospace; font-weight: bold; font-size: 0.8rem; cursor: pointer; }
     .scanner-submit-btn:active { transform: scale(0.95); }
-
-    .lore-modal-title { font-size: 1.15rem; color: #00ffcc; font-family: monospace; font-weight: bold; margin-bottom: 8px; text-shadow: 0 0 8px rgba(0, 255, 204, 0.6); text-align: center; }
-    .lore-scroll-box { background: #07090d; border: 1px solid #223; border-radius: 6px; padding: 14px; max-height: 48vh; overflow-y: auto; margin-bottom: 15px; }
-    .lore-text-content { font-family: monospace; font-size: 0.78rem; color: #c0d0e0; line-height: 1.5; text-shadow: 0 0 3px rgba(0, 255, 204, 0.2); }
-    .lore-audio-btn { background: #00ffcc; color: #000; border: none; border-radius: 20px; padding: 10px 18px; font-weight: bold; font-family: monospace; font-size: 0.8rem; cursor: pointer; width: 100%; box-shadow: 0 0 12px rgba(0, 255, 204, 0.5); transition: transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .lore-audio-btn:active { transform: scale(0.96); }
 
     .opensea-card-container {
       width: 85vw; max-width: 420px; background: #121214; border: 2px solid #2081e2;
@@ -585,87 +392,61 @@
 </head>
 <body>
 
-  <!-- SPACESHIP COCKPITS INTERFACE -->
-  <div class="cockpit" id="cockpit">
-    <div class="starfield" id="starfield"></div>
-
-    <div class="viewport-terminal">
-      <div class="terminal-header">// SYSTEM STATUS: STANDBY — SECURE CONNECTION ESTABLISHED</div>
-      <div class="terminal-body" id="terminalText">Welcome, Commander. 
-Your vessel is currently holding position in deep space orbit. 
-Access the LORE database via the dashboard below to initialize navigation protocols.</div>
+  <div class="viewport" id="scene">
+    <div class="scene-container">
+      <div class="clubhouse-bg"></div>
+      
+      <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
+      <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
+      <div class="hotspot laptop-hotspot" onclick="openWebModal('dex')"></div>
+      <div class="hotspot table-hotspot" onclick="openWebModal('desk')"></div>
+      <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
+      <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
-    <div class="dashboard">
-      <button class="btn-space" id="loreBtn" onclick="startCockpitLore()">[ LORE ]</button>
-      <button class="btn-space" id="lfgBtn" disabled onclick="launchHyperdrive()">[ LFG 🚀 ]</button>
+    <div class="top-controls-bar">
+      <a href="https://dexscreener.com/apechain" target="_blank" class="door-ape-sign">
+        <span class="sign-label">$APE:</span>
+        <span class="sign-price" id="signApePrice">...</span>
+      </a>
+      <div class="control-group">
+        <button class="lights-toggle-btn" id="lightsToggleBtn" onclick="toggleLights()">💡 LIGHTS</button>
+        <button class="panic-btn" onclick="triggerPanic()">🚨 SELL ALL</button>
+      </div>
     </div>
-  </div>
 
+    <div class="rekt-speech-bubble" id="rektBubble">
+      Bro wtf turn the lights back on before I get REKT!
+    </div>
 
-  <!-- THE RUGGED BAR ENVIRONMENT -->
-  <div class="bar-main-wrapper" id="barMainWrapper">
-    <div class="viewport" id="scene">
-      <div class="scene-container">
-        <div class="clubhouse-bg"></div>
-        
-        <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
-        <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
-        <div class="hotspot laptop-hotspot" onclick="openWebModal('dex')"></div>
-        <div class="hotspot table-hotspot" onclick="openWebModal('desk')"></div>
-        <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
-        <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
-      </div>
+    <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
+    <div class="door-version">v12.3</div>
 
-      <div class="top-controls-bar">
-        <a href="https://dexscreener.com/apechain" target="_blank" class="door-ape-sign">
-          <span class="sign-label">$APE:</span>
-          <span class="sign-price" id="signApePrice">...</span>
-        </a>
-        <div class="control-group">
-          <button class="lore-btn-bar" onclick="openBarLoreModal()">📜 LORE</button>
-          <button class="lights-toggle-btn" id="lightsToggleBtn" onclick="toggleLights()">💡 LIGHTS</button>
-          <button class="panic-btn" onclick="triggerPanic()">🚨 SELL ALL</button>
-        </div>
-      </div>
+    <div class="front-buttons-container">
+      <button class="degen-action-btn enter-btn" onclick="openDoors()">
+        <span class="btn-main-text">ENTER THE BAR</span>
+        <span class="btn-sub-text">"Ready to get rugged? Grab a seat."</span>
+      </button>
+      <button class="degen-action-btn grass-btn" onclick="openTouchGrassModal()">
+        <span class="btn-main-text">TOUCH GRASS</span>
+        <span class="btn-sub-text">"Look at actual trees for once."</span>
+      </button>
+    </div>
 
-      <div class="rekt-speech-bubble" id="rektBubble">
-        Bro wtf turn the lights back on before I get REKT!
-      </div>
-
-      <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-      <div class="door-version">v12.3</div>
-
-      <div class="front-buttons-container">
-        <button class="degen-action-btn enter-btn" onclick="openDoors()">
-          <span class="btn-main-text">ENTER THE BAR</span>
-          <span class="btn-sub-text">"Ready to get rugged? Grab a seat."</span>
-        </button>
-        <button class="degen-action-btn grass-btn" onclick="openTouchGrassModal()">
-          <span class="btn-main-text">TOUCH GRASS</span>
-          <span class="btn-sub-text">"Look at actual trees for once."</span>
-        </button>
-      </div>
-
-      <div class="doors-container">
-        <div class="door door-left"><div class="handle"></div></div>
-        <div class="door door-right"><div class="handle"></div></div>
-      </div>
+    <div class="doors-container">
+      <div class="door door-left"><div class="handle"></div></div>
+      <div class="door door-right"><div class="handle"></div></div>
     </div>
   </div>
 
-
-  <!-- PANIC MODAL -->
   <div class="panic-modal" id="panicModal">
     <div class="panic-card">
       <div class="panic-title">⚠️ PAPER HANDS DETECTED</div>
-      <div class="panic-desc">🧾 ORDER EXECUTED: Sold your entire bag at the absolute bottom (-99.8%). Thank you for providing exit liquidity to the whales.</div>
+      <div class="panic-desc" id="panicMessageText">🧾 ORDER EXECUTED: Sold your entire bag at the absolute bottom (-99.8%). Thank you for providing exit liquidity to the whales.</div>
       <button class="panic-dismiss-btn" onclick="dismissPanic()">BUY BACK HIGHER 🔄</button>
     </div>
   </div>
 
-
-  <!-- MINI-GAMES MODAL -->
   <div class="modal" id="gameModal">
     <div class="modal-content" id="modalContent">
       <span class="close-btn" onclick="closeGame()">&times;</span>
@@ -674,8 +455,6 @@ Access the LORE database via the dashboard below to initialize navigation protoc
     </div>
   </div>
 
-
-  <!-- WEB / TERMINAL MODALS -->
   <div class="modal" id="webModal">
     <div class="modal-content" id="webModalContent">
       <span class="close-btn" onclick="closeWebModal()">&times;</span>
@@ -697,16 +476,6 @@ Access the LORE database via the dashboard below to initialize navigation protoc
             <button class="scanner-submit-btn" onclick="runTokenScan()">SCAN COIN</button>
           </div>
         </div>
-      </div>
-
-      <div id="loreModalContainer" style="display: none;">
-        <div class="lore-modal-title">📜 THE CHRONICLES OF REKT</div>
-        <div class="lore-scroll-box">
-          <div class="lore-text-content" id="loreTextContent">
-            In the dark, rekt depths of the blockchain, where scammers and ruggers thought they owned the narrative, a legend awakened. We faced that pit-of-the-stomach panic when the red candles struck and survived the absurd game of liquidity musical chairs, living on instant noodles and pure copium, but we refused to let their greed destroy us. We built a sanctuary on absolute honesty. We bought the tops, sold the bottoms, and somehow still have enough diamond hands to hold the moon. Here, all are welcome, so long as you bring no scams, harassment, or hate. We have no room for racism, sell-shaming, or any toxicity; kindness is the only currency we accept. We aren't rich, we aren't the best developers in the space, but we're trying, and that’s what makes us real. We will weather the storms of future crypto cycles together, standing united no matter what happens in the market. No rug pull or scheme can stop us, because we aren't just holders—we are the heart and soul of the chain's force. Our legacy will echo through the blockchain, reaching dimensions unforeseen. Now, we rally as one inside ApeChain—the ultimate habitat for degens, friends, and all the hype-fueled crypto madness—standing together in our strength to build the biggest community in the space, make ApeChain the greatest chain of all time, and prove that even we can make it, despite having portfolio strategies that belong in a comedy club, a trading history that reads like a tragic novel, and a risk management style that involves screaming at green candles—all within a community built on trust, friendship, fun times, bad times, and where everyone is truly part of the shape, future, and direction of our project, under the glorious banner of ApeChain.
-          </div>
-        </div>
-        <button class="lore-audio-btn" id="loreAudioBtn" onclick="toggleLoreSpeech()">🔊 READ LORE ALOUD</button>
       </div>
 
       <div id="openseaCardModal" class="opensea-card-container" style="display: none;">
@@ -736,68 +505,7 @@ Access the LORE database via the dashboard below to initialize navigation protoc
     </div>
   </div>
 
-
   <script>
-    /* --- STARFIELD GENERATOR FOR SPACESHIP --- */
-    const starfield = document.getElementById('starfield');
-    for (let i = 0; i < 100; i++) {
-      const star = document.createElement('div');
-      star.classList.add('star');
-      star.style.top = `${Math.random() * 100}vh`;
-      star.style.left = `${Math.random() * 100}vw`;
-      const size = Math.random() * 3;
-      star.style.width = `${size}px`;
-      star.style.height = `${size}px`;
-      star.style.animationDuration = `${1 + Math.random() * 3}s`;
-      starfield.appendChild(star);
-    }
-
-    const cockpitLoreText = `[ACCESSING ARCHIVES...]
-Sector 4 classified logs decrypted. 
-The year is 2142. Earth's surface has transformed, dominated by sprawling neon-lit megacity outposts and subterranean trading hubs. 
-Among the chaos lies 'The Rugged Bar'—a legendary space-dock lounge where bounty hunters, smugglers, and rogue pilots swap stories of the void.
-Navigation coordinates to Earth's atmosphere have been automatically cross-referenced.
-Propulsion lock disengaged. 
-LFG sequence ready for deployment.`;
-
-    function startCockpitLore() {
-      const loreBtn = document.getElementById('loreBtn');
-      const terminal = document.getElementById('terminalText');
-      const lfgBtn = document.getElementById('lfgBtn');
-
-      loreBtn.disabled = true;
-      terminal.textContent = "";
-      
-      let index = 0;
-      function typeWriter() {
-        if (index < cockpitLoreText.length) {
-          terminal.textContent += cockpitLoreText.charAt(index);
-          index++;
-          terminal.scrollTop = terminal.scrollHeight;
-          setTimeout(typeWriter, 25);
-        } else {
-          lfgBtn.disabled = false;
-          lfgBtn.style.boxShadow = "0 0 20px #00ffcc";
-        }
-      }
-      typeWriter();
-    }
-
-    function launchHyperdrive() {
-      const cockpit = document.getElementById('cockpit');
-      const terminal = document.getElementById('terminalText');
-      
-      terminal.textContent += "\n\n> HYPERDRIVE ENGAGED. VECTOR: EARTH. WARP SPEED ACTIVATED...";
-      cockpit.classList.add('hyperdrive');
-
-      setTimeout(() => {
-        cockpit.classList.add('hidden');
-        document.getElementById('barMainWrapper').classList.add('active');
-      }, 2000);
-    }
-
-
-    /* --- RUGGED BAR LOGIC & AUDIO CONTEXT --- */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playTerminalSound(type) {
       if (!audioCtx) return;
@@ -903,7 +611,6 @@ LFG sequence ready for deployment.`;
       const iframe = document.getElementById('webIframe');
       const openseaCard = document.getElementById('openseaCardModal');
       const deskContainer = document.getElementById('deskModalContainer');
-      const loreContainer = document.getElementById('loreModalContainer');
       const grassContainer = document.getElementById('grassCardModal');
       const content = document.getElementById('webModalContent');
 
@@ -918,62 +625,7 @@ LFG sequence ready for deployment.`;
       iframe.src = '';
       openseaCard.style.display = 'none';
       deskContainer.style.display = 'none';
-      loreContainer.style.display = 'none';
       grassContainer.style.display = 'block';
-    }
-
-    function openBarLoreModal() {
-      playTerminalSound('click');
-      const modal = document.getElementById('webModal');
-      const iframe = document.getElementById('webIframe');
-      const openseaCard = document.getElementById('openseaCardModal');
-      const deskContainer = document.getElementById('deskModalContainer');
-      const loreContainer = document.getElementById('loreModalContainer');
-      const grassContainer = document.getElementById('grassCardModal');
-      const content = document.getElementById('webModalContent');
-
-      modal.style.display = 'flex';
-      content.className = 'modal-content lore-style';
-      iframe.style.display = 'none';
-      iframe.src = '';
-      openseaCard.style.display = 'none';
-      deskContainer.style.display = 'none';
-      grassContainer.style.display = 'none';
-      loreContainer.style.display = 'block';
-    }
-
-    let isSpeakingLore = false;
-    function toggleLoreSpeech() {
-      if (!('speechSynthesis' in window)) {
-        alert('Text-to-speech not supported in this browser.');
-        return;
-      }
-      playTerminalSound('click');
-      const btn = document.getElementById('loreAudioBtn');
-
-      if (isSpeakingLore) {
-        window.speechSynthesis.cancel();
-        isSpeakingLore = false;
-        btn.innerText = '🔊 READ LORE ALOUD';
-      } else {
-        const text = document.getElementById('loreTextContent').innerText;
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.0;
-        utterance.pitch = 0.95;
-
-        utterance.onend = () => {
-          isSpeakingLore = false;
-          btn.innerText = '🔊 READ LORE ALOUD';
-        };
-        utterance.onerror = () => {
-          isSpeakingLore = false;
-          btn.innerText = '🔊 READ LORE ALOUD';
-        };
-
-        isSpeakingLore = true;
-        btn.innerText = '🛑 STOP READING';
-        window.speechSynthesis.speak(utterance);
-      }
     }
 
     const deskMessages = [
@@ -1045,7 +697,6 @@ LFG sequence ready for deployment.`;
       const iframe = document.getElementById('webIframe');
       const openseaCard = document.getElementById('openseaCardModal');
       const deskContainer = document.getElementById('deskModalContainer');
-      const loreContainer = document.getElementById('loreModalContainer');
       const grassContainer = document.getElementById('grassCardModal');
       const content = document.getElementById('webModalContent');
 
@@ -1056,7 +707,6 @@ LFG sequence ready for deployment.`;
         iframe.style.display = 'block';
         openseaCard.style.display = 'none';
         deskContainer.style.display = 'none';
-        loreContainer.style.display = 'none';
         grassContainer.style.display = 'none';
         iframe.src = 'https://dexscreener.com/apechain?embed=1&theme=dark';
       } else if (type === 'desk') {
@@ -1065,7 +715,6 @@ LFG sequence ready for deployment.`;
         iframe.src = '';
         openseaCard.style.display = 'none';
         grassContainer.style.display = 'none';
-        loreContainer.style.display = 'none';
         deskContainer.style.display = 'block';
         document.getElementById('deskMessageDisplay').innerText = deskMessages[currentDeskIndex];
       } else if (type === 'opensea') {
@@ -1073,19 +722,12 @@ LFG sequence ready for deployment.`;
         iframe.style.display = 'none';
         iframe.src = '';
         deskContainer.style.display = 'none';
-        loreContainer.style.display = 'none';
         grassContainer.style.display = 'none';
         openseaCard.style.display = 'block';
       }
     }
 
     function closeWebModal() {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        isSpeakingLore = false;
-        const btn = document.getElementById('loreAudioBtn');
-        if (btn) btn.innerText = '🔊 READ LORE ALOUD';
-      }
       if (isAutoTickerRunning) {
         toggleAutoTicker();
       }
@@ -1101,7 +743,7 @@ LFG sequence ready for deployment.`;
           document.getElementById('signApePrice').innerText = '$' + data.apecoin.usd.toFixed(2);
         }
       } catch (e) {
-        document.getElementById('signApePrice').innerText = '$APE';
+        document.getElementById('signApePrice').innerText = '$0.14';
       }
     }
     updateApePrice();
