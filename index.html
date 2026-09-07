@@ -77,7 +77,7 @@
     }
 
     .cockpit-dashboard {
-      position: absolute; bottom: 0; left: 0; width: 100%; height: 56%;
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
       background: linear-gradient(0deg, #111216 0%, #1a1b24 85%, rgba(26,27,36,0) 100%);
       border-top: 4px solid #2a2c3d;
       z-index: 4;
@@ -119,7 +119,7 @@
       background: rgba(5, 7, 12, 0.92);
       border: 2px solid #00ffcc;
       border-radius: 8px;
-      height: 130px;
+      height: 145px;
       padding: 8px 10px;
       display: flex; flex-direction: column;
       box-shadow: 0 0 15px rgba(0, 255, 204, 0.3), inset 0 0 10px rgba(0, 255, 204, 0.15);
@@ -140,31 +140,6 @@
     }
     .terminal-screen-content::-webkit-scrollbar { width: 4px; }
     .terminal-screen-content::-webkit-scrollbar-thumb { background: #00ffcc; border-radius: 2px; }
-
-    .cockpit-controls {
-      display: flex; gap: 8px; width: 100%; margin-bottom: 5px;
-    }
-
-    .cockpit-btn {
-      flex: 1; background: #161821; border: 2px solid #ff007a; border-radius: 6px;
-      padding: 12px 6px; font-family: monospace; font-size: 0.75rem; font-weight: bold;
-      color: #ff007a; text-transform: uppercase; cursor: pointer; text-align: center;
-      box-shadow: 0 0 10px rgba(255, 0, 122, 0.3); transition: all 0.2s ease;
-      touch-action: manipulation;
-    }
-    .cockpit-btn:hover { background: rgba(255, 0, 122, 0.15); box-shadow: 0 0 18px rgba(255, 0, 122, 0.6); transform: translateY(-1px); }
-
-    .cockpit-btn.lfg-btn {
-      border-color: #00ff66; color: #00ff66; box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
-      opacity: 0.3; pointer-events: none;
-    }
-    .cockpit-btn.lfg-btn.active {
-      opacity: 1; pointer-events: auto; animation: lfgPulse 1.2s infinite alternate;
-    }
-    @keyframes lfgPulse {
-      0% { box-shadow: 0 0 10px rgba(0,255,102,0.4); border-color: #00ff66; }
-      100% { box-shadow: 0 0 25px rgba(0,255,102,0.9); border-color: #fff; }
-    }
 
     .viewport.hyperdrive .earth-planet {
       transform: translateX(-50%) scale(22);
@@ -545,12 +520,6 @@
             </div>
             <div class="terminal-screen-content" id="terminalText">Initializing block-archive stream...</div>
           </div>
-          
-          <div class="cockpit-controls">
-            <!-- Bound explicitly via inline onclick/ontouchend and DOM listeners -->
-            <button class="cockpit-btn" id="loreBtn" onclick="startLoreStream(event)" ontouchend="event.preventDefault(); startLoreStream(event);">📜 LORE</button>
-            <button class="cockpit-btn lfg-btn" id="lfgBtn" onclick="triggerHyperdrive()" ontouchend="event.preventDefault(); triggerHyperdrive();">LFG 🚀</button>
-          </div>
         </div>
       </div>
 
@@ -672,16 +641,9 @@
 
     let isTyping = false;
 
-    function startLoreStream(event) {
-      if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
+    function startLoreStream() {
       if (isTyping) return;
-
       isTyping = true;
-      const loreBtn = document.getElementById('loreBtn');
-      if (loreBtn) loreBtn.style.opacity = '0.5';
       
       const statusEl = document.getElementById('terminalStatus');
       if (statusEl) statusEl.innerText = 'STREAMING...';
@@ -706,31 +668,22 @@
           setTimeout(() => {
             terminalBox.innerText += "\n> TARGET LOCKED. HYPERDRIVE SYSTEMS ONLINE.";
             terminalBox.scrollTop = terminalBox.scrollHeight;
-            const lfgBtn = document.getElementById('lfgBtn');
-            if (lfgBtn) lfgBtn.classList.add('active');
+            
+            // Automatically launch hyperdrive right after lore finishes!
+            setTimeout(() => {
+              triggerHyperdrive();
+            }, 800);
           }, 600);
         }
       }
       typeNextChar();
     }
 
-    // Fixed window load initialization to safely kick off the lore stream and enable LFG
+    // Auto-start lore stream immediately when the page finishes loading
     window.addEventListener('load', () => {
-      const loreBtn = document.getElementById('loreBtn');
-      if (loreBtn) {
-        loreBtn.onclick = startLoreStream;
-        loreBtn.ontouchend = (e) => {
-          e.preventDefault();
-          startLoreStream(e);
-        };
-      }
-      
-      // Safety delay to ensure viewport elements are fully painted before typing
       setTimeout(() => {
-        if (!isTyping) {
-          startLoreStream();
-        }
-      }, 200);
+        startLoreStream();
+      }, 300);
     });
 
     let moonMiles = 238900;
