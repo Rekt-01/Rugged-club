@@ -3,215 +3,226 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v14.2 - Bathroom Stall</title>
+  <title>The Rugged Bar - Bathroom Stall (First Person)</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
-      user-select: none;
     }
 
-    body {
-      background-color: #020205;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
-    .viewport {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      overflow: hidden; perspective: 1200px;
-    }
-
-    .scene-container {
-      position: absolute; top: 50%; left: 50%;
-      width: 100vw; height: 177.78vw;
-      max-height: 100vh; max-width: 56.25vh;
-      transform: translate(-50%, -50%);
-      overflow: hidden;
-      background: #0d0907;
-    }
-
-    @media (min-aspect-ratio: 9/16) {
-      .scene-container { width: 56.25vh; height: 100vh; }
-    }
-
-    /* --- BATHROOM STALL ENVIRONMENT --- */
-    .stall-interior {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(180deg, #150f0b 0%, #0a0604 70%, #030201 100%);
-      box-shadow: inset 0 0 80px rgba(0,0,0,0.95);
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 40px 20px;
-    }
-
-    /* Dim flickering fluorescent light effect from above */
-    .stall-interior::before {
-      content: '';
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle at 50% 5%, rgba(255, 255, 200, 0.12) 0%, transparent 60%);
-      pointer-events: none;
-      animation: lightFlicker 4s infinite;
-    }
-    @keyframes lightFlicker {
-      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
-      20%, 24%, 55% { opacity: 0.4; }
-    }
-
-    /* The back of the stall door with metallic/rusty textures */
-    .stall-door-back {
-      position: relative;
+    body, html {
       width: 100%;
-      max-width: 340px;
-      height: 72vh;
-      background: #231913;
-      background-image: 
-        linear-gradient(90deg, rgba(0,0,0,0.5) 0%, transparent 8%, transparent 92%, rgba(0,0,0,0.7) 100%),
-        repeating-linear-gradient(0deg, #1f150f, #1f150f 30px, #17100b 31px, #17100b 60px);
-      border: 4px solid #100a06;
-      border-radius: 6px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 0 40px rgba(0,0,0,0.8);
-      padding: 25px 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      z-index: 2;
-    }
-
-    /* Stall metal door latch/handle */
-    .stall-latch {
-      position: absolute; top: 45%; right: 15px;
-      width: 12px; height: 70px;
-      background: linear-gradient(135deg, #555, #222);
-      border: 1px solid #111; border-radius: 3px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.9);
-    }
-
-    .graffiti-title {
-      font-family: monospace;
-      font-size: 0.85rem;
-      font-weight: bold;
-      color: #ff3333;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 12px;
-      text-shadow: 0 0 6px rgba(255, 51, 51, 0.6);
-      border-bottom: 1px dashed rgba(255, 51, 51, 0.3);
-      padding-bottom: 6px;
-    }
-
-    /* The NFT Project Lore written like marker graffiti */
-    .graffiti-lore {
+      height: 100%;
+      background-color: #020101;
+      overflow: hidden;
       font-family: 'Courier New', Courier, monospace;
-      font-size: 0.72rem;
-      color: #cfc5b4;
-      line-height: 1.45;
-      text-shadow: 0 0 2px rgba(0,0,0,0.8);
-      overflow-y: auto;
-      max-height: 100%;
-      padding-right: 5px;
-    }
-    .graffiti-lore::-webkit-scrollbar { width: 4px; }
-    .graffiti-lore::-webkit-scrollbar-thumb { background: #442f22; }
-
-    .lore-highlight {
-      color: #00ff66;
-      font-weight: bold;
-      text-shadow: 0 0 5px rgba(0, 255, 102, 0.4);
     }
 
-    .lore-warning {
-      color: #ffe600;
-      font-weight: bold;
+    /* First-person bathroom stall container simulating 3D perspective */
+    .fp-stall-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 25%, #16120e 0%, #080604 60%, #010101 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      perspective: 900px;
     }
 
-    /* Bottom back-to-bar actions */
-    .toilet-actions {
-      width: 100%;
-      max-width: 340px;
+    /* Dim flickering fluorescent overhead light */
+    .fp-stall-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 50% 5%, rgba(255, 235, 150, 0.1) 0%, transparent 55%);
+      pointer-events: none;
+      animation: overheadFlicker 4s infinite;
+    }
+    @keyframes overheadFlicker {
+      0%, 100% { opacity: 1; }
+      4% { opacity: 0.2; }
+      6% { opacity: 0.9; }
+      8% { opacity: 0.4; }
+      22% { opacity: 1; }
+      65% { opacity: 0.7; }
+      68% { opacity: 0.2; }
+      71% { opacity: 1; }
+    }
+
+    /* Left and right stall walls closing in for 3D depth */
+    .wall-left, .wall-right {
+      position: absolute;
+      top: 0;
+      width: 35vw;
+      height: 100vh;
+      background: linear-gradient(90deg, #120e0a 0%, #201812 100%);
+      box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .wall-left { left: 0; transform-origin: left; transform: skewY(2deg); border-right: 4px solid #090705; }
+    .wall-right { right: 0; transform-origin: right; transform: skewY(-2deg); border-left: 4px solid #090705; }
+
+    /* The back of the door directly in front of you */
+    .door-front {
+      position: relative;
+      width: 70vw;
+      max-width: 520px;
+      height: 92vh;
+      background-color: #261e17;
+      background-image: 
+        linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 3%, transparent 97%, rgba(0,0,0,0.8) 100%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 2px, transparent 2px, transparent 5px);
+      border: 8px solid #0d0a08;
+      box-shadow: inset 0 0 60px rgba(0,0,0,0.95), 0 0 40px rgba(0,0,0,0.9);
+      padding: 30px 25px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      justify-content: space-between;
       z-index: 2;
     }
 
-    .back-bar-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.9);
-      border: 2px solid #00ff66;
-      border-radius: 8px;
-      padding: 12px;
-      color: #00ff66;
-      font-family: monospace;
-      font-size: 0.85rem;
-      font-weight: bold;
-      text-decoration: none;
-      box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
-      transition: all 0.25s ease;
-      cursor: pointer;
-      letter-spacing: 1px;
+    /* Heavy industrial metal sliding lock / latch at eye level */
+    .door-latch {
+      position: absolute;
+      top: 48%;
+      right: -22px;
+      width: 25px;
+      height: 80px;
+      background: linear-gradient(135deg, #555, #111);
+      border: 2px solid #000;
+      border-radius: 4px;
+      box-shadow: 3px 3px 10px rgba(0,0,0,0.8);
+      z-index: 3;
     }
-    .back-bar-btn:hover {
-      background: rgba(0, 255, 102, 0.15);
-      box-shadow: 0 0 25px rgba(0, 255, 102, 0.6);
-      transform: scale(1.02);
+    .door-latch::before {
+      content: '';
+      position: absolute;
+      top: 25px;
+      left: -18px;
+      width: 20px;
+      height: 30px;
+      background: linear-gradient(90deg, #777, #333);
+      border: 1px solid #000;
     }
 
-    .toilet-footer-note {
-      font-family: monospace;
-      font-size: 0.6rem;
-      color: #665;
-      text-align: center;
+    /* Graffiti scroll area */
+    .graffiti-board {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 8px;
+      margin-top: 5px;
+    }
+    .graffiti-board::-webkit-scrollbar { width: 4px; }
+    .graffiti-board::-webkit-scrollbar-thumb { background: #3d2c21; }
+
+    .scrawled-text {
+      color: #b5a493;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      text-shadow: 0 0 2px rgba(0,0,0,0.9);
+      white-space: pre-wrap;
+    }
+
+    /* Realistic graffiti styles */
+    .marker-red { color: #ff3344; font-weight: bold; text-shadow: 0 0 4px rgba(255, 51, 68, 0.4); }
+    .marker-blue { color: #33aaff; font-weight: bold; }
+    .marker-white { color: #f0f0f0; }
+    .marker-yellow { color: #ffd700; font-weight: bold; }
+    .carved-text { color: #423226; font-weight: bold; letter-spacing: 1.5px; text-shadow: 1px 1px 0px rgba(255,255,255,0.06); }
+
+    /* Bottom exit zone */
+    .stall-floor-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+      border-top: 2px dashed #3d2c21;
+      padding-top: 15px;
+    }
+
+    .escape-btn {
+      background: #080604;
+      color: #00ff66;
+      border: 2px solid #00ff66;
+      padding: 12px 20px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.82rem;
+      font-weight: bold;
       letter-spacing: 1px;
+      cursor: pointer;
+      text-decoration: none;
+      border-radius: 4px;
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.2);
+      transition: all 0.2s ease-in-out;
+      text-align: center;
+      width: 100%;
+    }
+
+    .escape-btn:hover {
+      background: rgba(0, 255, 102, 0.15);
+      box-shadow: 0 0 20px rgba(0, 255, 102, 0.5);
+    }
+
+    .stall-hint {
+      font-size: 0.62rem;
+      color: #7a6858;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
   </style>
 </head>
 <body>
 
-  <div class="viewport">
-    <div class="scene-container">
-      <div class="stall-interior">
-        
-        <!-- BACK OF THE STALL DOOR -->
-        <div class="stall-door-back">
-          <div class="stall-latch"></div>
-          <div class="graffiti-title">📌 SCRATCHED INTO THE DOOR:</div>
-          
-          <div class="graffiti-lore">
-            <span class="lore-highlight">[PROJECT GENESIS: THE RUGGED PROTOCOL]</span><br><br>
-            It started in the dark corners of Sector 4. A collective of weary space degens, tired of smooth-talking devs and multi-sig rug pulls, pooled their last remaining fragments of space-scrap to build <span class="lore-highlight">The Rugged Bar</span>.<br><br>
-            Legend says the original smart contract was deployed by an anonymous space otter using a salvaged terminal code from 2024. The contract promised eternal alpha, but delivered instant bottom liquidity.<br><br>
-            <span class="lore-warning">WARNING FROM SURVIVORS:</span><br>
-            - Never trust a roadmap written in Comic Sans.<br>
-            - If the liquidity lock timer reads "Soon", run.<br>
-            - The bathroom stall is the only safe zone in the entire ecosystem where no one can track your gas fees.<br><br>
-            <i>"For those who got rekt, we drink. For those who stayed, alpha awaits behind the next red candle."</i><br><br>
-            <span style="color: #ff007a;">— Written in fading sharpie by Anon #42069</span>
-          </div>
-        </div>
+  <div class="fp-stall-container">
+    <!-- Side walls giving first-person perspective closure -->
+    <div class="wall-left"></div>
+    <div class="wall-right"></div>
 
-        <!-- STALL NAVIGATION -->
-        <div class="toilet-actions">
-          <a href="index.html" class="back-bar-btn">🚪 FLUSH & RETURN TO THE BAR</a>
-          <div class="toilet-footer-note">STALL STATUS: OCCUPIED (BY YOU)</div>
-        </div>
+    <!-- The stall door right in front of your face -->
+    <div class="door-front">
+      <div class="door-latch"></div>
 
+      <!-- LORE GRAFFITI ON THE BACK OF THE DOOR -->
+      <div class="graffiti-board">
+        <div class="scrawled-text">
+<span class="carved-text">[SCRATCHED IN W/ KEYS]</span>
+<span class="carved-text">DEV = LITERAL GOBLIN</span>
+
+<span class="marker-red">=== THE TRUE ORIGIN OF THE RUG ===</span>
+Before the floor price hit absolute zero, there was only the <span class="marker-white">Genesis Contract</span>, deployed block #1849204 by 'Satoshi's Drunk Uncle'. 
+
+The prophecy carved into the blockchain said: <span class="marker-yellow">"He who holds the pixelated trash shall inherit the digital wasteland."</span>
+
+<span class="marker-blue">-- Rumors scribbled lower down --</span>
+> Sector 7 floor is never coming back bro give up
+> I sold my car for this jpeg 
+> WHO KEEPS KNOCKING ON THE STALL DOOR IM TRIPPED OUT
+
+<span class="marker-red">THE LORE UPDATE (2026):</span>
+1. The smart contract was never decentralized. It was just a guy named Dave in a basement in Ohio clicking buttons.
+2. Every time a collection mints out, a random holder's toilet clogs IRL. 
+3. If you inspect the metadata hash closely, it spells out a recipe for instant ramen.
+
+<span class="marker-white">"We're all gonna make it..."</span> 
+<span class="marker-red">-> NO WE ARE NOT, BUY MORE LIQUIDITY LMAO</span>
+<span class="marker-blue">-> anon was here 4.20.69</span>
+        </div>
       </div>
+
+      <!-- EXIT -->
+      <div class="stall-floor-actions">
+        <a href="index.html" class="escape-btn">🚪 UNLATCH DOOR & ESCAPE BACK TO BAR</a>
+        <div class="stall-hint">First-person stall view active.</div>
+      </div>
+
     </div>
   </div>
 
 </body>
 </html>
-
