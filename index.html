@@ -748,6 +748,12 @@
 
     function startLoreStream() {
       if (isTyping) return;
+      
+      // Ensure AudioContext handles browser autoplay locks safely
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+
       isTyping = true;
       playTerminalSound('click');
       const loreBtn = document.getElementById('loreBtn');
