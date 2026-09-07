@@ -100,8 +100,8 @@
 
     /* Telemetry HUD Panel */
     .telemetry-hud {
-      background: rgba(0, 20, 20, 0.6);
-      border: 1px solid rgba(0, 255, 204, 0.4);
+      background: rgba(20, 0, 0, 0.6);
+      border: 1px solid rgba(255, 51, 51, 0.5);
       border-radius: 6px;
       padding: 6px 10px;
       margin-bottom: 8px;
@@ -109,14 +109,14 @@
       justify-content: space-between;
       align-items: center;
       font-family: monospace;
-      font-size: 0.65rem;
-      color: #00ffcc;
-      box-shadow: inset 0 0 8px rgba(0,255,204,0.15);
+      font-size: 0.6rem;
+      color: #ff3333;
+      box-shadow: inset 0 0 8px rgba(255,51,51,0.15);
     }
     .telemetry-hud span.val {
       color: #fff;
       font-weight: bold;
-      text-shadow: 0 0 5px #00ffcc;
+      text-shadow: 0 0 5px #ff3333;
     }
 
     /* Spaceship Interactive Terminal Screen */
@@ -539,9 +539,9 @@
         <div class="cockpit-windows-frame"></div>
         
         <div class="cockpit-dashboard" id="cockpitDashboard">
-          <!-- Live Moon Telemetry Header (Distance from Moon) -->
+          <!-- Live Moon Telemetry Header (Mission Failed: The Dev Rugged) -->
           <div class="telemetry-hud">
-            <span>TARGET: LUNAR SURFACE</span>
+            <span>MISSION FAILED: THE DEV RUGGED</span>
             <span>DIST FROM MOON: <span class="val" id="moonDistanceVal">238,900</span> MILES</span>
           </div>
 
