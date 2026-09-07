@@ -100,7 +100,7 @@
       border: 1px solid rgba(255, 51, 51, 0.5);
       border-radius: 6px;
       padding: 6px 10px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -119,11 +119,11 @@
       background: rgba(5, 7, 12, 0.92);
       border: 2px solid #00ffcc;
       border-radius: 8px;
-      height: 125px;
+      height: 145px;
       padding: 8px 10px;
       display: flex; flex-direction: column;
       box-shadow: 0 0 15px rgba(0, 255, 204, 0.3), inset 0 0 10px rgba(0, 255, 204, 0.15);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       position: relative;
     }
 
@@ -137,34 +137,9 @@
       flex: 1; overflow-y: auto; font-family: monospace; font-size: 0.68rem;
       color: #e0e0e0; line-height: 1.35; white-space: pre-wrap;
       text-shadow: 0 0 3px rgba(255,255,255,0.2);
-      touch-action: pan-y;
-      -webkit-overflow-scrolling: touch;
-      user-select: text;
     }
-    .terminal-screen-content::-webkit-scrollbar { width: 5px; }
-    .terminal-screen-content::-webkit-scrollbar-thumb { background: #00ffcc; border-radius: 3px; }
-
-    .lfg-hyperdrive-btn {
-      background: #00ffcc;
-      color: #000;
-      border: none;
-      border-radius: 6px;
-      padding: 8px;
-      font-family: monospace;
-      font-weight: 900;
-      font-size: 0.85rem;
-      cursor: pointer;
-      box-shadow: 0 0 12px rgba(0, 255, 204, 0.5);
-      transition: all 0.2s ease;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-      letter-spacing: 1px;
-    }
-    .lfg-hyperdrive-btn:hover {
-      background: #fff;
-      box-shadow: 0 0 20px rgba(0, 255, 204, 0.9);
-      transform: scale(1.02);
-    }
+    .terminal-screen-content::-webkit-scrollbar { width: 4px; }
+    .terminal-screen-content::-webkit-scrollbar-thumb { background: #00ffcc; border-radius: 2px; }
 
     .viewport.hyperdrive .earth-planet {
       transform: translateX(-50%) scale(22);
@@ -528,26 +503,23 @@
       <!-- SPACESHIP COCKPIT LAYER -->
       <div class="space-view" id="spaceView">
         <div class="stars"></div>
-        <div class="earth-planet" id="earthPlanet">🌍</div>
+        <div class="earth-planet" id="earthPlanet">🌎</div>
         <div class="cockpit-windows-frame"></div>
         
         <div class="cockpit-dashboard" id="cockpitDashboard">
           <!-- Live Moon Telemetry Header -->
           <div class="telemetry-hud">
-            <span>MISSION FAILED: THE DEV RUGGED</span>
-            <span>DIST FROM MOON: <span class="val" id="moonDistanceVal">238,900</span> MILES</span>
+            <span>MISSION STATUS: EMERGENCY ABORT</span>
+            <span>TARGET: EARTH HOME</span>
           </div>
 
           <div class="spaceship-terminal">
             <div class="terminal-header">
-              <span>SYS_CORE // MANIFESTO_FEED.log</span>
+              <span>SYS_CORE // RUG_ALERT.log</span>
               <span id="terminalStatus">STANDBY</span>
             </div>
-            <div class="terminal-screen-content" id="terminalText">Initializing block-archive stream...</div>
+            <div class="terminal-screen-content" id="terminalText">Awaiting flight sequence initialization...</div>
           </div>
-
-          <!-- LFG HYPERDRIVE BUTTON -->
-          <button class="lfg-hyperdrive-btn" onclick="triggerHyperdrive()">Lfg 🚀</button>
         </div>
       </div>
 
@@ -665,16 +637,17 @@
   </div>
 
   <script>
-    const fullLoreText = "In the dark, rekt depths of the blockchain, where scammers and ruggers thought they owned the narrative, a legend awakened. We faced that pit-of-the-stomach panic when the red candles struck, living on instant noodles and pure copium, but we refused to let their greed destroy us. We built a sanctuary on absolute honesty. We bought the tops, sold the bottoms, and somehow still have enough diamond hands to hold the moon. Here, all are welcome, so long as you bring no scams, harassment, or hate. We have no room for racism, sell-shaming, or any toxicity; kindness is the only currency we accept. We aren't rich, we aren't the best developers in the space, but we're trying, and that’s what makes us real. We will weather the storms of future crypto cycles together, standing together in our strength to build the biggest community in the space, make ApeChain the greatest chain of all time, and prove that even we can make it, despite having portfolio strategies that belong in a comedy club, a trading history that reads like a tragic novel, and a risk management style that involves screaming at green candles—all within a community built on trust, friendship, fun times, bad times, and where everyone is truly part of the shape, future, and direction of our project, under the glorious banner of ApeChain.";
+    // New terminal script sequence as requested
+    const ruggedTerminalText = "ALERT: THE DEV RUGGED THE LIQUIDITY POOL!\nMISSION TO THE MOON ABANDONED.\nRECALIBRATING NAVIGATION COMPUTERS...\nSETTING COORDINATES FOR HOME (THE RUGGED BAR).\nWAGMI, HOLD YOUR BAGS, WEN LAMBO? NEVER, WE DRINK INSTEAD. LFG 🚀";
 
     let isTyping = false;
 
-    function startLoreStream() {
+    function startRuggedStream() {
       if (isTyping) return;
       isTyping = true;
       
       const statusEl = document.getElementById('terminalStatus');
-      if (statusEl) statusEl.innerText = 'STREAMING...';
+      if (statusEl) statusEl.innerText = 'RUG_ALERT...';
       
       const terminalBox = document.getElementById('terminalText');
       if (!terminalBox) return;
@@ -683,30 +656,29 @@
       
       let charIndex = 0;
       function typeNextChar() {
-        if (charIndex < fullLoreText.length) {
-          terminalBox.innerText += fullLoreText.charAt(charIndex);
+        if (charIndex < ruggedTerminalText.length) {
+          terminalBox.innerText += ruggedTerminalText.charAt(charIndex);
           terminalBox.scrollTop = terminalBox.scrollHeight;
           charIndex++;
-          setTimeout(typeNextChar, 14);
+          setTimeout(typeNextChar, 18);
         } else {
-          terminalBox.innerText += "\n\n> INPUTTING CORDS FOR EARTH...";
+          terminalBox.innerText += "\n\n> WARP ENGINES ENGAGING...";
           terminalBox.scrollTop = terminalBox.scrollHeight;
-          if (statusEl) statusEl.innerText = 'READY FOR WARP';
+          if (statusEl) statusEl.innerText = 'WARP ACTIVE';
           
           setTimeout(() => {
-            terminalBox.innerText += "\n> TARGET LOCKED. HYPERDRIVE SYSTEMS ONLINE.";
-            terminalBox.scrollTop = terminalBox.scrollHeight;
-          }, 600);
+            triggerHyperdrive();
+          }, 800);
         }
       }
       typeNextChar();
     }
 
-    // Auto-start lore stream immediately when the page finishes loading
+    // Load sequence starts after 1 second delay
     window.addEventListener('load', () => {
       setTimeout(() => {
-        startLoreStream();
-      }, 300);
+        startRuggedStream();
+      }, 1000);
     });
 
     let moonMiles = 238900;
@@ -718,11 +690,7 @@
       }
     }, 2000);
 
-    let hyperdriveTriggered = false;
     function triggerHyperdrive() {
-      if (hyperdriveTriggered) return;
-      hyperdriveTriggered = true;
-
       const scene = document.getElementById('scene');
       scene.classList.add('hyperdrive');
       
