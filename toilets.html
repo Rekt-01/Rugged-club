@@ -14,7 +14,7 @@
     }
 
     body {
-      background-color: #050508;
+      background-color: #020205;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -38,193 +38,116 @@
       max-height: 100vh; max-width: 56.25vh;
       transform: translate(-50%, -50%);
       overflow: hidden;
-      background: #090a0f;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      padding: 25px 20px;
-      border: 4px solid #1a1b24;
-      box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
+      background: url('toilet.jpg') center center / cover no-repeat;
     }
 
     @media (min-aspect-ratio: 9/16) {
       .scene-container { width: 56.25vh; height: 100vh; }
     }
 
-    /* --- RESTROOM INTERIOR THEME --- */
-    .toilet-header {
-      text-align: center;
-      z-index: 3;
-      margin-top: 10px;
-    }
-    
-    .toilet-title {
-      font-family: monospace;
-      font-size: 1.1rem;
-      color: #00ff66;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      text-shadow: 0 0 10px rgba(0, 255, 102, 0.6);
-      margin-bottom: 4px;
-    }
-
-    .toilet-subtitle {
-      font-family: monospace;
-      font-size: 0.65rem;
-      color: #888;
-      font-style: italic;
-    }
-
-    /* The Stall / Urinal Booth Centerpiece */
-    .stall-viewport {
-      position: relative;
-      width: 100%;
-      flex: 1;
-      max-height: 380px;
-      margin: 15px 0;
-      background: radial-gradient(circle at center, #1b1d28 0%, #0c0d12 80%);
-      border: 2px dashed #33364d;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
-    }
-
-    .toilet-graphic {
-      font-size: 90px;
-      filter: drop-shadow(0 0 15px rgba(0, 255, 102, 0.3));
-      animation: bowlFloat 3s ease-in-out infinite alternate;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    .toilet-graphic:active {
-      transform: scale(0.92);
-    }
-    @keyframes bowlFloat {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-8px); }
-    }
-
-    .flush-instruction {
-      font-family: monospace;
-      font-size: 0.75rem;
-      color: #ffe600;
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(255, 230, 0, 0.4);
-      padding: 5px 12px;
-      border-radius: 6px;
-      margin-top: 15px;
-      letter-spacing: 1px;
-      text-shadow: 0 0 6px rgba(255, 230, 0, 0.5);
-    }
-
-    /* Interactive Flush / Escape Controls */
-    .toilet-controls {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 3;
-      margin-bottom: 10px;
-    }
-
-    .flush-action-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.9);
-      padding: 12px 16px;
-      border-radius: 10px;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-      border: 2px solid #ff3333;
-      width: 100%;
-    }
-    .flush-action-btn:hover {
-      background: rgba(255, 51, 51, 0.15);
-      box-shadow: 0 0 25px rgba(255, 51, 51, 0.7);
-      transform: scale(1.03);
-    }
-    .flush-action-btn .btn-main-text {
-      font-family: monospace;
-      font-size: 0.95rem;
-      font-weight: 900;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #ff3333;
-      text-shadow: 0 0 8px #ff3333;
-      margin-bottom: 2px;
-    }
-    .flush-action-btn .btn-sub-text {
-      font-family: monospace;
-      font-size: 0.6rem;
-      color: #aaa;
-      font-style: italic;
-    }
-
-    .back-bar-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.9);
-      padding: 12px 16px;
-      border-radius: 10px;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-      border: 2px solid #00ff66;
-      width: 100%;
-    }
-    .back-bar-btn:hover {
-      background: rgba(0, 255, 102, 0.15);
-      box-shadow: 0 0 25px rgba(0, 255, 102, 0.7);
-      transform: scale(1.03);
-    }
-    .back-bar-btn .btn-main-text {
-      font-family: monospace;
-      font-size: 0.95rem;
-      font-weight: 900;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #00ff66;
-      text-shadow: 0 0 8px #00ff66;
-      margin-bottom: 2px;
-    }
-    .back-bar-btn .btn-sub-text {
-      font-family: monospace;
-      font-size: 0.6rem;
-      color: #aaa;
-      font-style: italic;
-    }
-
-    /* Flush Animation Overlay */
-    .flush-overlay {
+    /* --- INTERACTIVE HOTSPOTS --- */
+    .hotspot {
       position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle, #0044ff 0%, #001133 80%);
-      opacity: 0;
-      pointer-events: none;
-      z-index: 10;
-      transition: opacity 0.4s ease;
+      z-index: 5;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      transition: background 0.2s ease;
     }
-    .flush-overlay.active {
-      opacity: 0.85;
-      animation: flushRipple 1.2s ease-out;
+
+    /* Hidden button on the stall latch/lock mechanism */
+    .stall-lock-hotspot {
+      top: 42%;
+      right: 23%;
+      width: 15%;
+      height: 8%;
     }
-    @keyframes flushRipple {
-      0% { transform: scale(0.8); opacity: 0.9; }
-      50% { transform: scale(1.2); opacity: 0.6; }
-      100% { transform: scale(1); opacity: 0; }
+    .stall-lock-hotspot:hover, .stall-lock-hotspot:active {
+      background: rgba(0, 255, 102, 0.2);
+      border-radius: 6px;
+    }
+
+    /* "LORE" graffiti hotspot on the left wall */
+    .lore-hotspot {
+      top: 56%;
+      left: 3%;
+      width: 12%;
+      height: 7%;
+    }
+    .lore-hotspot:hover, .lore-hotspot:active {
+      background: rgba(255, 0, 122, 0.25);
+      border-radius: 4px;
+    }
+
+    /* --- POPUP WINDOW MODAL --- */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 20;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+      position: relative;
+      background: #0d0d12;
+      border: 2px solid #ff007a;
+      border-radius: 12px;
+      padding: 30px 20px 20px 20px;
+      width: 90vw;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(255, 0, 122, 0.5);
+      font-family: monospace;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px; right: 15px;
+      color: #fff;
+      font-size: 1.8rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close-btn:hover {
+      color: #ff007a;
+    }
+
+    .modal-title {
+      color: #ff007a;
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-shadow: 0 0 8px rgba(255, 0, 122, 0.6);
+      letter-spacing: 1px;
+    }
+
+    .modal-body-text {
+      color: #ccc;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    .modal-action-btn {
+      background: #ff007a;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 0.8rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 0, 122, 0.5);
+    }
+    .modal-action-btn:active {
+      transform: scale(0.95);
     }
   </style>
 </head>
@@ -232,41 +155,35 @@
 
   <div class="viewport">
     <div class="scene-container">
-      <div class="flush-overlay" id="flushOverlay"></div>
+      
+      <!-- Hidden hotspot over the bathroom stall lock/latch pointing back to the bar -->
+      <a href="index.html?doors=open" class="hotspot stall-lock-hotspot" title="Unlock Stall & Return to Bar"></a>
 
-      <div class="toilet-header">
-        <div class="toilet-title">🚻 VIP RESTROOM</div>
-        <div class="toilet-subtitle">"Where paper hands go to reflect on bad entries."</div>
-      </div>
+      <!-- Hotspot covering the "LORE" text on the left wall -->
+      <button class="hotspot lore-hotspot" onclick="openLoreModal()" title="Inspect Lore"></button>
 
-      <div class="stall-viewport">
-        <div class="toilet-graphic" onclick="triggerFlushAnimation()">🚽</div>
-        <div class="flush-instruction">TAP BOWL TO FLUSH EMOTIONS</div>
-      </div>
+    </div>
+  </div>
 
-      <div class="toilet-controls">
-        <!-- CRITICAL FIX: Appends ?doors=open to bring user back straight to open bar doors -->
-        <a href="index.html?doors=open" class="back-bar-btn">
-          <span class="btn-main-text">🚪 RETURN TO THE BAR</span>
-          <span class="btn-sub-text">"Back to staring at live charts."</span>
-        </a>
-        
-        <a href="index.html" class="flush-action-btn">
-          <span class="btn-main-text">🔄 EMERGENCY FLUSH (RESET)</span>
-          <span class="btn-sub-text">"Lock the doors and start over."</span>
-        </a>
+  <!-- Lore Popup Window Modal -->
+  <div class="modal" id="loreModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeLoreModal()">&times;</span>
+      <div class="modal-title">📜 RESTROOM LORE ARCHIVE</div>
+      <div class="modal-body-text" id="loreTextContainer">
+        "It is said that whoever stares long enough into the 404 Degen graffiti while holding a heavy bag will unlock the secrets of the next market cycle... (Add your custom lore content here later!)"
       </div>
+      <button class="modal-action-btn" onclick="closeLoreModal()">CLOSE WRITING</button>
     </div>
   </div>
 
   <script>
-    function triggerFlushAnimation() {
-      const overlay = document.getElementById('flushOverlay');
-      overlay.classList.add('active');
-      
-      setTimeout(() => {
-        overlay.classList.remove('active');
-      }, 1200);
+    function openLoreModal() {
+      document.getElementById('loreModal').style.display = 'flex';
+    }
+
+    function closeLoreModal() {
+      document.getElementById('loreModal').style.display = 'none';
     }
   </script>
 
