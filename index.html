@@ -531,14 +531,12 @@
   <div class="viewport" id="scene">
     <div class="scene-container">
       
-      <!-- SPACESHIP COCKPIT LAYER -->
       <div class="space-view" id="spaceView">
         <div class="stars"></div>
         <div class="earth-planet" id="earthPlanet">🌍</div>
         <div class="cockpit-windows-frame"></div>
         
         <div class="cockpit-dashboard" id="cockpitDashboard">
-          <!-- Live Moon Telemetry Header -->
           <div class="telemetry-hud">
             <span>TARGET: LUNAR SURFACE</span>
             <span>DISTANCE: <span class="val" id="moonDistanceVal">238,900</span> MILES</span>
@@ -559,7 +557,6 @@
         </div>
       </div>
 
-      <!-- CLUBHOUSE BAR BACKGROUND & HOTSPOTS -->
       <div class="clubhouse-bg"></div>
       
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
@@ -570,7 +567,6 @@
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
-    <!-- BAR CONTROLS -->
     <div class="top-controls-bar">
       <a href="https://dexscreener.com/apechain" target="_blank" class="door-ape-sign">
         <span class="sign-label">$APE:</span>
@@ -673,89 +669,14 @@
   </div>
 
   <script>
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playTerminalSound(type) {
-      if (!audioCtx) return;
-      if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-      
-      const osc = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      osc.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-
-      let now = audioCtx.currentTime;
-      if (type === 'click') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, now);
-        osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
-        gainNode.gain.setValueAtTime(0.08, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-        osc.start(now);
-        osc.stop(now + 0.08);
-      } else if (type === 'type') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(800 + Math.random() * 200, now);
-        gainNode.gain.setValueAtTime(0.02, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
-        osc.start(now);
-        osc.stop(now + 0.03);
-      } else if (type === 'scan') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(200, now);
-        osc.frequency.linearRampToValueAtTime(600, now + 0.2);
-        gainNode.gain.setValueAtTime(0.1, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-        osc.start(now);
-        osc.stop(now + 0.2);
-      } else if (type === 'alert') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.setValueAtTime(300, now + 0.1);
-        gainNode.gain.setValueAtTime(0.12, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-        osc.start(now);
-        osc.stop(now + 0.25);
-      } else if (type === 'switch') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(300, now);
-        osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
-        gainNode.gain.setValueAtTime(0.1, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-        osc.start(now);
-        osc.stop(now + 0.1);
-      } else if (type === 'warp') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(100, now);
-        osc.frequency.exponentialRampToValueAtTime(1200, now + 2.2);
-        gainNode.gain.setValueAtTime(0.2, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.4);
-        osc.start(now);
-        osc.stop(now + 2.4);
-      } else if (type === 'panic') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(800, now);
-        osc.frequency.linearRampToValueAtTime(150, now + 0.4);
-        gainNode.gain.setValueAtTime(0.2, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-        osc.start(now);
-        osc.stop(now + 0.4);
-      }
-    }
-
     const fullLoreText = "In the dark, rekt depths of the blockchain, where scammers and ruggers thought they owned the narrative, a legend awakened. We faced that pit-of-the-stomach panic when the red candles struck, living on instant noodles and pure copium, but we refused to let their greed destroy us. We built a sanctuary on absolute honesty. We bought the tops, sold the bottoms, and somehow still have enough diamond hands to hold the moon. Here, all are welcome, so long as you bring no scams, harassment, or hate. We have no room for racism, sell-shaming, or any toxicity; kindness is the only currency we accept. We aren't rich, we aren't the best developers in the space, but we're trying, and that’s what makes us real. We will weather the storms of future crypto cycles together, standing together in our strength to build the biggest community in the space, make ApeChain the greatest chain of all time, and prove that even we can make it, despite having portfolio strategies that belong in a comedy club, a trading history that reads like a tragic novel, and a risk management style that involves screaming at green candles—all within a community built on trust, friendship, fun times, bad times, and where everyone is truly part of the shape, future, and direction of our project, under the glorious banner of ApeChain.";
 
     let isTyping = false;
 
     function startLoreStream() {
       if (isTyping) return;
-      
-      // Ensure AudioContext handles browser autoplay locks safely
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume().catch(() => {});
-      }
 
       isTyping = true;
-      playTerminalSound('click');
       const loreBtn = document.getElementById('loreBtn');
       loreBtn.style.opacity = '0.5';
       document.getElementById('terminalStatus').innerText = 'STREAMING...';
@@ -768,13 +689,11 @@
         if (charIndex < fullLoreText.length) {
           terminalBox.innerText += fullLoreText.charAt(charIndex);
           terminalBox.scrollTop = terminalBox.scrollHeight;
-          if (charIndex % 3 === 0) playTerminalSound('type');
           charIndex++;
           setTimeout(typeNextChar, 14);
         } else {
           terminalBox.innerText += "\n\n> INPUTTING CORDS FOR EARTH...";
           terminalBox.scrollTop = terminalBox.scrollHeight;
-          playTerminalSound('alert');
           document.getElementById('terminalStatus').innerText = 'READY FOR WARP';
           
           setTimeout(() => {
@@ -798,7 +717,6 @@
     }, 2000);
 
     function triggerHyperdrive() {
-      playTerminalSound('warp');
       const scene = document.getElementById('scene');
       scene.classList.add('hyperdrive');
       
@@ -813,7 +731,6 @@
     let speechBubbleTimer = null;
 
     function toggleLights() {
-      playTerminalSound('switch');
       isLightsOff = !isLightsOff;
       const scene = document.getElementById('scene');
       const btn = document.getElementById('lightsToggleBtn');
@@ -836,26 +753,22 @@
     }
 
     function triggerPanic() {
-      playTerminalSound('panic');
       const scene = document.getElementById('scene');
       scene.classList.add('panic-active');
       document.getElementById('panicModal').style.display = 'flex';
     }
 
     function dismissPanic() {
-      playTerminalSound('click');
       const scene = document.getElementById('scene');
       scene.classList.remove('panic-active');
       document.getElementById('panicModal').style.display = 'none';
     }
 
     function openDoors() {
-      playTerminalSound('click');
       document.getElementById('scene').classList.add('open');
     }
 
     function openTouchGrassModal() {
-      playTerminalSound('click');
       const modal = document.getElementById('webModal');
       const iframe = document.getElementById('webIframe');
       const openseaCard = document.getElementById('openseaCardModal');
@@ -904,13 +817,11 @@
     let isAutoTickerRunning = false;
 
     function cycleDeskMessage() {
-      playTerminalSound('click');
       currentDeskIndex = (currentDeskIndex + 1) % deskMessages.length;
       document.getElementById('deskMessageDisplay').innerText = deskMessages[currentDeskIndex];
     }
 
     function toggleAutoTicker() {
-      playTerminalSound('alert');
       isAutoTickerRunning = !isAutoTickerRunning;
       const btn = document.getElementById('tickerToggleBtn');
       if (isAutoTickerRunning) {
@@ -925,7 +836,6 @@
     }
 
     function runTokenScan() {
-      playTerminalSound('scan');
       let inputVal = document.getElementById('tokenScannerInput').value.trim();
       if (!inputVal) inputVal = "$RANDOM";
       if (!inputVal.startsWith('$')) inputVal = '$' + inputVal.toUpperCase();
