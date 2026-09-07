@@ -115,31 +115,50 @@
       text-shadow: 0 0 5px #ff3333;
     }
 
+    /* --- Windows / PuTTY Terminal Style --- */
     .spaceship-terminal {
-      background: rgba(5, 7, 12, 0.92);
-      border: 2px solid #00ffcc;
-      border-radius: 8px;
-      height: 145px;
-      padding: 8px 10px;
+      background: #000000;
+      border: 2px solid #555555;
+      border-radius: 2px;
+      height: 155px;
+      padding: 6px 8px;
       display: flex; flex-direction: column;
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.3), inset 0 0 10px rgba(0, 255, 204, 0.15);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
       margin-bottom: 8px;
       position: relative;
     }
 
     .terminal-header {
       display: flex; justify-content: space-between; align-items: center;
-      font-family: monospace; font-size: 0.65rem; color: #00ffcc;
-      border-bottom: 1px dashed rgba(0, 255, 204, 0.3); padding-bottom: 4px; margin-bottom: 5px;
+      font-family: 'Consolas', 'Courier New', monospace; 
+      font-size: 0.65rem; color: #ffffff; background: #000080;
+      padding: 2px 4px; margin-bottom: 5px;
     }
 
     .terminal-screen-content {
-      flex: 1; overflow-y: auto; font-family: monospace; font-size: 0.68rem;
-      color: #e0e0e0; line-height: 1.35; white-space: pre-wrap;
-      text-shadow: 0 0 3px rgba(255,255,255,0.2);
+      flex: 1; overflow-y: auto; 
+      font-family: 'Consolas', 'Courier New', monospace; 
+      font-size: 0.7rem;
+      color: #cccccc; /* Classic Windows/PuTTY light gray text */
+      line-height: 1.35; white-space: pre-wrap;
     }
-    .terminal-screen-content::-webkit-scrollbar { width: 4px; }
-    .terminal-screen-content::-webkit-scrollbar-thumb { background: #00ffcc; border-radius: 2px; }
+    .terminal-screen-content::-webkit-scrollbar { width: 6px; }
+    .terminal-screen-content::-webkit-scrollbar-thumb { background: #555; }
+
+    /* Blinking Terminal Cursor */
+    .terminal-cursor {
+      display: inline-block;
+      width: 7px;
+      height: 12px;
+      background: #cccccc;
+      vertical-align: middle;
+      animation: cursorBlink 1s infinite;
+      margin-left: 2px;
+    }
+    @keyframes cursorBlink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
 
     .viewport.hyperdrive .earth-planet {
       transform: translateX(-50%) scale(22);
@@ -515,10 +534,10 @@
 
           <div class="spaceship-terminal">
             <div class="terminal-header">
-              <span>SYS_CORE // RUG_ALERT.log</span>
+              <span>Command Prompt - RUG_ALERT.log</span>
               <span id="terminalStatus">STANDBY</span>
             </div>
-            <div class="terminal-screen-content" id="terminalText">Awaiting flight sequence initialization...</div>
+            <div class="terminal-screen-content" id="terminalText">Awaiting flight sequence initialization...<span class="terminal-cursor"></span></div>
           </div>
         </div>
       </div>
@@ -637,8 +656,7 @@
   </div>
 
   <script>
-    // New terminal script sequence requested
-    const ruggedTerminalText = "SYS_ALERT: INCOMING TRANSMISSION FROM [WALLET: 0xDEAD...BEEF]\nDECRYPTING... [DONE]\n\n--------------------------------------------------\n[CRITICAL] DEV WALLET DRAINED - 420 ETH TRANSFERRED TO TORNADO CASH\n[STATUS] \"MOON MISSION\" RUGGED. LIQUIDITY PULLED.\n[ERROR] FLOOR PRICE: 0.0000 ETH\n--------------------------------------------------\n\nRE-CALIBRATING NAVIGATION MATRIX...\nOLD DESTINATION: THE MOON (CANCELLED)\nNEW TARGET: SHITCOIN CASINO // REKT SECTOR\n\nRADAR SWEEP: [ / ] WIPING DISCORD CHANNELS...\nRADAR SWEEP: [ - ] DELETING TWITTER ACCOUNT...\nRADAR SWEEP: [ \\ ] DUSTING OFF THE LAUNCHPAD...\nRADAR SWEEP: [ | ] DEPLOYING SMART CONTRACT V2: \"ELONPUMP_INU\"\n\nENTER NEW CONTRACT ADDRESS > _";
+    const ruggedTerminalText = "SYS_ALERT: INCOMING TRANSMISSION FROM [WALLET: 0xDEAD...BEEF]\nDECRYPTING... [DONE]\n\n--------------------------------------------------\n[CRITICAL] DEV WALLET DRAINED - 420 ETH TRANSFERRED TO TORNADO CASH\n[STATUS] \"MOON MISSION\" RUGGED. LIQUIDITY PULLED.\n[ERROR] FLOOR PRICE: 0.0000 ETH\n--------------------------------------------------\n\nRE-CALIBRATING NAVIGATION MATRIX...\nOLD DESTINATION: THE MOON (CANCELLED)\nNEW TARGET: SHITCOIN CASINO // REKT SECTOR\n\nRADAR SWEEP: [ / ] WIPING DISCORD CHANNELS...\nRADAR SWEEP: [ - ] DELETING TWITTER ACCOUNT...\nRADAR SWEEP: [ \\ ] DUSTING OFF THE LAUNCHPAD...\nRADAR SWEEP: [ | ] DEPLOYING SMART CONTRACT V2: \"ELONPUMP_INU\"\n\nENTER NEW CONTRACT ADDRESS > ";
 
     let isTyping = false;
 
@@ -647,7 +665,7 @@
       isTyping = true;
       
       const statusEl = document.getElementById('terminalStatus');
-      if (statusEl) statusEl.innerText = 'RUG_ALERT...';
+      if (statusEl) statusEl.innerText = 'CONNECTED';
       
       const terminalBox = document.getElementById('terminalText');
       if (!terminalBox) return;
@@ -657,24 +675,36 @@
       let charIndex = 0;
       function typeNextChar() {
         if (charIndex < ruggedTerminalText.length) {
-          terminalBox.innerText += ruggedTerminalText.charAt(charIndex);
+          // Add cursor right after the current text
+          terminalBox.innerText = ruggedTerminalText.substring(0, charIndex + 1);
+          
+          // Append the blinking cursor element back
+          let cursor = document.createElement('span');
+          cursor.className = 'terminal-cursor';
+          terminalBox.appendChild(cursor);
+
           terminalBox.scrollTop = terminalBox.scrollHeight;
           charIndex++;
-          setTimeout(typeNextChar, 10);
+          
+          // Slower delay (~45ms per character for an authentic reading speed)
+          setTimeout(typeNextChar, 45);
         } else {
-          terminalBox.innerText += "\n\n> WARP ENGINES ENGAGING...";
+          terminalBox.innerHTML += "\n\n> WARP ENGINES ENGAGING...";
+          let cursor = document.createElement('span');
+          cursor.className = 'terminal-cursor';
+          terminalBox.appendChild(cursor);
           terminalBox.scrollTop = terminalBox.scrollHeight;
-          if (statusEl) statusEl.innerText = 'WARP ACTIVE';
+          
+          if (statusEl) statusEl.innerText = 'TRANSMITTING';
           
           setTimeout(() => {
             triggerHyperdrive();
-          }, 1000);
+          }, 1200);
         }
       }
       typeNextChar();
     }
 
-    // Load sequence starts after 1 second delay
     window.addEventListener('load', () => {
       setTimeout(() => {
         startRuggedStream();
