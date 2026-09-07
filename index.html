@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v13.0 - Space Command</title>
+  <title>The Rugged Bar v14.0 - Space Command</title>
   <style>
     * {
       box-sizing: border-box;
@@ -48,7 +48,7 @@
       background: radial-gradient(circle at center, #0f1026 0%, #05050a 60%, #000000 100%);
       z-index: 1;
       overflow: hidden;
-      transition: transform 1.8s cubic-bezier(0.5, 0, 0.1, 1), filter 1.5s ease;
+      transition: filter 1.5s ease;
     }
 
     /* Starfield background elements */
@@ -69,20 +69,13 @@
       100% { transform: translateY(200px); }
     }
 
-    /* Earth in the distance */
+    /* Earth Emoji Planet in the distance */
     .earth-planet {
-      position: absolute; top: 22%; left: 50%; transform: translateX(-50%);
-      width: 130px; height: 130px; border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #4da6ff 0%, #0044cc 40%, #001a66 80%, #000511 100%);
-      box-shadow: 0 0 30px rgba(77, 166, 255, 0.4), inset -15px -15px 25px rgba(0,0,0,0.8);
+      position: absolute; top: 24%; left: 50%; transform: translateX(-50%) scale(1);
+      font-size: 85px;
       z-index: 2;
-      transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 3s ease;
-    }
-    /* Earth atmosphere glow */
-    .earth-planet::after {
-      content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px;
-      border-radius: 50%; box-shadow: 0 0 15px rgba(0, 153, 255, 0.6);
-      pointer-events: none; opacity: 0.8;
+      filter: drop-shadow(0 0 15px rgba(77, 166, 255, 0.6));
+      transition: transform 2.4s cubic-bezier(0.7, 0, 0.2, 1), filter 2s ease;
     }
 
     /* Cockpit HUD Overlay & Dashboard Frame */
@@ -95,6 +88,7 @@
       padding: 15px;
       display: flex; flex-direction: column; justify-content: flex-end;
       box-shadow: inset 0 15px 25px rgba(0,255,204,0.05);
+      transition: transform 1s ease-in;
     }
 
     .cockpit-windows-frame {
@@ -146,7 +140,7 @@
 
     .cockpit-btn.lfg-btn {
       border-color: #00ff66; color: #00ff66; box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
-      opacity: 0.4; pointer-events: none;
+      opacity: 0.3; pointer-events: none;
     }
     .cockpit-btn.lfg-btn.active {
       opacity: 1; pointer-events: auto; animation: lfgPulse 1.2s infinite alternate;
@@ -157,22 +151,15 @@
     }
 
     /* HYPERDRIVE WARP ANIMATION STATE */
-    .viewport.hyperdrive .space-view {
-      transform: scale(8);
-      filter: brightness(3) contrast(1.5);
-      transition: transform 2.2s cubic-bezier(0.7, 0, 0.9, 1), filter 1s ease;
-    }
     .viewport.hyperdrive .earth-planet {
-      transform: translateX(-50%) scale(15);
-      box-shadow: 0 0 100px #fff, 0 0 200px #4da6ff;
-      transition: transform 2.2s cubic-bezier(0.7, 0, 0.9, 1);
+      transform: translateX(-50%) scale(22);
+      filter: drop-shadow(0 0 50px #fff) drop-shadow(0 0 100px #4da6ff);
     }
     .viewport.hyperdrive .cockpit-dashboard {
       transform: translateY(120%);
-      transition: transform 1.2s ease-in;
     }
     .viewport.hyperdrive .stars {
-      animation-duration: 0.3s;
+      animation-duration: 0.25s;
     }
 
 
@@ -528,10 +515,10 @@
       <!-- SPACESHIP COCKPIT LAYER -->
       <div class="space-view" id="spaceView">
         <div class="stars"></div>
-        <div class="earth-planet" id="earthPlanet"></div>
+        <div class="earth-planet" id="earthPlanet">🌍</div>
         <div class="cockpit-windows-frame"></div>
         
-        <div class="cockpit-dashboard">
+        <div class="cockpit-dashboard" id="cockpitDashboard">
           <div class="spaceship-terminal">
             <div class="terminal-header">
               <span>SYS_CORE // MANIFESTO_FEED.log</span>
@@ -575,7 +562,7 @@
     </div>
 
     <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-    <div class="door-version">v13.0</div>
+    <div class="door-version">v14.0</div>
 
     <div class="front-buttons-container">
       <button class="degen-action-btn enter-btn" onclick="openDoors()">
@@ -616,7 +603,7 @@
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
       <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v13.0</div>
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.0</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
@@ -714,11 +701,11 @@
       } else if (type === 'warp') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(100, now);
-        osc.frequency.exponentialRampToValueAtTime(1200, now + 2.0);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 2.2);
         gainNode.gain.setValueAtTime(0.2, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.4);
         osc.start(now);
-        osc.stop(now + 2.2);
+        osc.stop(now + 2.4);
       } else if (type === 'panic') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(800, now);
@@ -751,10 +738,11 @@
           terminalBox.scrollTop = terminalBox.scrollHeight;
           if (charIndex % 3 === 0) playTerminalSound('type');
           charIndex++;
-          setTimeout(typeNextChar, 18);
+          setTimeout(typeNextChar, 14);
         } else {
-          // Finished printing lore
+          // Finished printing lore exactly as requested
           terminalBox.innerText += "\n\n> INPUTTING CORDS FOR EARTH...";
+          terminalBox.scrollTop = terminalBox.scrollHeight;
           playTerminalSound('alert');
           document.getElementById('terminalStatus').innerText = 'READY FOR WARP';
           
@@ -762,7 +750,7 @@
             terminalBox.innerText += "\n> TARGET LOCKED. HYPERDRIVE SYSTEMS ONLINE.";
             terminalBox.scrollTop = terminalBox.scrollHeight;
             document.getElementById('lfgBtn').classList.add('active');
-          }, 800);
+          }, 600);
         }
       }
       typeNextChar();
@@ -774,12 +762,11 @@
       scene.classList.add('hyperdrive');
       
       setTimeout(() => {
-        // Transition from cockpit view to Clubhouse Bar view
+        // Transition from cockpit view to Clubhouse Bar view smoothly
         scene.classList.remove('hyperdrive');
         scene.classList.add('bar-active');
-        // Clean up cockpit element display if needed
         document.getElementById('spaceView').style.display = 'none';
-      }, 2100);
+      }, 2300);
     }
 
     let isLightsOff = false;
