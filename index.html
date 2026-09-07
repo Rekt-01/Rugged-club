@@ -139,13 +139,12 @@
       flex: 1; overflow-y: auto; 
       font-family: 'Consolas', 'Courier New', monospace; 
       font-size: 0.7rem;
-      color: #cccccc; /* Classic Windows/PuTTY light gray text */
+      color: #cccccc;
       line-height: 1.35; white-space: pre-wrap;
     }
     .terminal-screen-content::-webkit-scrollbar { width: 6px; }
     .terminal-screen-content::-webkit-scrollbar-thumb { background: #555; }
 
-    /* Blinking Terminal Cursor */
     .terminal-cursor {
       display: inline-block;
       width: 7px;
@@ -519,14 +518,12 @@
   <div class="viewport" id="scene">
     <div class="scene-container">
       
-      <!-- SPACESHIP COCKPIT LAYER -->
       <div class="space-view" id="spaceView">
         <div class="stars"></div>
         <div class="earth-planet" id="earthPlanet">🌎</div>
         <div class="cockpit-windows-frame"></div>
         
         <div class="cockpit-dashboard" id="cockpitDashboard">
-          <!-- Live Moon Telemetry Header -->
           <div class="telemetry-hud">
             <span>MISSION STATUS: EMERGENCY ABORT</span>
             <span>TARGET: EARTH HOME</span>
@@ -542,7 +539,6 @@
         </div>
       </div>
 
-      <!-- CLUBHOUSE BAR BACKGROUND & HOTSPOTS -->
       <div class="clubhouse-bg"></div>
       
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
@@ -553,7 +549,6 @@
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
-    <!-- BAR CONTROLS -->
     <div class="top-controls-bar">
       <a href="https://dexscreener.com/apechain" target="_blank" class="door-ape-sign">
         <span class="sign-label">$APE:</span>
@@ -676,10 +671,8 @@
       let charIndex = 0;
       function typeNextChar() {
         if (charIndex < ruggedTerminalText.length) {
-          // Add cursor right after the current text
           terminalBox.innerText = ruggedTerminalText.substring(0, charIndex + 1);
           
-          // Append the blinking cursor element back
           let cursor = document.createElement('span');
           cursor.className = 'terminal-cursor';
           terminalBox.appendChild(cursor);
@@ -687,7 +680,6 @@
           terminalBox.scrollTop = terminalBox.scrollHeight;
           charIndex++;
           
-          // Slower delay (~45ms per character for an authentic reading speed)
           setTimeout(typeNextChar, 45);
         } else {
           terminalBox.innerHTML += "\n\n> WARP ENGINES ENGAGING...";
@@ -707,9 +699,19 @@
     }
 
     window.addEventListener('load', () => {
-      setTimeout(() => {
-        startRuggedStream();
-      }, 1000);
+      // Check if URL parameters request the bar to load with open doors directly
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('doors') === 'open') {
+        const scene = document.getElementById('scene');
+        const spaceView = document.getElementById('spaceView');
+        if (spaceView) spaceView.style.display = 'none';
+        scene.classList.add('bar-active');
+        scene.classList.add('open');
+      } else {
+        setTimeout(() => {
+          startRuggedStream();
+        }, 1000);
+      }
     });
 
     let moonMiles = 238900;
