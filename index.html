@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -543,7 +543,7 @@
               <span>SYS_CORE // MANIFESTO_FEED.log</span>
               <span id="terminalStatus">STANDBY</span>
             </div>
-            <div class="terminal-screen-content" id="terminalText">Press [ LORE ] to initialize block-archive stream...</div>
+            <div class="terminal-screen-content" id="terminalText">Initializing block-archive stream...</div>
           </div>
           
           <div class="cockpit-controls">
@@ -714,7 +714,7 @@
       typeNextChar();
     }
 
-    // Secondary safety binding listener to guarantee responsiveness across devices
+    // Auto-start the lore stream when the DOM content is fully loaded
     document.addEventListener('DOMContentLoaded', () => {
       const loreBtn = document.getElementById('loreBtn');
       if (loreBtn) {
@@ -724,6 +724,9 @@
           startLoreStream(e);
         });
       }
+      
+      // Trigger the stream automatically on load
+      startLoreStream();
     });
 
     let moonMiles = 238900;
