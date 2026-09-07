@@ -554,7 +554,8 @@
           </div>
           
           <div class="cockpit-controls">
-            <button class="cockpit-btn" id="loreBtn" onclick="startLoreStream()" ontouchend="event.preventDefault(); startLoreStream();">📜 LORE</button>
+            <!-- Fixed LORE button markup optimized for touch/click handling -->
+            <button class="cockpit-btn" id="loreBtn">📜 LORE</button>
             <button class="cockpit-btn lfg-btn" id="lfgBtn" onclick="triggerHyperdrive()" ontouchend="event.preventDefault(); triggerHyperdrive();">LFG 🚀</button>
           </div>
         </div>
@@ -678,7 +679,11 @@
 
     let isTyping = false;
 
-    function startLoreStream() {
+    function startLoreStream(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
       if (isTyping) return;
 
       isTyping = true;
@@ -710,6 +715,15 @@
       }
       typeNextChar();
     }
+
+    // Attach explicit click & touch listeners to avoid mobile/desktop event gaps
+    document.addEventListener('DOMContentLoaded', () => {
+      const loreBtn = document.getElementById('loreBtn');
+      if (loreBtn) {
+        loreBtn.addEventListener('click', startLoreStream);
+        loreBtn.addEventListener('touchend', startLoreStream);
+      }
+    });
 
     // Live Moon Distance Telemetry simulation counter
     let moonMiles = 238900;
