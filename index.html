@@ -125,14 +125,17 @@
     .door-ape-sign .sign-label { font-size: 0.6rem; color: #00ff66; font-weight: bold; text-transform: uppercase; }
     .door-ape-sign .sign-price { font-size: 0.75rem; font-weight: bold; color: #fff; text-shadow: 0 0 6px #00ff66; }
 
-    .lights-toggle-btn, .panic-btn {
+    .lights-toggle-btn, .panic-btn, .lore-btn {
       background: rgba(0, 0, 0, 0.85); border: 2px solid #ffe600; border-radius: 6px;
       padding: 6px 8px; color: #ffe600; font-family: monospace; font-size: 0.65rem;
       font-weight: bold; cursor: pointer; box-shadow: 0 0 12px rgba(255, 230, 0, 0.4);
       transition: all 0.3s ease; display: flex; align-items: center; gap: 3px;
     }
-    .lights-toggle-btn:hover, .panic-btn:hover { background: rgba(255, 230, 0, 0.2); box-shadow: 0 0 20px rgba(255, 230, 0, 0.7); transform: scale(1.03); }
+    .lights-toggle-btn:hover, .panic-btn:hover, .lore-btn:hover { background: rgba(255, 230, 0, 0.2); box-shadow: 0 0 20px rgba(255, 230, 0, 0.7); transform: scale(1.03); }
     .viewport.lights-off .lights-toggle-btn { border-color: #ff007a; color: #ff007a; box-shadow: 0 0 12px rgba(255, 0, 122, 0.4); }
+
+    .lore-btn { border-color: #00ffcc; color: #00ffcc; box-shadow: 0 0 12px rgba(0, 255, 204, 0.4); }
+    .lore-btn:hover { background: rgba(0, 255, 204, 0.2); box-shadow: 0 0 20px rgba(0, 255, 204, 0.8); }
 
     .panic-btn { border-color: #ff3333; color: #ff3333; box-shadow: 0 0 12px rgba(255, 51, 51, 0.4); }
     .panic-btn:hover { background: rgba(255, 51, 51, 0.2); box-shadow: 0 0 20px rgba(255, 51, 51, 0.8); }
@@ -292,6 +295,16 @@
       text-align: center;
     }
 
+    .modal-content.lore-style {
+      border-color: #00ffcc;
+      box-shadow: 0 0 35px rgba(0, 255, 204, 0.6);
+      background: #0b0f14;
+      width: 92vw;
+      max-width: 520px;
+      padding: 25px 20px;
+      text-align: left;
+    }
+
     .modal-content.grass-style {
       border-color: #00ffcc;
       box-shadow: 0 0 30px #00ffcc;
@@ -347,6 +360,13 @@
     .scanner-input { flex: 1; background: #0b0c10; border: 1px solid #ff007a; border-radius: 6px; padding: 6px 10px; color: #fff; font-family: monospace; font-size: 0.85rem; outline: none; }
     .scanner-submit-btn { background: #00ff66; color: #000; border: none; border-radius: 6px; padding: 0 12px; font-family: monospace; font-weight: bold; font-size: 0.8rem; cursor: pointer; }
     .scanner-submit-btn:active { transform: scale(0.95); }
+
+    /* Lore Terminal Styles */
+    .lore-modal-title { font-size: 1.15rem; color: #00ffcc; font-family: monospace; font-weight: bold; margin-bottom: 8px; text-shadow: 0 0 8px rgba(0, 255, 204, 0.6); text-align: center; }
+    .lore-scroll-box { background: #07090d; border: 1px solid #223; border-radius: 6px; padding: 14px; max-height: 48vh; overflow-y: auto; margin-bottom: 15px; }
+    .lore-text-content { font-family: monospace; font-size: 0.78rem; color: #c0d0e0; line-height: 1.5; text-shadow: 0 0 3px rgba(0, 255, 204, 0.2); }
+    .lore-audio-btn { background: #00ffcc; color: #000; border: none; border-radius: 20px; padding: 10px 18px; font-weight: bold; font-family: monospace; font-size: 0.8rem; cursor: pointer; width: 100%; box-shadow: 0 0 12px rgba(0, 255, 204, 0.5); transition: transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .lore-audio-btn:active { transform: scale(0.96); }
 
     .opensea-card-container {
       width: 85vw; max-width: 420px; background: #121214; border: 2px solid #2081e2;
@@ -415,6 +435,7 @@
         <span class="sign-price" id="signApePrice">...</span>
       </a>
       <div class="control-group">
+        <button class="lore-btn" onclick="openLoreModal()">📜 LORE</button>
         <button class="lights-toggle-btn" id="lightsToggleBtn" onclick="toggleLights()">💡 LIGHTS</button>
         <button class="panic-btn" onclick="triggerPanic()">🚨 SELL ALL</button>
       </div>
@@ -481,6 +502,16 @@
             <button class="scanner-submit-btn" onclick="runTokenScan()">SCAN COIN</button>
           </div>
         </div>
+      </div>
+
+      <div id="loreModalContainer" style="display: none;">
+        <div class="lore-modal-title">📜 THE CHRONICLES OF REKT</div>
+        <div class="lore-scroll-box">
+          <div class="lore-text-content" id="loreTextContent">
+            In the dark, rekt depths of the blockchain, where scammers and ruggers thought they owned the narrative, a legend awakened. We faced that pit-of-the-stomach panic when the red candles struck and survived the absurd game of liquidity musical chairs, living on instant noodles and pure copium, but we refused to let their greed destroy us. We built a sanctuary on absolute honesty. We bought the tops, sold the bottoms, and somehow still have enough diamond hands to hold the moon. Here, all are welcome, so long as you bring no scams, harassment, or hate. We have no room for racism, sell-shaming, or any toxicity; kindness is the only currency we accept. We aren't rich, we aren't the best developers in the space, but we're trying, and that’s what makes us real. We will weather the storms of future crypto cycles together, standing united no matter what happens in the market. No rug pull or scheme can stop us, because we aren't just holders—we are the heart and soul of the chain's force. Our legacy will echo through the blockchain, reaching dimensions unforeseen. Now, we rally as one inside ApeChain—the ultimate habitat for degens, friends, and all the hype-fueled crypto madness—standing together in our strength to build the biggest community in the space, make ApeChain the greatest chain of all time, and prove that even we can make it, despite having portfolio strategies that belong in a comedy club, a trading history that reads like a tragic novel, and a risk management style that involves screaming at green candles—all within a community built on trust, friendship, fun times, bad times, and where everyone is truly part of the shape, future, and direction of our project, under the glorious banner of ApeChain.
+          </div>
+        </div>
+        <button class="lore-audio-btn" id="loreAudioBtn" onclick="toggleLoreSpeech()">🔊 READ LORE ALOUD</button>
       </div>
 
       <div id="openseaCardModal" class="opensea-card-container" style="display: none;">
@@ -616,6 +647,7 @@
       const iframe = document.getElementById('webIframe');
       const openseaCard = document.getElementById('openseaCardModal');
       const deskContainer = document.getElementById('deskModalContainer');
+      const loreContainer = document.getElementById('loreModalContainer');
       const grassContainer = document.getElementById('grassCardModal');
       const content = document.getElementById('webModalContent');
 
@@ -630,7 +662,65 @@
       iframe.src = '';
       openseaCard.style.display = 'none';
       deskContainer.style.display = 'none';
+      loreContainer.style.display = 'none';
       grassContainer.style.display = 'block';
+    }
+
+    function openLoreModal() {
+      playTerminalSound('click');
+      const modal = document.getElementById('webModal');
+      const iframe = document.getElementById('webIframe');
+      const openseaCard = document.getElementById('openseaCardModal');
+      const deskContainer = document.getElementById('deskModalContainer');
+      const loreContainer = document.getElementById('loreModalContainer');
+      const grassContainer = document.getElementById('grassCardModal');
+      const content = document.getElementById('webModalContent');
+
+      modal.style.display = 'flex';
+      content.className = 'modal-content lore-style';
+      iframe.style.display = 'none';
+      iframe.src = '';
+      openseaCard.style.display = 'none';
+      deskContainer.style.display = 'none';
+      grassContainer.style.display = 'none';
+      loreContainer.style.display = 'block';
+    }
+
+    /* Web Speech API Implementation for Browser Text-to-Speech */
+    let isSpeakingLore = false;
+    function toggleLoreSpeech() {
+      if (!('speechSynthesis' in window)) {
+        alert('Text-to-speech not supported in this browser.');
+        return;
+      }
+
+      playTerminalSound('click');
+      const btn = document.getElementById('loreAudioBtn');
+
+      if (isSpeakingLore) {
+        window.speechSynthesis.cancel();
+        isSpeakingLore = false;
+        btn.innerText = '🔊 READ LORE ALOUD';
+      } else {
+        const text = document.getElementById('loreTextContent').innerText;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 0.95;
+
+        utterance.onend = () => {
+          isSpeakingLore = false;
+          btn.innerText = '🔊 READ LORE ALOUD';
+        };
+
+        utterance.onerror = () => {
+          isSpeakingLore = false;
+          btn.innerText = '🔊 READ LORE ALOUD';
+        };
+
+        isSpeakingLore = true;
+        btn.innerText = '🛑 STOP READING';
+        window.speechSynthesis.speak(utterance);
+      }
     }
 
     const deskMessages = [
@@ -702,6 +792,7 @@
       const iframe = document.getElementById('webIframe');
       const openseaCard = document.getElementById('openseaCardModal');
       const deskContainer = document.getElementById('deskModalContainer');
+      const loreContainer = document.getElementById('loreModalContainer');
       const grassContainer = document.getElementById('grassCardModal');
       const content = document.getElementById('webModalContent');
 
@@ -712,6 +803,7 @@
         iframe.style.display = 'block';
         openseaCard.style.display = 'none';
         deskContainer.style.display = 'none';
+        loreContainer.style.display = 'none';
         grassContainer.style.display = 'none';
         iframe.src = 'https://dexscreener.com/apechain?embed=1&theme=dark';
       } else if (type === 'desk') {
@@ -720,6 +812,7 @@
         iframe.src = '';
         openseaCard.style.display = 'none';
         grassContainer.style.display = 'none';
+        loreContainer.style.display = 'none';
         deskContainer.style.display = 'block';
         document.getElementById('deskMessageDisplay').innerText = deskMessages[currentDeskIndex];
       } else if (type === 'opensea') {
@@ -727,12 +820,19 @@
         iframe.style.display = 'none';
         iframe.src = '';
         deskContainer.style.display = 'none';
+        loreContainer.style.display = 'none';
         grassContainer.style.display = 'none';
         openseaCard.style.display = 'block';
       }
     }
 
     function closeWebModal() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        isSpeakingLore = false;
+        const btn = document.getElementById('loreAudioBtn');
+        if (btn) btn.innerText = '🔊 READ LORE ALOUD';
+      }
       if (isAutoTickerRunning) {
         toggleAutoTicker();
       }
