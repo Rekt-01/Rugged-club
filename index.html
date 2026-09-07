@@ -637,8 +637,8 @@
   </div>
 
   <script>
-    // New terminal script sequence as requested
-    const ruggedTerminalText = "ALERT: THE DEV RUGGED THE LIQUIDITY POOL!\nMISSION TO THE MOON ABANDONED.\nRECALIBRATING NAVIGATION COMPUTERS...\nSETTING COORDINATES FOR HOME (THE RUGGED BAR).\nWAGMI, HOLD YOUR BAGS, WEN LAMBO? NEVER, WE DRINK INSTEAD. LFG 🚀";
+    // New terminal script sequence requested
+    const ruggedTerminalText = "SYS_ALERT: INCOMING TRANSMISSION FROM [WALLET: 0xDEAD...BEEF]\nDECRYPTING... [DONE]\n\n--------------------------------------------------\n[CRITICAL] DEV WALLET DRAINED - 420 ETH TRANSFERRED TO TORNADO CASH\n[STATUS] \"MOON MISSION\" RUGGED. LIQUIDITY PULLED.\n[ERROR] FLOOR PRICE: 0.0000 ETH\n--------------------------------------------------\n\nRE-CALIBRATING NAVIGATION MATRIX...\nOLD DESTINATION: THE MOON (CANCELLED)\nNEW TARGET: SHITCOIN CASINO // REKT SECTOR\n\nRADAR SWEEP: [ / ] WIPING DISCORD CHANNELS...\nRADAR SWEEP: [ - ] DELETING TWITTER ACCOUNT...\nRADAR SWEEP: [ \\ ] DUSTING OFF THE LAUNCHPAD...\nRADAR SWEEP: [ | ] DEPLOYING SMART CONTRACT V2: \"ELONPUMP_INU\"\n\nENTER NEW CONTRACT ADDRESS > _";
 
     let isTyping = false;
 
@@ -660,7 +660,7 @@
           terminalBox.innerText += ruggedTerminalText.charAt(charIndex);
           terminalBox.scrollTop = terminalBox.scrollHeight;
           charIndex++;
-          setTimeout(typeNextChar, 18);
+          setTimeout(typeNextChar, 10);
         } else {
           terminalBox.innerText += "\n\n> WARP ENGINES ENGAGING...";
           terminalBox.scrollTop = terminalBox.scrollHeight;
@@ -668,7 +668,7 @@
           
           setTimeout(() => {
             triggerHyperdrive();
-          }, 800);
+          }, 1000);
         }
       }
       typeNextChar();
