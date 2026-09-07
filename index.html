@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -714,19 +714,23 @@
       typeNextChar();
     }
 
-    // Auto-start the lore stream when the DOM content is fully loaded
-    document.addEventListener('DOMContentLoaded', () => {
+    // Fixed window load initialization to safely kick off the lore stream and enable LFG
+    window.addEventListener('load', () => {
       const loreBtn = document.getElementById('loreBtn');
       if (loreBtn) {
-        loreBtn.addEventListener('click', startLoreStream);
-        loreBtn.addEventListener('touchend', (e) => {
+        loreBtn.onclick = startLoreStream;
+        loreBtn.ontouchend = (e) => {
           e.preventDefault();
           startLoreStream(e);
-        });
+        };
       }
       
-      // Trigger the stream automatically on load
-      startLoreStream();
+      // Safety delay to ensure viewport elements are fully painted before typing
+      setTimeout(() => {
+        if (!isTyping) {
+          startLoreStream();
+        }
+      }, 200);
     });
 
     let moonMiles = 238900;
