@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v14.3 - Space Command</title>
+  <title>The Rugged Bar v14.2 - Space Command</title>
   <style>
     * {
       box-sizing: border-box;
@@ -26,7 +26,7 @@
     .viewport {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
-      overflow: hidden; perspective: 1400px;
+      overflow: hidden; perspective: 1200px;
     }
 
     .scene-container {
@@ -42,10 +42,10 @@
       .scene-container { width: 56.25vh; height: 100vh; }
     }
 
-    /* --- ENHANCED SPACESHIP COCKPIT ENVIRONMENT --- */
+    /* --- SPACESHIP COCKPIT ENVIRONMENT --- */
     .space-view {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle at center, #111428 0%, #06070c 55%, #000000 100%);
+      background: radial-gradient(circle at center, #0f1026 0%, #05050a 60%, #000000 100%);
       z-index: 1;
       overflow: hidden;
       transition: filter 1.5s ease;
@@ -69,179 +69,43 @@
     }
 
     .earth-planet {
-      position: absolute; top: 22%; left: 50%; transform: translateX(-50%) scale(1);
-      font-size: 80px;
+      position: absolute; top: 20%; left: 50%; transform: translateX(-50%) scale(1);
+      font-size: 75px;
       z-index: 2;
-      filter: drop-shadow(0 0 20px rgba(77, 166, 255, 0.7));
+      filter: drop-shadow(0 0 15px rgba(77, 166, 255, 0.6));
       transition: transform 2.4s cubic-bezier(0.7, 0, 0.2, 1), filter 2s ease;
     }
 
-    /* Sci-Fi Cockpit Window Frames & Struts */
+    .cockpit-dashboard {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
+      background: linear-gradient(0deg, #111216 0%, #1a1b24 85%, rgba(26,27,36,0) 100%);
+      border-top: 4px solid #2a2c3d;
+      z-index: 4;
+      clip-path: polygon(0% 15%, 15% 0%, 85% 0%, 100% 15%, 100% 100%, 0% 100%);
+      padding: 12px 15px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      box-shadow: inset 0 15px 25px rgba(0,255,204,0.05);
+      transition: transform 1s ease-in;
+    }
+
     .cockpit-windows-frame {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      border: 16px solid rgba(13, 15, 20, 0.98);
+      border: 12px solid rgba(17, 18, 22, 0.95);
       border-bottom: none; z-index: 3; pointer-events: none;
-      box-shadow: inset 0 0 60px rgba(0,0,0,0.95), 0 0 15px rgba(0,255,204,0.08);
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.9);
     }
-    .cockpit-windows-frame::before {
-      content: '';
-      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      width: 24px; height: 35%;
-      background: linear-gradient(180deg, rgba(25,28,38,0.95), rgba(13,15,20,0.98));
-      border-bottom: 3px solid #00ffcc;
-      box-shadow: 0 0 10px rgba(0,255,204,0.4);
-    }
-    .cockpit-windows-frame::after {
-      content: '';
-      position: absolute; top: 35%; left: 0; width: 100%; height: 4px;
-      background: rgba(0, 255, 204, 0.25);
-      box-shadow: 0 0 8px rgba(0,255,204,0.5);
-    }
-
-    /* Targeting Reticle Overlay */
-    .targeting-reticle {
-      position: absolute; top: 28%; left: 50%; transform: translate(-50%, -50%);
-      width: 140px; height: 140px; border: 1px dashed rgba(0, 255, 204, 0.35);
-      border-radius: 50%; z-index: 2; pointer-events: none; display: flex;
-      justify-content: center; align-items: center; animation: reticleSpin 25s linear infinite;
-    }
-    .reticle-inner {
-      position: absolute; width: 110px; height: 110px; border: 1px solid rgba(255, 51, 51, 0.4);
-      border-radius: 50%;
-    }
-    @keyframes reticleSpin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-
-    /* 3D Immersive Dashboard Console */
-    .cockpit-dashboard {
-      position: absolute; bottom: 0; left: 0; width: 100%; height: 53%;
-      background: linear-gradient(180deg, #181a24 0%, #0e1017 40%, #08090e 100%);
-      border-top: 5px solid #2a2e3d;
-      z-index: 4;
-      clip-path: polygon(0% 12%, 12% 0%, 88% 0%, 100% 12%, 100% 100%, 0% 100%);
-      padding: 14px 16px;
-      display: flex; flex-direction: column; justify-content: flex-end;
-      box-shadow: inset 0 20px 30px rgba(0,255,204,0.08), 0 -10px 30px rgba(0,0,0,0.8);
-      transition: transform 1s cubic-bezier(0.5, 0, 0.2, 1);
-    }
-
-    /* Top Deck Module Grid: Hardware Switches & Radar */
-    .console-hardware-deck {
-      display: grid;
-      grid-template-columns: 1fr 110px;
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-
-    .switches-module {
-      background: rgba(8, 10, 15, 0.9);
-      border: 1px solid #2a2e3d;
-      border-radius: 6px;
-      padding: 6px 8px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      align-items: center;
-    }
-
-    .switch-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-    }
-
-    .switch-label {
-      font-family: monospace;
-      font-size: 0.5rem;
-      color: #8b9bb4;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* Tactile Toggle Switch */
-    .toggle-switch {
-      position: relative;
-      width: 34px;
-      height: 18px;
-      background: #050608;
-      border: 1px solid #3a445c;
-      border-radius: 9px;
-      cursor: pointer;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
-      transition: all 0.2s;
-    }
-    .toggle-switch::after {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 12px;
-      height: 12px;
-      background: #ff3333;
-      border-radius: 50%;
-      box-shadow: 0 0 6px #ff3333;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .toggle-switch.active {
-      border-color: #00ffcc;
-      background: rgba(0, 255, 204, 0.1);
-    }
-    .toggle-switch.active::after {
-      left: 18px;
-      background: #00ffcc;
-      box-shadow: 0 0 8px #00ffcc;
-    }
-
-    /* Radar / Sonar Scope Box */
-    .radar-module {
-      background: rgba(3, 6, 12, 0.95);
-      border: 1px solid #00ffcc;
-      border-radius: 6px;
-      height: 65px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: inset 0 0 10px rgba(0,255,204,0.2);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .radar-screen {
-      width: 50px;
-      height: 50px;
-      border: 1px solid rgba(0, 255, 204, 0.4);
-      border-radius: 50%;
-      position: relative;
-      background: radial-gradient(circle, rgba(0,255,204,0.15) 0%, rgba(0,0,0,0.8) 70%);
-    }
-    .radar-sweep {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 25px; height: 25px;
-      border-top: 2px solid #00ffcc;
-      border-radius: 25px 0 0 0;
-      transform-origin: bottom right;
-      animation: radarSweepAnim 3s linear infinite;
-    }
-    @keyframes radarSweepAnim { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .radar-blip {
-      position: absolute; top: 15px; right: 14px;
-      width: 4px; height: 4px; background: #ff3333;
-      border-radius: 50%; box-shadow: 0 0 5px #ff3333;
-      animation: blipBlink 1.5s infinite;
-    }
-    @keyframes blipBlink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
 
     .telemetry-hud {
-      background: rgba(10, 3, 3, 0.75);
+      background: rgba(20, 0, 0, 0.6);
       border: 1px solid rgba(255, 51, 51, 0.5);
       border-radius: 6px;
-      padding: 5px 10px;
-      margin-bottom: 5px;
+      padding: 6px 10px;
+      margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-family: monospace;
-      font-size: 0.58rem;
+      font-size: 0.6rem;
       color: #ff3333;
       box-shadow: inset 0 0 8px rgba(255,51,51,0.15);
     }
@@ -251,12 +115,11 @@
       text-shadow: 0 0 5px #ff3333;
     }
 
-    /* Scrollable Terminal Screen */
     .spaceship-terminal {
-      background: rgba(4, 6, 10, 0.94);
+      background: rgba(5, 7, 12, 0.92);
       border: 2px solid #00ffcc;
       border-radius: 8px;
-      height: 115px;
+      height: 125px;
       padding: 8px 10px;
       display: flex; flex-direction: column;
       box-shadow: 0 0 15px rgba(0, 255, 204, 0.3), inset 0 0 10px rgba(0, 255, 204, 0.15);
@@ -266,12 +129,12 @@
 
     .terminal-header {
       display: flex; justify-content: space-between; align-items: center;
-      font-family: monospace; font-size: 0.62rem; color: #00ffcc;
-      border-bottom: 1px dashed rgba(0, 255, 204, 0.3); padding-bottom: 3px; margin-bottom: 4px;
+      font-family: monospace; font-size: 0.65rem; color: #00ffcc;
+      border-bottom: 1px dashed rgba(0, 255, 204, 0.3); padding-bottom: 4px; margin-bottom: 5px;
     }
 
     .terminal-screen-content {
-      flex: 1; overflow-y: auto; font-family: monospace; font-size: 0.66rem;
+      flex: 1; overflow-y: auto; font-family: monospace; font-size: 0.68rem;
       color: #e0e0e0; line-height: 1.35; white-space: pre-wrap;
       text-shadow: 0 0 3px rgba(255,255,255,0.2);
       touch-action: pan-y;
@@ -281,30 +144,26 @@
     .terminal-screen-content::-webkit-scrollbar { width: 5px; }
     .terminal-screen-content::-webkit-scrollbar-thumb { background: #00ffcc; border-radius: 3px; }
 
-    /* LFG Hyperdrive Button */
     .lfg-hyperdrive-btn {
-      background: linear-gradient(135deg, #00ffcc 0%, #00b386 100%);
+      background: #00ffcc;
       color: #000;
       border: none;
       border-radius: 6px;
-      padding: 9px;
+      padding: 8px;
       font-family: monospace;
       font-weight: 900;
       font-size: 0.85rem;
       cursor: pointer;
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+      box-shadow: 0 0 12px rgba(0, 255, 204, 0.5);
       transition: all 0.2s ease;
       text-transform: uppercase;
-      margin-bottom: 2px;
-      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
     }
     .lfg-hyperdrive-btn:hover {
       background: #fff;
-      box-shadow: 0 0 25px rgba(0, 255, 204, 0.95);
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.9);
       transform: scale(1.02);
-    }
-    .lfg-hyperdrive-btn:active {
-      transform: scale(0.98);
     }
 
     .viewport.hyperdrive .earth-planet {
@@ -670,43 +529,15 @@
       <div class="space-view" id="spaceView">
         <div class="stars"></div>
         <div class="earth-planet" id="earthPlanet">🌍</div>
-        <div class="targeting-reticle"><div class="reticle-inner"></div></div>
         <div class="cockpit-windows-frame"></div>
         
         <div class="cockpit-dashboard" id="cockpitDashboard">
-          
-          <!-- Hardware Deck: Interactive Switches & Radar Scope -->
-          <div class="console-hardware-deck">
-            <div class="switches-module">
-              <div class="switch-group">
-                <span class="switch-label">SHIELDS</span>
-                <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
-              </div>
-              <div class="switch-group">
-                <span class="switch-label">WARP</span>
-                <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
-              </div>
-              <div class="switch-group">
-                <span class="switch-label">AI_CORE</span>
-                <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
-              </div>
-            </div>
-            
-            <div class="radar-module">
-              <div class="radar-screen">
-                <div class="radar-sweep"></div>
-                <div class="radar-blip"></div>
-              </div>
-            </div>
-          </div>
-
           <!-- Live Moon Telemetry Header -->
           <div class="telemetry-hud">
-            <span>MISSION: ESCAPE THE RUG</span>
-            <span>DIST TO MOON: <span class="val" id="moonDistanceVal">238,900</span> MILES</span>
+            <span>MISSION FAILED: THE DEV RUGGED</span>
+            <span>DIST FROM MOON: <span class="val" id="moonDistanceVal">238,900</span> MILES</span>
           </div>
 
-          <!-- Scrollable Lore Terminal -->
           <div class="spaceship-terminal">
             <div class="terminal-header">
               <span>SYS_CORE // MANIFESTO_FEED.log</span>
@@ -748,7 +579,7 @@
     </div>
 
     <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-    <div class="door-version">v14.3</div>
+    <div class="door-version">v14.2</div>
 
     <div class="front-buttons-container">
       <button class="degen-action-btn enter-btn" onclick="openDoors()">
@@ -789,7 +620,7 @@
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
       <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.3</div>
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.2</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
@@ -871,17 +702,12 @@
       typeNextChar();
     }
 
-    // Auto-start lore stream immediately on load
+    // Auto-start lore stream immediately when the page finishes loading
     window.addEventListener('load', () => {
       setTimeout(() => {
         startLoreStream();
       }, 300);
     });
-
-    // Interactive switch toggle handler
-    function toggleSwitch(el) {
-      el.classList.toggle('active');
-    }
 
     let moonMiles = 238900;
     setInterval(() => {
