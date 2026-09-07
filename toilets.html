@@ -20,7 +20,7 @@
       font-family: 'Courier New', Courier, monospace;
     }
 
-    /* First-person bathroom stall container simulating 3D perspective */
+    /* First-person bathroom stall container */
     .fp-stall-container {
       position: relative;
       width: 100vw;
@@ -53,7 +53,7 @@
       71% { opacity: 1; }
     }
 
-    /* Left and right stall walls closing in for 3D depth */
+    /* Side walls closing in for 3D depth */
     .wall-left, .wall-right {
       position: absolute;
       top: 0;
@@ -63,11 +63,12 @@
       box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
       pointer-events: none;
       z-index: 1;
+      transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
     }
     .wall-left { left: 0; transform-origin: left; transform: skewY(2deg); border-right: 4px solid #090705; }
     .wall-right { right: 0; transform-origin: right; transform: skewY(-2deg); border-left: 4px solid #090705; }
 
-    /* The back of the door directly in front of you */
+    /* The stall door right in front of your face */
     .door-front {
       position: relative;
       width: 70vw;
@@ -84,6 +85,8 @@
       flex-direction: column;
       justify-content: space-between;
       z-index: 2;
+      transform-origin: left center;
+      transition: transform 0.9s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.9s ease;
     }
 
     /* Heavy industrial metal sliding lock / latch at eye level */
@@ -98,6 +101,7 @@
       border-radius: 4px;
       box-shadow: 3px 3px 10px rgba(0,0,0,0.8);
       z-index: 3;
+      transition: transform 0.3s ease;
     }
     .door-latch::before {
       content: '';
@@ -175,17 +179,29 @@
       letter-spacing: 1px;
       text-transform: uppercase;
     }
+
+    /* Door opening transition classes */
+    .opening .door-latch {
+      transform: translateX(15px) rotate(-20deg);
+    }
+    .opening .door-front {
+      transform: perspective(1200px) rotateY(-110deg);
+      box-shadow: none;
+    }
+    .opening .wall-left, .opening .wall-right {
+      opacity: 0.2;
+    }
   </style>
 </head>
 <body>
 
-  <div class="fp-stall-container">
+  <div class="fp-stall-container" id="container">
     <!-- Side walls giving first-person perspective closure -->
     <div class="wall-left"></div>
     <div class="wall-right"></div>
 
     <!-- The stall door right in front of your face -->
-    <div class="door-front">
+    <div class="door-front" id="stallDoor">
       <div class="door-latch"></div>
 
       <!-- LORE GRAFFITI ON THE BACK OF THE DOOR -->
@@ -217,12 +233,30 @@ The prophecy carved into the blockchain said: <span class="marker-yellow">"He wh
 
       <!-- EXIT -->
       <div class="stall-floor-actions">
-        <a href="index.html" class="escape-btn">🚪 UNLATCH DOOR & ESCAPE BACK TO BAR</a>
+        <a href="#" class="escape-btn" id="escapeBtn">🚪 UNLATCH DOOR & ESCAPE BACK TO BAR</a>
         <div class="stall-hint">First-person stall view active.</div>
       </div>
 
     </div>
   </div>
 
+  <script>
+    const escapeBtn = document.getElementById('escapeBtn');
+    const container = document.getElementById('container');
+
+    escapeBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Trigger the door-swing animation
+      container.classList.add('opening');
+
+      // After the animation finishes, redirect to index.html with an open-doors parameter
+      setTimeout(() => {
+        window.location.href = 'index.html?doors=open';
+      }, 850);
+    });
+  </script>
+
 </body>
 </html>
+
