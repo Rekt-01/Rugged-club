@@ -98,7 +98,7 @@
       box-shadow: inset 0 0 40px rgba(0,0,0,0.9);
     }
 
-    /* Telemetry HUD Panel (Miles from Moon) */
+    /* Telemetry HUD Panel */
     .telemetry-hud {
       background: rgba(0, 20, 20, 0.6);
       border: 1px solid rgba(0, 255, 204, 0.4);
@@ -109,7 +109,7 @@
       justify-content: space-between;
       align-items: center;
       font-family: monospace;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: #00ffcc;
       box-shadow: inset 0 0 8px rgba(0,255,204,0.15);
     }
@@ -153,9 +153,10 @@
 
     .cockpit-btn {
       flex: 1; background: #161821; border: 2px solid #ff007a; border-radius: 6px;
-      padding: 9px 6px; font-family: monospace; font-size: 0.75rem; font-weight: bold;
+      padding: 12px 6px; font-family: monospace; font-size: 0.75rem; font-weight: bold;
       color: #ff007a; text-transform: uppercase; cursor: pointer; text-align: center;
       box-shadow: 0 0 10px rgba(255, 0, 122, 0.3); transition: all 0.2s ease;
+      touch-action: manipulation;
     }
     .cockpit-btn:hover { background: rgba(255, 0, 122, 0.15); box-shadow: 0 0 18px rgba(255, 0, 122, 0.6); transform: translateY(-1px); }
 
@@ -531,15 +532,17 @@
   <div class="viewport" id="scene">
     <div class="scene-container">
       
+      <!-- SPACESHIP COCKPIT LAYER -->
       <div class="space-view" id="spaceView">
         <div class="stars"></div>
         <div class="earth-planet" id="earthPlanet">🌍</div>
         <div class="cockpit-windows-frame"></div>
         
         <div class="cockpit-dashboard" id="cockpitDashboard">
+          <!-- Live Moon Telemetry Header (Distance from Moon) -->
           <div class="telemetry-hud">
             <span>TARGET: LUNAR SURFACE</span>
-            <span>DISTANCE: <span class="val" id="moonDistanceVal">238,900</span> MILES</span>
+            <span>DIST FROM MOON: <span class="val" id="moonDistanceVal">238,900</span> MILES</span>
           </div>
 
           <div class="spaceship-terminal">
@@ -551,12 +554,13 @@
           </div>
           
           <div class="cockpit-controls">
-            <button class="cockpit-btn" id="loreBtn" onclick="startLoreStream()">📜 LORE</button>
-            <button class="cockpit-btn lfg-btn" id="lfgBtn" onclick="triggerHyperdrive()">LFG 🚀</button>
+            <button class="cockpit-btn" id="loreBtn" onclick="startLoreStream()" ontouchend="event.preventDefault(); startLoreStream();">📜 LORE</button>
+            <button class="cockpit-btn lfg-btn" id="lfgBtn" onclick="triggerHyperdrive()" ontouchend="event.preventDefault(); triggerHyperdrive();">LFG 🚀</button>
           </div>
         </div>
       </div>
 
+      <!-- CLUBHOUSE BAR BACKGROUND & HOTSPOTS -->
       <div class="clubhouse-bg"></div>
       
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
@@ -567,6 +571,7 @@
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
     </div>
 
+    <!-- BAR CONTROLS -->
     <div class="top-controls-bar">
       <a href="https://dexscreener.com/apechain" target="_blank" class="door-ape-sign">
         <span class="sign-label">$APE:</span>
