@@ -71,7 +71,7 @@
       20% { transform: translate(-3px, 3px) scale(1.05); }
       40% { transform: translate(3px, -2px) scale(1.05); }
       60% { transform: translate(-2px, -3px) scale(1.05); }
-      80% { transform: translate2px, 2px) scale(1.05); }
+      80% { transform: translate(2px, 2px) scale(1.05); }
       100% { transform: translate(0, 0) scale(1.05); }
     }
 
@@ -79,6 +79,7 @@
       position: absolute; z-index: 3; cursor: pointer; display: none;
       border: none; background: transparent;
       transition: background 0.3s ease;
+      text-decoration: none;
     }
 
     .arcade-hotspot { top: 50%; left: 51.5%; width: 15%; height: 8%; }
@@ -101,7 +102,7 @@
     }
     .otter-hotspot:hover, .otter-hotspot:active { background: rgba(32, 129, 226, 0.25); }
 
-    /* --- HIDDEN ROCKET LINK OVERLAY (PRECISELY ON THE DRAWN TABLE ROCKET) --- */
+    /* --- HIDDEN ROCKET LINK OVERLAY --- */
     .rocket-table-link {
       position: absolute;
       top: 61.5%;
@@ -305,7 +306,6 @@
       box-shadow: 0 0 25px #00ff66; padding: 12px; max-width: 95vw;
     }
 
-    .modal-content.pacman-style { border-color: #ffe600; box-shadow: 0 0 25px #ffe600; }
     .modal-content.opensea-style { border-color: #2081e2; box-shadow: 0 0 25px #2081e2; }
     
     .modal-content.desk-style {
@@ -321,25 +321,6 @@
     .close-btn {
       position: absolute; top: -40px; right: 0; color: #fff;
       font-size: 2rem; font-weight: bold; cursor: pointer; z-index: 11;
-    }
-
-    canvas { background: #000; border-radius: 8px; touch-action: none; }
-
-    .mobile-controls { 
-      display: flex; flex-direction: column; align-items: center; margin-top: 10px; width: 100%; 
-    }
-    .dpad-row { display: flex; justify-content: center; gap: 8px; margin: 2px 0; }
-    .btn-ctrl {
-      width: 48px; height: 48px; background: rgba(255, 255, 255, 0.15);
-      border: 2px solid #fff; border-radius: 8px; color: #fff;
-      font-size: 1.2rem; font-weight: bold; display: flex;
-      justify-content: center; align-items: center; cursor: pointer;
-    }
-    .btn-ctrl:active { background: rgba(255, 255, 255, 0.5); }
-    .btn-shoot {
-      width: 130px; height: 42px; background: #00ff66; color: #000;
-      font-weight: bold; font-size: 1rem; border: none; border-radius: 25px;
-      margin-top: 8px; cursor: pointer; box-shadow: 0 0 10px #00ff66;
     }
 
     .web-iframe {
@@ -416,15 +397,14 @@
       
       <div class="clubhouse-bg"></div>
       
-      <!-- Interactive Hotspots & Hidden Rocket Link -->
-      <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
-      <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
+      <a href="pacman.html" class="hotspot arcade-hotspot" title="Pac-Man Arcade"></a>
+      <a href="pool.html" class="hotspot pool-hotspot" title="Pool Table"></a>
+      
       <div class="hotspot laptop-hotspot" onclick="openWebModal('dex')"></div>
       <div class="hotspot table-hotspot" onclick="openWebModal('desk')"></div>
       <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
 
-      <!-- Hidden link precisely over the drawn rocket model on the table -->
       <a href="moon.html" target="_blank" class="rocket-table-link" title="moon"></a>
     </div>
 
@@ -469,14 +449,6 @@
       <div class="panic-title">⚠️ PAPER HANDS DETECTED</div>
       <div class="panic-desc" id="panicMessageText">🧾 ORDER EXECUTED: Sold your entire bag at the absolute bottom (-99.8%). Thank you for providing exit liquidity to the whales.</div>
       <button class="panic-dismiss-btn" onclick="dismissPanic()">BUY BACK HIGHER 🔄</button>
-    </div>
-  </div>
-
-  <div class="modal" id="gameModal">
-    <div class="modal-content" id="modalContent">
-      <span class="close-btn" onclick="closeGame()">&times;</span>
-      <canvas id="gameCanvas" width="320" height="320"></canvas>
-      <div class="mobile-controls" id="controlsContainer"></div>
     </div>
   </div>
 
@@ -719,343 +691,6 @@
     }
     updateApePrice();
     setInterval(updateApePrice, 30000);
-
-    let activeGameLoop = null;
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const controlsContainer = document.getElementById('controlsContainer');
-
-    function openGame(gameType) {
-      if (activeGameLoop) {
-        cancelAnimationFrame(activeGameLoop);
-        activeGameLoop = null;
-      }
-      document.getElementById('gameModal').style.display = 'flex';
-      if (gameType === 'pacman') {
-        document.getElementById('modalContent').className = 'modal-content pacman-style';
-        startArcadePacman();
-      } else if (gameType === 'pool') {
-        document.getElementById('modalContent').className = 'modal-content';
-        startArcadePool();
-      }
-    }
-
-    function closeGame() {
-      document.getElementById('gameModal').style.display = 'none';
-      if (activeGameLoop) {
-        cancelAnimationFrame(activeGameLoop);
-        activeGameLoop = null;
-      }
-    }
-
-    /* PAC-MAN */
-    function startArcadePacman() {
-      canvas.width = 320; canvas.height = 320;
-      const tileSize = 20;
-      let initialMap = [
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
-        [1,2,1,1,2,1,2,1,1,2,1,2,1,1,2,1],
-        [1,3,1,1,2,2,2,1,1,2,2,2,1,1,3,1],
-        [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
-        [1,1,1,2,1,1,1,0,0,1,1,1,2,1,1,1],
-        [0,0,1,2,1,0,0,0,0,0,0,1,2,1,0,0],
-        [1,1,1,2,1,0,1,1,1,1,0,1,2,1,1,1],
-        [1,2,2,2,2,0,1,0,0,1,0,2,2,2,2,1],
-        [1,2,1,1,2,1,1,1,1,1,1,2,1,1,2,1],
-        [1,3,2,1,2,2,2,0,0,2,2,2,1,2,3,1],
-        [1,1,2,1,2,1,2,1,1,2,1,2,1,2,1,1],
-        [1,2,2,2,2,1,2,2,2,2,1,2,2,2,2,1],
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-      ];
-      let map = initialMap.map(row => [...row]);
-      let score = 0;
-      let gameMessage = null;
-      let pacman = { x: 30, y: 30, radius: 7.5, dirX: 0, dirY: 0, speed: 1.2 };
-      let ghost = { x: 150, y: 130, radius: 7.5, dirX: 0, dirY: -1, speed: 0.8, color: '#ff0000' };
-
-      controlsContainer.innerHTML = `
-        <div class="dpad-row"><div class="btn-ctrl" onmousedown="startPac(event, 0,-1)" onmouseup="stopPac(event)" ontouchstart="startPac(event, 0,-1)" ontouchend="stopPac(event)">▲</div></div>
-        <div class="dpad-row">
-          <div class="btn-ctrl" onmousedown="startPac(event, -1,0)" onmouseup="stopPac(event)" ontouchstart="startPac(event, -1,0)" ontouchend="stopPac(event)">◀</div>
-          <div class="btn-ctrl" onmousedown="startPac(event, 0,1)" onmouseup="stopPac(event)" ontouchstart="startPac(event, 0,1)" ontouchend="stopPac(event)">▼</div>
-          <div class="btn-ctrl" onmousedown="startPac(event, 1,0)" onmouseup="stopPac(event)" ontouchstart="startPac(event, 1,0)" ontouchend="stopPac(event)">▶</div>
-        </div>
-      `;
-
-      window.startPac = (e, dx, dy) => { if (e && e.preventDefault) e.preventDefault(); pacman.dirX = dx; pacman.dirY = dy; };
-      window.stopPac = (e) => { if (e && e.preventDefault) e.preventDefault(); pacman.dirX = 0; pacman.dirY = 0; };
-
-      function canMove(x, y, dx, dy, speed, radius) {
-        let targetX = x + dx * speed, targetY = y + dy * speed;
-        let gX1 = Math.floor((targetX - radius) / tileSize), gX2 = Math.floor((targetX + radius) / tileSize);
-        let gY1 = Math.floor((targetY - radius) / tileSize), gY2 = Math.floor((targetY + radius) / tileSize);
-        if (map[gY1] && (map[gY1][gX1] === 1 || map[gY1][gX2] === 1)) return false;
-        if (map[gY2] && (map[gY2][gX1] === 1 || map[gY2][gX2] === 1)) return false;
-        return true;
-      }
-
-      function updatePacmanGame() {
-        if (!gameMessage) {
-          if (canMove(pacman.x, pacman.y, pacman.dirX, pacman.dirY, pacman.speed, pacman.radius)) {
-            pacman.x += pacman.dirX * pacman.speed; pacman.y += pacman.dirY * pacman.speed;
-          }
-          let cX = Math.floor(pacman.x / tileSize), cY = Math.floor(pacman.y / tileSize);
-          if (map[cY] && map[cY][cX] > 1) {
-            score += map[cY][cX] === 3 ? 50 : 10;
-            map[cY][cX] = 0;
-            if (!map.some(row => row.includes(2) || row.includes(3))) {
-              gameMessage = "CONGRATS! FULLY RUGGED! 💀";
-            }
-          }
-
-          if (!canMove(ghost.x, ghost.y, ghost.dirX, ghost.dirY, ghost.speed, ghost.radius)) {
-            let directions = [
-              {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
-            ].filter(d => canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed, ghost.radius));
-            if (directions.length > 0) {
-              let chosen = directions[Math.floor(Math.random() * directions.length)];
-              ghost.dirX = chosen.dx; ghost.dirY = chosen.dy;
-            } else {
-              ghost.dirX = 0; ghost.dirY = 0;
-            }
-          } else {
-            if (Math.random() < 0.03) {
-              let altDirs = [
-                {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
-              ].filter(d => canMove(ghost.x, ghost.y, d.dx, d.dy, ghost.speed, ghost.radius));
-              if (altDirs.length > 0) {
-                let chosen = altDirs[Math.floor(Math.random() * altDirs.length)];
-                ghost.dirX = chosen.dx; ghost.dirY = chosen.dy;
-              }
-            }
-          }
-          ghost.x += ghost.dirX * ghost.speed;
-          ghost.y += ghost.dirY * ghost.speed;
-
-          if (Math.hypot(pacman.x - ghost.x, pacman.y - ghost.y) < 12) {
-            gameMessage = "GOT RUGGED! BAG TO ZERO! 📉";
-          }
-        }
-        drawPacman();
-        activeGameLoop = requestAnimationFrame(updatePacmanGame);
-      }
-
-      function drawPacman() {
-        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        for (let r = 0; r < map.length; r++) {
-          for (let c = 0; c < map[r].length; c++) {
-            if (map[r][c] === 1) { ctx.fillStyle = '#1919a6'; ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize); }
-            else if (map[r][c] > 1) { ctx.fillStyle = '#ffb8ae'; ctx.beginPath(); ctx.arc(c * tileSize + 10, r * tileSize + 10, map[r][c] === 3 ? 6 : 3, 0, Math.PI * 2); ctx.fill(); }
-          }
-        }
-        ctx.fillStyle = '#ffe600'; ctx.beginPath(); ctx.arc(pacman.x, pacman.y, pacman.radius, 0.2, 2 * Math.PI - 0.2); ctx.lineTo(pacman.x, pacman.y); ctx.fill();
-        ctx.fillStyle = ghost.color; ctx.beginPath(); ctx.arc(ghost.x, ghost.y, ghost.radius, Math.PI, 0, false); ctx.lineTo(ghost.x + ghost.radius, ghost.y + ghost.radius); ctx.lineTo(ghost.x - ghost.radius, ghost.y + ghost.radius); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.font = '12px sans-serif'; ctx.fillText('SCORE: ' + score, 10, 305);
-
-        if (gameMessage) {
-          ctx.fillStyle = 'rgba(0,0,0,0.85)'; ctx.fillRect(0, 80, canvas.width, 160);
-          ctx.fillStyle = '#ff3333'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
-          ctx.fillText(gameMessage, canvas.width / 2, 160);
-          ctx.textAlign = 'left';
-        }
-      }
-      updatePacmanGame();
-    }
-
-    /* POOL */
-    function startArcadePool() {
-      canvas.width = 320; canvas.height = 180;
-      const pockets = [
-        { x: 15, y: 15 }, { x: 160, y: 12 }, { x: 305, y: 15 },
-        { x: 15, y: 165 }, { x: 160, y: 168 }, { x: 305, y: 165 }
-      ];
-
-      let score = 100;
-      let turn = 'Player';
-      let shotTaken = false;
-      let popMessage = null;
-      let messageTimer = 0;
-      let cueBall = { x: 80, y: 90, vx: 0, vy: 0, r: 6, color: '#fff', isCue: true };
-      let aimAngle = 0;
-      let powerLevel = 6;
-      
-      let ballColors = ['#e3af34', '#1f3fd8', '#d63031', '#9b59b6', '#e67e22', '#2ecc71', '#34495e', '#f1c40f'];
-      let rackStartX = 220;
-      let rackStartY = 90;
-      let spacing = 13;
-      let balls = [cueBall];
-
-      let colorIdx = 0;
-      for (let col = 0; col < 4; col++) {
-        for (let row = 0; row <= col; row++) {
-          let bx = rackStartX + (col * spacing * 0.866);
-          let by = rackStartY + (row * spacing) - (col * spacing / 2);
-          balls.push({ x: bx, y: by, vx: 0, vy: 0, r: 6, color: ballColors[colorIdx % ballColors.length], isCue: false });
-          colorIdx++;
-        }
-      }
-
-      const missInsults = ["Wiped out! Shot missed completely!"];
-      const scratchInsults = ["SCRATCH! You rugged your cue ball!"];
-      const potSuccessMessages = ["WHALE PUMP! Pocketed nicely!"];
-      const winMessages = ["TABLE CLEARED! Bags mooned!"];
-
-      controlsContainer.innerHTML = `
-        <div class="dpad-row">
-          <div class="btn-ctrl" onclick="rotateAim(-0.15)">↺</div>
-          <div class="btn-ctrl" onclick="rotateAim(0.15)">↻</div>
-        </div>
-        <button class="btn-shoot" onclick="shootCue()">SHOOT SHOT!</button>
-      `;
-
-      window.rotateAim = (rad) => { if (turn === 'Player' && !isMoving()) aimAngle += rad; };
-      window.shootCue = () => {
-        if (turn === 'Player' && !isMoving()) {
-          cueBall.vx = Math.cos(aimAngle) * powerLevel;
-          cueBall.vy = Math.sin(aimAngle) * powerLevel;
-          shotTaken = true;
-          popMessage = null;
-        }
-      };
-
-      function isMoving() {
-        return balls.some(b => Math.abs(b.vx) > 0.05 || Math.abs(b.vy) > 0.05);
-      }
-
-      function takeAiTurn() {
-        let targetBalls = balls.filter(b => !b.isCue);
-        if (targetBalls.length === 0) return;
-        let target = targetBalls[Math.floor(Math.random() * targetBalls.length)];
-        let aiAngle = Math.atan2(target.y - cueBall.y, target.x - cueBall.x) + (Math.random() - 0.5) * 0.4;
-        cueBall.vx = Math.cos(aiAngle) * 5;
-        cueBall.vy = Math.sin(aiAngle) * 5;
-        shotTaken = true;
-      }
-
-      function updatePoolGame() {
-        let moving = isMoving();
-        let ballsBeforeCount = balls.length;
-
-        for (let i = balls.length - 1; i >= 0; i--) {
-          let b = balls[i];
-          b.x += b.vx; b.y += b.vy;
-          b.vx *= 0.985; b.vy *= 0.985;
-
-          if (Math.abs(b.vx) < 0.04) b.vx = 0;
-          if (Math.abs(b.vy) < 0.04) b.vy = 0;
-
-          if (b.x - b.r < 18) { b.x = 18 + b.r; b.vx *= -1; }
-          if (b.x + b.r > 302) { b.x = 302 - b.r; b.vx *= -1; }
-          if (b.y - b.r < 18) { b.y = 18 + b.r; b.vy *= -1; }
-          if (b.y + b.r > 162) { b.y = 162 - b.r; b.vy *= -1; }
-
-          pockets.forEach(p => {
-            if (Math.hypot(b.x - p.x, b.y - p.y) < 19) {
-              if (b.isCue) {
-                b.x = 80; b.y = 90; b.vx = 0; b.vy = 0;
-                popMessage = scratchInsults[0];
-                messageTimer = 300;
-              } else {
-                balls.splice(i, 1);
-                score += 100;
-                popMessage = potSuccessMessages[Math.floor(Math.random() * potSuccessMessages.length)];
-                messageTimer = 300;
-              }
-            }
-          });
-        }
-
-        for (let i = 0; i < balls.length; i++) {
-          for (let j = i + 1; j < balls.length; j++) {
-            let b1 = balls[i], b2 = balls[j];
-            let dx = b2.x - b1.x, dy = b2.y - b1.y;
-            let dist = Math.hypot(dx, dy);
-            let minDist = b1.r + b2.r;
-
-            if (dist < minDist && dist > 0) {
-              let nx = dx / dist, ny = dy / dist;
-              let overlap = minDist - dist;
-              b1.x -= nx * overlap * 0.5; b1.y -= ny * overlap * 0.5;
-              b2.x += nx * overlap * 0.5; b2.y += ny * overlap * 0.5;
-
-              let kx = b1.vx - b2.vx, ky = b1.vy - b2.vy;
-              let p = 2 * (nx * kx + ny * ky) / 2;
-              if (p > 0) {
-                b1.vx -= p * nx * 0.95; b1.vy -= p * ny * 0.95;
-                b2.vx += p * nx * 0.95; b2.vy += p * ny * 0.95;
-              }
-            }
-          }
-        }
-
-        if (shotTaken && !moving) {
-          shotTaken = false;
-          let remainingObjects = balls.filter(b => !b.isCue).length;
-          if (remainingObjects === 0) {
-            popMessage = winMessages[0];
-            messageTimer = 420;
-          } else if (balls.length === ballsBeforeCount && !popMessage) {
-            popMessage = missInsults[Math.floor(Math.random() * missInsults.length)];
-            messageTimer = 300;
-          }
-
-          if (remainingObjects > 0) {
-            if (turn === 'Player') {
-              turn = 'Computer';
-              setTimeout(takeAiTurn, 1000);
-            } else {
-              turn = 'Player';
-            }
-          }
-        }
-
-        if (messageTimer > 0) messageTimer--;
-
-        drawPool();
-        activeGameLoop = requestAnimationFrame(updatePoolGame);
-      }
-
-      function drawPool() {
-        ctx.fillStyle = '#0f5220'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = '#5c3a21'; ctx.lineWidth = 14;
-        ctx.strokeRect(7, 7, 306, 166);
-
-        pockets.forEach(p => {
-          ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, Math.PI * 2); ctx.fill();
-        });
-
-        balls.forEach(b => {
-          ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
-          ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.stroke();
-        });
-
-        if (!isMoving() && turn === 'Player') {
-          ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 2; ctx.beginPath();
-          ctx.moveTo(cueBall.x, cueBall.y);
-          ctx.lineTo(cueBall.x + Math.cos(aimAngle) * 70, cueBall.y + Math.sin(aimAngle) * 70);
-          ctx.stroke();
-        }
-
-        ctx.fillStyle = '#fff'; ctx.font = '11px sans-serif';
-        ctx.fillText('SCORE: ' + score, 20, 26);
-        ctx.fillText('TURN: ' + turn, 200, 26);
-
-        if (popMessage && messageTimer > 0) {
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.92)';
-          ctx.fillRect(20, 50, 280, 80);
-          ctx.strokeStyle = '#00ff66'; ctx.lineWidth = 2;
-          ctx.strokeRect(20, 50, 280, 80);
-
-          ctx.fillStyle = '#00ff66'; ctx.font = 'bold 11px monospace';
-          ctx.textAlign = 'center';
-          ctx.fillText(popMessage, canvas.width / 2, 95);
-          ctx.textAlign = 'left';
-        }
-      }
-
-      updatePoolGame();
-    }
   </script>
 
 </body>
