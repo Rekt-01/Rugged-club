@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v14.2 - Space Command</title>
+  <title>The Rugged Bar v14.3 - Space Command</title>
   <style>
     * {
       box-sizing: border-box;
@@ -68,12 +68,31 @@
       100% { transform: translateY(200px); }
     }
 
+    .earth-container {
+      position: absolute; top: 18%; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      z-index: 2; cursor: pointer; transition: transform 2.4s cubic-bezier(0.7, 0, 0.2, 1);
+    }
+    .earth-container:hover .earth-planet {
+      filter: drop-shadow(0 0 25px rgba(0, 255, 102, 0.8));
+    }
     .earth-planet {
-      position: absolute; top: 20%; left: 50%; transform: translateX(-50%) scale(1);
-      font-size: 75px;
-      z-index: 2;
+      font-size: 65px;
       filter: drop-shadow(0 0 15px rgba(77, 166, 255, 0.6));
-      transition: transform 2.4s cubic-bezier(0.7, 0, 0.2, 1), filter 2s ease;
+      transition: filter 2s ease;
+    }
+    .earth-label {
+      font-family: monospace; font-size: 0.65rem; font-weight: bold;
+      color: #00ff66; background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(0, 255, 102, 0.6); padding: 4px 10px;
+      border-radius: 12px; margin-top: 8px; letter-spacing: 1.5px;
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.4);
+      animation: degenPulse 1.5s infinite alternate;
+      white-space: nowrap;
+    }
+    @keyframes degenPulse {
+      0% { transform: scale(1); box-shadow: 0 0 8px rgba(0,255,102,0.3); }
+      100% { transform: scale(1.05); box-shadow: 0 0 16px rgba(0,255,102,0.8); }
     }
 
     .cockpit-dashboard {
@@ -159,8 +178,10 @@
       51%, 100% { opacity: 0; }
     }
 
-    .viewport.hyperdrive .earth-planet {
+    .viewport.hyperdrive .earth-container {
       transform: translateX(-50%) scale(22);
+    }
+    .viewport.hyperdrive .earth-planet {
       filter: drop-shadow(0 0 50px #fff) drop-shadow(0 0 100px #4da6ff);
     }
     .viewport.hyperdrive .cockpit-dashboard {
@@ -327,6 +348,12 @@
       border: 2px solid #555; border-radius: 6px;
       box-shadow: 0 0 12px rgba(0,0,0,0.9), inset 0 0 5px rgba(255,255,255,0.2);
       transform: translateY(-50%);
+      cursor: pointer; pointer-events: auto;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .handle:hover {
+      border-color: #00ff66;
+      box-shadow: 0 0 18px rgba(0, 255, 102, 0.8), inset 0 0 8px rgba(0, 255, 102, 0.4);
     }
     .door-left .handle { right: 45px; }
     .door-right .handle { left: 45px; }
@@ -438,12 +465,14 @@
       border: 2px solid #fff; border-radius: 8px; color: #fff;
       font-size: 1.2rem; font-weight: bold; display: flex;
       justify-content: center; align-items: center; cursor: pointer;
+      touch-action: manipulation;
     }
     .btn-ctrl:active { background: rgba(255, 255, 255, 0.5); }
     .btn-shoot {
       width: 130px; height: 42px; background: #00ff66; color: #000;
       font-weight: bold; font-size: 1rem; border: none; border-radius: 25px;
       margin-top: 8px; cursor: pointer; box-shadow: 0 0 10px #00ff66;
+      touch-action: manipulation;
     }
 
     .web-iframe {
@@ -520,7 +549,10 @@
       
       <div class="space-view" id="spaceView">
         <div class="stars"></div>
-        <div class="earth-planet" id="earthPlanet">🌎</div>
+        <div class="earth-container" onclick="triggerHyperdrive()">
+          <div class="earth-planet" id="earthPlanet">🌎</div>
+          <div class="earth-label">⚡ CLICK TO APE 🦧</div>
+        </div>
         <div class="cockpit-windows-frame"></div>
         
         <div class="cockpit-dashboard" id="cockpitDashboard">
@@ -566,7 +598,7 @@
     </div>
 
     <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-    <div class="door-version">v14.2</div>
+    <div class="door-version">v14.3</div>
 
     <div class="front-buttons-container">
       <button class="degen-action-btn enter-btn" onclick="openDoors()">
@@ -580,8 +612,8 @@
     </div>
 
     <div class="doors-container">
-      <div class="door door-left"><div class="handle"></div></div>
-      <div class="door door-right"><div class="handle"></div></div>
+      <div class="door door-left"><div class="handle" onclick="openDoors()"></div></div>
+      <div class="door door-right"><div class="handle" onclick="openDoors()"></div></div>
     </div>
   </div>
 
@@ -607,7 +639,7 @@
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
       <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.2</div>
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.3</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
@@ -699,14 +731,12 @@
     }
 
     window.addEventListener('load', () => {
-      // Check if URL parameters request the bar to load with open doors directly
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('doors') === 'open') {
         const scene = document.getElementById('scene');
         const spaceView = document.getElementById('spaceView');
         if (spaceView) spaceView.style.display = 'none';
-        scene.classList.add('bar-active');
-        scene.classList.add('open');
+        scene.classList.add('bar-active', 'open');
       } else {
         setTimeout(() => {
           startRuggedStream();
