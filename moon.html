@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Original Spaceship Cockpit Interface - Distant Moon View</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        /* Main Cockpit Container matching reference aspect ratio */
+        .cockpit-view {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #05070a;
+            position: relative;
+        }
+
+        /* --- UPPER VIEWPORT WINDOW --- */
+        .window-frame {
+            flex: 1.2;
+            background: #010308;
+            position: relative;
+            overflow: hidden;
+            /* Creates the angled trapezoid window shape from reference */
+            clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%);
+            border-bottom: 8px solid #0b0f17;
+        }
+
+        /* Starfield background */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(white 1px, transparent 0);
+            background-size: 30px 30px;
+            opacity: 0.85;
+            z-index: 1;
+        }
+
+        /* Distant Moon Body */
+        .distant-moon {
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle at 35% 35%, #94a3b8 0%, #475569 50%, #1e293b 90%);
+            border-radius: 50%;
+            top: 25%;
+            left: 55%;
+            transform: translate(-50%, -50%);
+            box-shadow: inset -35px -35px 50px rgba(0, 0, 0, 0.9), 0 0 25px rgba(148, 163, 184, 0.15);
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        /* Crater textures on the distant moon */
+        .moon-crater {
+            position: absolute;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 50%;
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.8);
+        }
+        .mc1 { width: 55px; height: 25px; top: 60px; left: 70px; transform: rotate(-15deg); }
+        .mc2 { width: 40px; height: 35px; top: 140px; left: 130px; }
+        .mc3 { width: 70px; height: 30px; top: 110px; left: 30px; transform: rotate(20deg); }
+
+        /* American Flag planted on the distant moon */
+        .distant-flag {
+            position: absolute;
+            top: 110px;
+            left: 125px;
+            font-size: 24px;
+            z-index: 3;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.9));
+        }
+
+
+        /* --- LOWER CONSOLE DASHBOARD --- */
+        .dashboard {
+            height: 380px;
+            background: linear-gradient(180deg, #121721 0%, #05070a 100%);
+            display: grid;
+            grid-template-columns: 1fr 1.6fr 1fr;
+            padding: 15px 25px;
+            gap: 20px;
+            border-top: 4px solid #1e293b;
+            box-shadow: inset 0 20px 30px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        /* Glowing Console Panels */
+        .console-panel {
+            background: #090d14;
+            border: 2px solid #1e293b;
+            border-radius: 4px;
+            padding: 10px;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
+        }
+
+        /* Glowing Blue Monitors (Left & Right) */
+        .screen-monitor {
+            width: 100%;
+            height: 160px;
+            background: #000814;
+            border: 2px solid #0284c7;
+            border-radius: 3px;
+            box-shadow: inset 0 0 20px rgba(0, 150, 255, 0.3), 0 0 10px rgba(2, 132, 199, 0.4);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .screen-content {
+            color: #38bdf8;
+            font-size: 11px;
+            text-shadow: 0 0 5px #38bdf8;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        /* Center Warning Light Matrix */
+        .center-console {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            background: #0b0f17;
+            border: 2px solid #27272a;
+            border-radius: 4px;
+            padding: 12px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9), 0 0 15px rgba(239, 68, 68, 0.15);
+        }
+
+        .warning-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+            width: 100%;
+            background: #030508;
+            padding: 8px;
+            border-radius: 3px;
+            border: 1px solid #3f3f46;
+        }
+
+        .warn-light {
+            height: 22px;
+            background: #dc2626;
+            border-radius: 2px;
+            box-shadow: 0 0 8px #ef4444;
+            animation: pulse-light 2s infinite alternate;
+        }
+        .warn-light.orange {
+            background: #ea580c;
+            box-shadow: 0 0 8px #f97316;
+        }
+
+        @keyframes pulse-light {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; box-shadow: 0 0 12px #ff4500; }
+        }
+
+        /* Analog Dials Row */
+        .dials-row {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 5px;
+        }
+        .dial {
+            width: 45px;
+            height: 45px;
+            border: 3px solid #475569;
+            border-radius: 50%;
+            background: #020617;
+            position: relative;
+            box-shadow: inset 0 0 5px #000;
+        }
+        .dial::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 16px;
+            background: #38bdf8;
+            transform-origin: top center;
+            transform: rotate(45deg);
+        }
+
+        /* Side switch banks & Return Button styling */
+        .switch-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            margin-top: 8px;
+        }
+        .toggle-switch {
+            height: 18px;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 2px;
+        }
+
+        .return-btn-container {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .return-btn {
+            display: inline-block;
+            background: #00ff66;
+            color: #000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 0.75rem;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        .return-btn:hover {
+            background: #00cc52;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.8);
+        }
+
+        .return-btn:active {
+            transform: scale(0.97);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cockpit-view">
+        <!-- TOP VIEWWINDOW WITH DISTANT MOON & FLAG -->
+        <div class="window-frame">
+            <div class="stars"></div>
+            <div class="distant-moon">
+                <div class="moon-crater mc1"></div>
+                <div class="moon-crater mc2"></div>
+                <div class="moon-crater mc3"></div>
+                <div class="distant-flag">🇺🇸</div>
+            </div>
+        </div>
+
+        <!-- LOWER INSTRUMENT DASHBOARD -->
+        <div class="dashboard">
+            <!-- Left Console Panel -->
+            <div class="console-panel">
+                <div class="screen-monitor">
+                    <div class="screen-content">
+                        [LUNAR_APPROACH: ON]<br>
+                        RANGE: 4,280 KM<br>
+                        TARGET: ACQUIRED
+                    </div>
+                </div>
+                <div class="switch-grid" style="margin-top: 10px;">
+                    <div class="toggle-switch"></div>
+                    <div class="toggle-switch" style="background: #7f1d1d;"></div>
+                    <div class="toggle-switch"></div>
+                    <div class="toggle-switch"></div>
+                </div>
+            </div>
+
+            <!-- Center Console Panel (Warning Lights & Dials) -->
+            <div class="center-console">
+                <div class="warning-grid">
+                    <div class="warn-light"></div>
+                    <div class="warn-light orange"></div>
+                    <div class="warn-light"></div>
+                    <div class="warn-light orange"></div>
+                    <div class="warn-light"></div>
+                    <div class="warn-light orange"></div>
+                    <div class="warn-light"></div>
+                    <div class="warn-light orange"></div>
+                    
+                    <div class="warn-light orange"></div>
+                    <div class="warn-light"></div>
+                    <div class="warn-light orange"></div>
+                    <div class="warn-light"></div>
+                    <div class="warn-light orange"></div>
+                    <div class="warn-light"></div>
+                    <div class="warn-light orange"></div>
+                    <div class="warn-light"></div>
+                </div>
+
+                <div class="dials-row">
+                    <div class="dial"></div>
+                    <div class="dial"></div>
+                    <div class="dial"></div>
+                    <div class="dial"></div>
+                </div>
+            </div>
+
+            <!-- Right Console Panel -->
+            <div class="console-panel">
+                <div class="screen-monitor" style="border-color: #0369a1;">
+                    <div class="screen-content" style="color: #34d399; text-shadow: 0 0 5px #34d399;">
+                        * TELEMETRY ACTIVE *<br>
+                        TRAJECTORY: STABLE<br>
+                        SYSTEMS: READY
+                    </div>
+                </div>
+                <div class="switch-grid" style="margin-top: 10px;">
+                    <div class="toggle-switch"></div>
+                    <div class="toggle-switch"></div>
+                    <div class="toggle-switch" style="background: #14532d;"></div>
+                    <div class="toggle-switch"></div>
+                </div>
+                <div class="return-btn-container">
+                    <a href="index.html" class="return-btn">RETURN TO THE BAR 🍻</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
