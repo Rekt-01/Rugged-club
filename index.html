@@ -77,12 +77,12 @@
     }
 
     .cockpit-dashboard {
-      position: absolute; bottom: 0; left: 0; width: 100%; height: 55%;
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
       background: linear-gradient(0deg, #111216 0%, #1a1b24 85%, rgba(26,27,36,0) 100%);
       border-top: 4px solid #2a2c3d;
       z-index: 4;
-      clip-path: polygon(0% 12%, 15% 0%, 85% 0%, 100% 12%, 100% 100%, 0% 100%);
-      padding: 10px 15px;
+      clip-path: polygon(0% 15%, 15% 0%, 85% 0%, 100% 15%, 100% 100%, 0% 100%);
+      padding: 12px 15px;
       display: flex; flex-direction: column; justify-content: flex-end;
       box-shadow: inset 0 15px 25px rgba(0,255,204,0.05);
       transition: transform 1s ease-in;
@@ -99,13 +99,13 @@
       background: rgba(20, 0, 0, 0.6);
       border: 1px solid rgba(255, 51, 51, 0.5);
       border-radius: 6px;
-      padding: 5px 10px;
-      margin-bottom: 6px;
+      padding: 6px 10px;
+      margin-bottom: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-family: monospace;
-      font-size: 0.58rem;
+      font-size: 0.6rem;
       color: #ff3333;
       box-shadow: inset 0 0 8px rgba(255,51,51,0.15);
     }
@@ -120,35 +120,35 @@
       background: #000000;
       border: 2px solid #555555;
       border-radius: 2px;
-      height: 130px;
-      padding: 5px 8px;
+      height: 155px;
+      padding: 6px 8px;
       display: flex; flex-direction: column;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       position: relative;
     }
 
     .terminal-header {
       display: flex; justify-content: space-between; align-items: center;
       font-family: 'Consolas', 'Courier New', monospace; 
-      font-size: 0.6rem; color: #ffffff; background: #000080;
-      padding: 2px 4px; margin-bottom: 4px;
+      font-size: 0.65rem; color: #ffffff; background: #000080;
+      padding: 2px 4px; margin-bottom: 5px;
     }
 
     .terminal-screen-content {
       flex: 1; overflow-y: auto; 
       font-family: 'Consolas', 'Courier New', monospace; 
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       color: #cccccc;
-      line-height: 1.3; white-space: pre-wrap;
+      line-height: 1.35; white-space: pre-wrap;
     }
     .terminal-screen-content::-webkit-scrollbar { width: 6px; }
     .terminal-screen-content::-webkit-scrollbar-thumb { background: #555; }
 
     .terminal-cursor {
       display: inline-block;
-      width: 6px;
-      height: 11px;
+      width: 7px;
+      height: 12px;
       background: #cccccc;
       vertical-align: middle;
       animation: cursorBlink 1s infinite;
@@ -157,52 +157,6 @@
     @keyframes cursorBlink {
       0%, 50% { opacity: 1; }
       51%, 100% { opacity: 0; }
-    }
-
-    /* --- Cockpit Action Buttons --- */
-    .cockpit-actions {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 6px;
-      width: 100%;
-    }
-    .cockpit-btn {
-      flex: 1;
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-family: monospace;
-      font-weight: bold;
-      font-size: 0.7rem;
-      cursor: pointer;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      transition: all 0.2s ease;
-    }
-    .cockpit-btn:hover {
-      transform: scale(1.02);
-    }
-    .start-terminal-btn {
-      background: rgba(0, 255, 102, 0.15);
-      border: 2px solid #00ff66;
-      color: #00ff66;
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
-    }
-    .start-terminal-btn:hover {
-      background: rgba(0, 255, 102, 0.3);
-      box-shadow: 0 0 15px rgba(0, 255, 102, 0.6);
-    }
-    .skip-hyperdrive-btn {
-      background: rgba(0, 255, 204, 0.15);
-      border: 2px solid #00ffcc;
-      color: #00ffcc;
-      box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
-    }
-    .skip-hyperdrive-btn:hover {
-      background: rgba(0, 255, 204, 0.3);
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
     }
 
     .viewport.hyperdrive .earth-planet {
@@ -582,15 +536,6 @@
             </div>
             <div class="terminal-screen-content" id="terminalText">Awaiting flight sequence initialization...<span class="terminal-cursor"></span></div>
           </div>
-
-          <div class="cockpit-actions">
-            <button class="cockpit-btn start-terminal-btn" onclick="startRuggedStream()">
-              ▶ START TERMINAL
-            </button>
-            <button class="cockpit-btn skip-hyperdrive-btn" onclick="skipToBar()">
-              🚀 HYPER DRIVE
-            </button>
-          </div>
         </div>
       </div>
 
@@ -735,7 +680,7 @@
           terminalBox.scrollTop = terminalBox.scrollHeight;
           charIndex++;
           
-          setTimeout(typeNextChar, 35);
+          setTimeout(typeNextChar, 45);
         } else {
           terminalBox.innerHTML += "\n\n> WARP ENGINES ENGAGING...";
           let cursor = document.createElement('span');
@@ -747,24 +692,14 @@
           
           setTimeout(() => {
             triggerHyperdrive();
-          }, 1000);
+          }, 1200);
         }
       }
       typeNextChar();
     }
 
-    function skipToBar() {
-      // Instantly fill the terminal with text and trigger hyperdrive immediately
-      const statusEl = document.getElementById('terminalStatus');
-      if (statusEl) statusEl.innerText = 'BYPASSED';
-      const terminalBox = document.getElementById('terminalText');
-      if (terminalBox) {
-        terminalBox.innerText = ruggedTerminalText + "\n\n> MANUAL OVERRIDE: WARP ENGINES ENGAGING DIRECTLY...";
-      }
-      triggerHyperdrive();
-    }
-
     window.addEventListener('load', () => {
+      // Check if URL parameters request the bar to load with open doors directly
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('doors') === 'open') {
         const scene = document.getElementById('scene');
@@ -772,6 +707,10 @@
         if (spaceView) spaceView.style.display = 'none';
         scene.classList.add('bar-active');
         scene.classList.add('open');
+      } else {
+        setTimeout(() => {
+          startRuggedStream();
+        }, 1000);
       }
     });
 
@@ -779,6 +718,8 @@
     setInterval(() => {
       if (moonMiles > 235000) {
         moonMiles -= Math.floor(Math.random() * 12) + 3;
+        const distEl = document.getElementById('moonDistanceVal');
+        if (distEl) distEl.innerText = moonMiles.toLocaleString();
       }
     }, 2000);
 
