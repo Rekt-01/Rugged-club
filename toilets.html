@@ -122,19 +122,57 @@
       color: #ff007a;
       font-size: 1.1rem;
       font-weight: bold;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       text-shadow: 0 0 8px rgba(255, 0, 122, 0.6);
       letter-spacing: 1px;
     }
 
+    .modal-subtitle {
+      color: #00ff66;
+      font-size: 0.8rem;
+      margin-bottom: 15px;
+      font-weight: bold;
+      text-shadow: 0 0 6px rgba(0, 255, 102, 0.4);
+    }
+
     .modal-body-text {
       color: #ccc;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       line-height: 1.4;
       margin-bottom: 20px;
-      max-height: 50vh;
+      max-height: 45vh;
       overflow-y: auto;
       text-align: left;
+    }
+
+    .lang-btn-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .lang-btn {
+      background: #15151f;
+      color: #00ff66;
+      border: 1px solid #00ff66;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .lang-btn:hover, .lang-btn.active {
+      background: #00ff66;
+      color: #020205;
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
     }
 
     .modal-action-btn {
@@ -148,6 +186,7 @@
       font-size: 0.8rem;
       cursor: pointer;
       box-shadow: 0 0 10px rgba(255, 0, 122, 0.5);
+      width: 100%;
     }
     .modal-action-btn:active {
       transform: scale(0.95);
@@ -173,22 +212,61 @@
     <div class="modal-content">
       <span class="close-btn" onclick="closeLoreModal()">&times;</span>
       <div class="modal-title">📜 RESTROOM LORE ARCHIVE</div>
-      <div class="modal-body-text" id="loreTextContainer">
-        Legend has it that this very stall was built during the legendary bloodbath, when the gas fees were higher than the community's collective IQ and every green candle was just a cruel optical illusion engineered by a founder named Chad who promised utility before vanishing to Dubai with the mint funds.<br><br>
-        They say if you stare long enough into the 404 Degen graffiti while down 99% on your third consecutive "revolutionary AI meme coin," you can still hear the faint, echoing cries of paper hands hitting the emergency sell button. The plumbing here doesn’t actually flush wastewater—it directly pipes your remaining liquidity straight into a wallet labeled <em>"Liquidity Provision (Trust Me Bro)"</em>.<br><br>
-        Local legends claim that the only way to break the curse of the red candle is to hit the latch, walk back out to the bar, and pretend you didn't just mortgage your mother’s garage for a JPEG of a bored primate wearing a pirate hat.
+      <div class="modal-subtitle">CHOOSE YOUR DIALECT, ANON:</div>
+      
+      <div class="lang-btn-container">
+        <button class="lang-btn" onclick="setLore(1)">
+          <span>🌐 [1] Degen Dialect (Original)</span>
+          <span>&gt;</span>
+        </button>
+        <button class="lang-btn" onclick="setLore(2)">
+          <span>🧪 [2] Copium Dialect</span>
+          <span>&gt;</span>
+        </button>
+        <button class="lang-btn" onclick="setLore(3)">
+          <span>🔥 [3] Unhinged Hopium Dialect</span>
+          <span>&gt;</span>
+        </button>
       </div>
-      <button class="modal-action-btn" onclick="closeLoreModal()">CLOSE WRITING</button>
+
+      <div class="modal-body-text" id="loreTextContainer">
+        Select a translation above to inject the alpha straight into your brain-rot.
+      </div>
+
+      <button class="modal-action-btn" onclick="closeLoreModal()">CLOSE CHAT</button>
     </div>
   </div>
 
   <script>
+    const loreOptions = {
+      1: `Legend has it that this very stall was built during the legendary bloodbath, when the gas fees were higher than the community's collective IQ and every green candle was just a cruel optical illusion engineered by a founder named Chad who promised utility before vanishing to Dubai with the mint funds.<br><br>They say if you stare long enough into the 404 Degen graffiti while down 99% on your third consecutive "revolutionary AI meme coin," you can still hear the faint, echoing cries of paper hands hitting the emergency sell button. The plumbing here doesn’t actually flush wastewater—it directly pipes your remaining liquidity straight into a wallet labeled <em>"Liquidity Provision (Trust Me Bro)"</em>.<br><br>Local legends claim that the only way to break the curse of the red candle is to hit the latch, walk back out to the bar, and pretend you didn't just mortgage your mother’s garage for a JPEG of a bored primate wearing a pirate hat.`,
+      
+      2: `We all crawled in here straight from rinses and smoking NFT rug pulls, blinking into the dim light of a dying laptop screen with a collective migraine and zero APE left for gas. That’s us. We aren’t VC-backed paper-pushers, master artists, or elite smart-contract devs—we're just a bunch of brain-rotted degens winging it, copying spaghetti code from GitHub at 3 AM, and fat-fingering mint functions as we go because we're building this shit out of pure spite from the trenches.<br><br>While everyone else is out chasing whatever shiny new L2 is dropping influencer exit liquidity this week, we stayed. We're locked in and riding with ApeChain because we still actually believe in $APE.<br><br>This NFT clubhouse isn't some soulless corporate mint farm; it’s a survivor camp built by serial bagholders who are sick of getting farmed by anon devs. Run by the underground Copium Cartel with <strong>Liquidation Larry</strong> at the head of the table huffing industrial-grade hopium through a gas mask, we're here to ape in, shitpost, talk charts, and cope about real life when our portfolios look like a literal crime scene. But hear this loud and clear, anon: everyone is welcome here, but we have absolute zero tolerance for hate, racism, bigotry, or toxic gatekeepers. Sell-shaming someone for panic-selling the local bottom gets you instantly blacklisted into the shadow realm—remember, <strong>no crying in the casino, bro</strong>.<br><br>We’re bound to get rekt on a few bugs, but we're building a real empire from the mud. In this ecosystem, we don't do soft stuff—we run on pure, unfiltered <strong>$CHAOS</strong> and absolute degenerate solidarity. LFG.`,
+      
+      3: `We dragged our broken, rekt carcasses straight out of the smoking craters of a hundred dead mints, blinking into the green-tinted glow of a dying monitor with a permanent migraine and exactly zero APE left for gas. That’s us. We aren't polished, PowerPoint-poisoned crypto influencers, algorithmic market makers, or Harvard-dropout devs who know what a "roadmap" is—we’re a chaotic hive-mind of brain-rotted degens stealing spaghetti code off GitHub, mainlining energy drinks at 4 AM, and fat-fingering smart contracts out of pure, unadulterated spite.<br><br>While the rest of the timeline is whoring itself out to whatever sterile new L2 is pumping influencer exit liquidity this week, we chained ourselves to ApeChain and threw away the key because we’re too stubborn (or brain-damaged) to leave.<br><br>This isn't some sanitized corporate art project or a VC-backed extraction scam. It’s an underground bio-hazard ward run by <strong>Liquidation Larry</strong> from the back of the Copium Cartel, sitting at a wobbly desk wearing a gas mask duct-taped together with old hardware wallets and huffing industrial-grade hopium. We’re here to ape blindly, shitpost into the void, scream at charts, and pretend our net worth isn't a federal crime scene.<br><br>Listen up, anon: everyone’s welcome in the trenches, but we have zero patience for crybabies, fedoras, bigots, or bootlickers. Sell-shame someone for capitulating at the literal wick of the bottom and you get launched straight into the shadow realm. Rule number one of the asylum: <strong>no crying in the casino, bro</strong>.<br><br>We’re gonna break things, exploit our own bugs, and probably get liquidated twice by Tuesday. But we’re building this empire out of pure, toxic sludge and absolute degenerate brotherhood. LFG.`
+    };
+
     function openLoreModal() {
       document.getElementById('loreModal').style.display = 'flex';
+      setLore(1); // Default to option 1 on open
     }
 
     function closeLoreModal() {
       document.getElementById('loreModal').style.display = 'none';
+    }
+
+    function setLore(optionNum) {
+      document.getElementById('loreTextContainer').innerHTML = loreOptions[optionNum];
+      
+      // Update button active state visual
+      const buttons = document.querySelectorAll('.lang-btn');
+      buttons.forEach((btn, index) => {
+        if (index + 1 === optionNum) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
     }
   </script>
 
