@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v15.0 - American Pool Edition</title>
+  <title>The Rugged Bar v15.1 - American Pool Edition</title>
   <style>
     * {
       box-sizing: border-box;
@@ -317,13 +317,13 @@
   <div class="modal-overlay" id="rulesModal">
     <div class="modal-card">
       <div class="modal-title">📜 AMERICAN POOL WHITEPAPER</div>
-    <div class="modal-desc">
-      <p><strong>1. The Racking Layout:</strong> 15 object balls (Solids 1–7, Stripes 9–15, and the 8-Ball dead center) plus the white cue ball.</p>
-      <p><strong>2. Claiming Your Group:</strong> The table starts open after the break. The first player to legally pocket a ball claims that group (Solids or Stripes) for the remainder of the match.</p>
-      <p><strong>3. Consecutive Shots:</strong> If you legally pocket a ball belonging to your assigned group, your turn continues (another shot). If you miss or pocket an illegal target, your turn ends.</p>
-      <p><strong>4. Fouls & Scratches:</strong> Pocketing the white cue ball or failing to hit your own group first results in a foul, granting your opponent "ball-in-hand" placement anywhere on the felt.</p>
-      <p><strong>5. The 8-Ball Finale:</strong> The black 8-ball is the final objective. You can only pocket it after completely clearing all 7 of your group balls. Sinking it early or committing a foul on the 8-ball results in an automatic loss.</p>
-    </div>
+      <div class="modal-desc">
+        <p><strong>1. The Racking Layout:</strong> 15 object balls (Solids 1–7, Stripes 9–15, and the 8-Ball dead center) plus the white cue ball.</p>
+        <p><strong>2. Claiming Your Group:</strong> The table starts open after the break. The first player to legally pocket a ball claims that group (Solids or Stripes) for the remainder of the match.</p>
+        <p><strong>3. Consecutive Shots:</strong> If you legally pocket a ball belonging to your assigned group, your turn continues (another shot). If you miss or pocket an illegal target, your turn ends.</p>
+        <p><strong>4. Fouls & Scratches:</strong> Pocketing the white cue ball or failing to hit your own group first results in a foul, granting your opponent "ball-in-hand" placement anywhere on the felt.</p>
+        <p><strong>5. The 8-Ball Finale:</strong> The black 8-ball is the final objective. You can only pocket it after completely clearing all 7 of your group balls. Sinking it early or committing a foul on the 8-ball results in an automatic loss.</p>
+      </div>
       <button class="modal-btn" onclick="closeRulesModal()">GOT IT, LET'S PLAY 🚀</button>
     </div>
   </div>
@@ -360,25 +360,23 @@
       { x: 16, y: 174 }, { x: 180, y: 178 }, { x: 344, y: 174 }
     ];
 
-    let playerGroup = null; // 'solids' or 'stripes'
+    let playerGroup = null; 
     let aiGroup = null;
     let turn = 'Player';
     let shotFired = false;
     let gameOver = false;
     let ballInHand = false;
 
-    // Standard American Pool 15 balls + cue ball
     let cueBall = { x: 90, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
 
-    // Build standard 5-row triangle rack (1 to 15)
     let rackX = 240, rackY = 95, spacing = 11.5;
     let ballNumbers = [
-      1,                     // Apex
-      2, 9,                  // Row 2
-      3, 8, 10,              // Row 3 (8-ball dead center)
-      4, 11, 12, 5,          // Row 4
-      6, 13, 14, 15, 7       // Row 5
+      1,                     
+      2, 9,                  
+      3, 8, 10,              
+      4, 11, 12, 5,          
+      6, 13, 14, 15, 7       
     ];
 
     let numIdx = 0;
@@ -390,16 +388,15 @@
         let by = rackY + (row * spacing) - (col * spacing / 2);
         
         let bType = (n === 8) ? 'black' : (n <= 7 ? 'solids' : 'stripes');
-        // Color mapping for visuals
         let bColor = '#ffffff';
         if (n === 8) bColor = '#111111';
-        else if (n === 1 || n === 9) bColor = '#f1c40f'; // Yellow
-        else if (n === 2 || n === 10) bColor = '#2980b9'; // Blue
-        else if (n === 3 || n === 11) bColor = '#e74c3c'; // Red
-        else if (n === 4 || n === 12) bColor = '#8e44ad'; // Purple
-        else if (n === 5 || n === 13) bColor = '#d35400'; // Orange
-        else if (n === 6 || n === 14) bColor = '#27ae60'; // Green
-        else if (n === 7 || n === 15) bColor = '#c0392b'; // Maroon
+        else if (n === 1 || n === 9) bColor = '#f1c40f'; 
+        else if (n === 2 || n === 10) bColor = '#2980b9'; 
+        else if (n === 3 || n === 11) bColor = '#e74c3c'; 
+        else if (n === 4 || n === 12) bColor = '#8e44ad'; 
+        else if (n === 5 || n === 13) bColor = '#d35400'; 
+        else if (n === 6 || n === 14) bColor = '#27ae60'; 
+        else if (n === 7 || n === 15) bColor = '#c0392b'; 
 
         balls.push({ x: bx, y: by, vx: 0, vy: 0, r: 5.5, color: bColor, isCue: false, type: bType, num: n, isStripe: n > 8 });
         numIdx++;
@@ -412,7 +409,6 @@
     function showToast(text) {
       toast.innerText = text;
       toast.classList.add('show');
-      setTimeout => { toast.classList.remove('show'); }, 2000);
       setTimeout(() => { toast.classList.remove('show'); }, 2000);
     }
 
@@ -492,7 +488,6 @@
         });
       }
 
-      // Collisions & tracking first contact
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
           let b1 = balls[i], b2 = balls[j];
@@ -535,7 +530,6 @@
         if (turn === 'Player') {
           let foulOccurred = false;
 
-          // Rule check: Must hit own group first (if assigned)
           if (hasScratch) {
             foulOccurred = true;
           } else if (!firstBallHit) {
@@ -565,7 +559,6 @@
           } else {
             if (objectPots.length > 0) {
               if (!playerGroup) {
-                // First legally potted object ball sets the group
                 let firstPot = objectPots.find(i => i.type !== 'black');
                 if (firstPot) {
                   playerGroup = firstPot.type;
@@ -589,7 +582,6 @@
             }
           }
         } else {
-          // AI Turn Processing
           let aiHasBallsLeft = (aiGroup === 'solids' && remainingSolids > 0) || 
                                (aiGroup === 'stripes' && remainingStripes > 0) ||
                                (!aiGroup && (remainingSolids > 0 || remainingStripes > 0));
@@ -659,7 +651,6 @@
         ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
         ctx.fill();
 
-        // Draw stripe overlay if applicable
         if (b.isStripe) {
           ctx.fillStyle = '#ffffff';
           ctx.beginPath();
