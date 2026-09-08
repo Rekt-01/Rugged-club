@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v14.4 - Degen Billiards</title>
+  <title>The Rugged Bar v15.0 - American Pool Edition</title>
   <style>
     * {
       box-sizing: border-box;
@@ -29,7 +29,7 @@
       background: #0d0d12;
       border: 3px solid #00ff66;
       border-radius: 12px;
-      padding: 15px;
+      padding: 12px;
       width: 96vw;
       max-width: 480px;
       box-shadow: 0 0 30px rgba(0, 255, 102, 0.4);
@@ -43,57 +43,46 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .title-text {
       color: #00ff66;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: bold;
       text-shadow: 0 0 6px #00ff66;
     }
 
     .nav-buttons {
       display: flex;
-      gap: 6px;
+      gap: 5px;
+    }
+
+    .rule-btn, .exit-btn {
+      padding: 3px 6px;
+      border-radius: 5px;
+      font-size: 0.65rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
 
     .rule-btn {
       background: rgba(0, 255, 204, 0.15);
       border: 2px solid #00ffcc;
       color: #00ffcc;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 0.7rem;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 0 8px rgba(0, 255, 204, 0.4);
-      transition: all 0.2s ease;
+      box-shadow: 0 0 6px rgba(0, 255, 204, 0.4);
     }
-    .rule-btn:hover {
-      background: #00ffcc;
-      color: #000;
-      transform: scale(1.05);
-    }
+    .rule-btn:hover { background: #00ffcc; color: #000; }
 
     .exit-btn {
       background: rgba(255, 51, 51, 0.15);
       border: 2px solid #ff3333;
       color: #ff3333;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 0.7rem;
-      font-weight: bold;
-      cursor: pointer;
       text-decoration: none;
-      box-shadow: 0 0 8px rgba(255, 51, 51, 0.4);
-      transition: all 0.2s ease;
+      box-shadow: 0 0 6px rgba(255, 51, 51, 0.4);
     }
-    .exit-btn:hover {
-      background: #ff3333;
-      color: #000;
-      transform: scale(1.05);
-    }
+    .exit-btn:hover { background: #ff3333; color: #000; }
 
     .settings-row {
       width: 100%;
@@ -103,9 +92,9 @@
       background: #121218;
       border: 1px solid #333;
       border-radius: 6px;
-      padding: 6px 12px;
-      margin-bottom: 8px;
-      font-size: 0.7rem;
+      padding: 5px 10px;
+      margin-bottom: 6px;
+      font-size: 0.65rem;
       color: #aaa;
     }
 
@@ -113,12 +102,12 @@
       background: #ffe600;
       color: #000;
       border: none;
-      padding: 3px 8px;
+      padding: 3px 6px;
       border-radius: 4px;
       font-weight: bold;
       font-family: monospace;
       cursor: pointer;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
     }
 
     .scoreboard {
@@ -128,9 +117,9 @@
       background: #121218;
       border: 1px solid #333;
       border-radius: 6px;
-      padding: 6px 12px;
-      margin-bottom: 10px;
-      font-size: 0.7rem;
+      padding: 5px 10px;
+      margin-bottom: 8px;
+      font-size: 0.65rem;
       color: #fff;
     }
     .score-item span { color: #ffe600; font-weight: bold; }
@@ -159,9 +148,9 @@
       background: rgba(0, 0, 0, 0.95);
       border: 2px solid #ff007a;
       border-radius: 8px;
-      padding: 10px 16px;
+      padding: 8px 14px;
       color: #ff007a;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: bold;
       text-align: center;
       box-shadow: 0 0 20px rgba(255, 0, 122, 0.8);
@@ -180,25 +169,25 @@
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-top: 10px;
+      gap: 5px;
+      margin-top: 8px;
     }
 
     .aim-row {
       display: flex;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .btn-ctrl {
       flex: 1;
       max-width: 120px;
-      height: 36px;
+      height: 32px;
       background: rgba(255, 255, 255, 0.08);
       border: 2px solid #00ffcc;
       border-radius: 6px;
       color: #00ffcc;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       font-weight: bold;
       display: flex;
       justify-content: center;
@@ -213,11 +202,11 @@
 
     .btn-shoot {
       width: 100%;
-      height: 40px;
+      height: 36px;
       background: #00ff66;
       color: #000;
       font-weight: bold;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       border: none;
       border-radius: 6px;
       cursor: pointer;
@@ -244,7 +233,7 @@
       background: #0d0d12;
       border: 3px solid #ffe600;
       border-radius: 12px;
-      padding: 20px;
+      padding: 18px;
       width: 90vw;
       max-width: 400px;
       text-align: center;
@@ -254,40 +243,36 @@
       flex-direction: column;
     }
     .modal-title {
-      font-size: 1.05rem;
+      font-size: 0.95rem;
       font-weight: bold;
       color: #ffe600;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       text-shadow: 0 0 8px rgba(255, 230, 0, 0.5);
     }
     .modal-desc {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       color: #fff;
-      line-height: 1.5;
-      margin-bottom: 15px;
+      line-height: 1.4;
+      margin-bottom: 12px;
       text-align: left;
       overflow-y: auto;
       max-height: 55vh;
       padding-right: 5px;
     }
-    .modal-desc p {
-      margin-bottom: 8px;
-    }
-    .modal-desc strong {
-      color: #00ffcc;
-    }
+    .modal-desc p { margin-bottom: 6px; }
+    .modal-desc strong { color: #00ffcc; }
     .modal-btn {
       background: #ffe600;
       color: #000;
       border: none;
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 20px;
       font-weight: bold;
       font-family: monospace;
       cursor: pointer;
       box-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
       text-transform: uppercase;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       margin-top: auto;
       touch-action: manipulation;
     }
@@ -297,7 +282,7 @@
 
   <div class="pool-container">
     <div class="header-bar">
-      <div class="title-text">🎱 PUB BILLIARDS: DEGEN EDITION</div>
+      <div class="title-text">🎱 AMERICAN POOL: BOOM EDITION</div>
       <div class="nav-buttons">
         <button class="rule-btn" onclick="openRulesModal()">📖 RULES</button>
         <a href="index.html" class="exit-btn">🚪 EXIT</a>
@@ -310,12 +295,12 @@
     </div>
 
     <div class="scoreboard">
-      <div class="score-item">TURN: <span id="turnDisplay">PLAYER (APE)</span></div>
-      <div class="score-item">GROUP: <span id="groupDisplay">OPEN (ANY)</span></div>
+      <div class="score-item">TURN: <span id="turnDisplay">PLAYER (SOLIDS/STRIPES)</span></div>
+      <div class="score-item">GROUP: <span id="groupDisplay">OPEN TABLE</span></div>
     </div>
 
     <div class="canvas-wrapper">
-      <canvas id="poolCanvas" width="340" height="190"></canvas>
+      <canvas id="poolCanvas" width="360" height="190"></canvas>
       <div class="event-toast" id="eventToast"></div>
     </div>
 
@@ -324,22 +309,22 @@
         <button class="btn-ctrl" onclick="adjustAim(-0.1)">◀ ROTATE</button>
         <button class="btn-ctrl" onclick="adjustAim(0.1)">ROTATE ▶</button>
       </div>
-      <button class="btn-shoot" onclick="executeShot()">⚡ SEND THE LIQUIDITY (SHOOT)</button>
+      <button class="btn-shoot" onclick="executeShot()">⚡ SEND THE SHOT</button>
     </div>
   </div>
 
   <!-- Rules Modal -->
   <div class="modal-overlay" id="rulesModal">
     <div class="modal-card">
-      <div class="modal-title">📜 DEGEN WHITEPAPER: THE RULES</div>
-      <div class="modal-desc">
-        <p><strong>1. The Initial Allocation (The Rack):</strong> We start with 5 Red bags, 5 Yellow bags, and 1 Black whale asset. No pre-sales allowed.</p>
-        <p><strong>2. Claiming Your Bag (Open Table):</strong> The table starts open. Whichever color you successfully sink first via clean market execution becomes your permanent token allocation for the frame.</p>
-        <p><strong>3. Diamond Hands Bonus (Streak):</strong> If you legally sink one of your assigned bags, you get an extra shift (another shot). If you miss or paper-hand the shot, the turn flips to the computer whale.</p>
-        <p><strong>4. The Dreaded Scratch (Foul):</strong> Sinking the white cue ball is a liquidity drain. Your cue resets to center and your turn instantly gets rugged.</p>
-        <p><strong>5. The Final Boss (The Black Ball):</strong> The black is your exit liquidity ticket. You can only pocket it <em>after</em> completely clearing all 5 of your assigned bags. Sinking it early or alongside a foul means instant liquidation and game over.</p>
-      </div>
-      <button class="modal-btn" onclick="closeRulesModal()">GOT IT, LET'S TRADE 🚀</button>
+      <div class="modal-title">📜 AMERICAN POOL WHITEPAPER</div>
+    <div class="modal-desc">
+      <p><strong>1. The Racking Layout:</strong> 15 object balls (Solids 1–7, Stripes 9–15, and the 8-Ball dead center) plus the white cue ball.</p>
+      <p><strong>2. Claiming Your Group:</strong> The table starts open after the break. The first player to legally pocket a ball claims that group (Solids or Stripes) for the remainder of the match.</p>
+      <p><strong>3. Consecutive Shots:</strong> If you legally pocket a ball belonging to your assigned group, your turn continues (another shot). If you miss or pocket an illegal target, your turn ends.</p>
+      <p><strong>4. Fouls & Scratches:</strong> Pocketing the white cue ball or failing to hit your own group first results in a foul, granting your opponent "ball-in-hand" placement anywhere on the felt.</p>
+      <p><strong>5. The 8-Ball Finale:</strong> The black 8-ball is the final objective. You can only pocket it after completely clearing all 7 of your group balls. Sinking it early or committing a foul on the 8-ball results in an automatic loss.</p>
+    </div>
+      <button class="modal-btn" onclick="closeRulesModal()">GOT IT, LET'S PLAY 🚀</button>
     </div>
   </div>
 
@@ -363,60 +348,72 @@
       isEasyMode = !isEasyMode;
       document.getElementById('modeLabel').innerText = isEasyMode ? 'EASY (BIG POCKETS)' : 'NORMAL';
       document.getElementById('modeLabel').style.color = isEasyMode ? '#00ff66' : '#00ffcc';
-      showToast(isEasyMode ? "🟢 EASY MODE: Pockets expanded for paper hands!" : "🔴 NORMAL MODE: Standard pub difficulty.");
+      showToast(isEasyMode ? "🟢 EASY MODE: Pockets expanded!" : "🔴 NORMAL MODE: Standard American pockets.");
     }
 
-    function openRulesModal() {
-      document.getElementById('rulesModal').style.display = 'flex';
-    }
-
-    function closeRulesModal() {
-      document.getElementById('rulesModal').style.display = 'none';
-    }
-
-    function getPocketRadius() {
-      return isEasyMode ? 18 : 12;
-    }
+    function openRulesModal() { document.getElementById('rulesModal').style.display = 'flex'; }
+    function closeRulesModal() { document.getElementById('rulesModal').style.display = 'none'; }
+    function getPocketRadius() { return isEasyMode ? 20 : 13; }
 
     const pockets = [
-      { x: 16, y: 16 }, { x: 170, y: 13 }, { x: 324, y: 16 },
-      { x: 16, y: 174 }, { x: 170, y: 177 }, { x: 324, y: 174 }
+      { x: 16, y: 16 }, { x: 180, y: 12 }, { x: 344, y: 16 },
+      { x: 16, y: 174 }, { x: 180, y: 178 }, { x: 344, y: 174 }
     ];
 
-    let playerGroup = null; 
+    let playerGroup = null; // 'solids' or 'stripes'
     let aiGroup = null;
     let turn = 'Player';
     let shotFired = false;
     let gameOver = false;
+    let ballInHand = false;
 
-    let cueBall = { x: 85, y: 95, vx: 0, vy: 0, r: 6.5, color: '#ffffff', isCue: true, type: 'cue' };
+    // Standard American Pool 15 balls + cue ball
+    let cueBall = { x: 90, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
 
-    let rackX = 230, rackY = 95, spacing = 13.5;
-    let poolTypes = ['red', 'yellow', 'red', 'yellow', 'black', 'red', 'yellow', 'red', 'yellow', 'red'];
-    let typeIndex = 0;
-    
-    for (let col = 0; col < 4; col++) {
+    // Build standard 5-row triangle rack (1 to 15)
+    let rackX = 240, rackY = 95, spacing = 11.5;
+    let ballNumbers = [
+      1,                     // Apex
+      2, 9,                  // Row 2
+      3, 8, 10,              // Row 3 (8-ball dead center)
+      4, 11, 12, 5,          // Row 4
+      6, 13, 14, 15, 7       // Row 5
+    ];
+
+    let numIdx = 0;
+    for (let col = 0; col < 5; col++) {
       for (let row = 0; row <= col; row++) {
-        if (typeIndex >= poolTypes.length) break;
+        if (numIdx >= ballNumbers.length) break;
+        let n = ballNumbers[numIdx];
         let bx = rackX + (col * spacing * 0.866);
         let by = rackY + (row * spacing) - (col * spacing / 2);
-        let pType = poolTypes[typeIndex];
-        let pColor = pType === 'red' ? '#e74c3c' : (pType === 'yellow' ? '#f1c40f' : '#111111');
-        balls.push({ x: bx, y: by, vx: 0, vy: 0, r: 6.5, color: pColor, isCue: false, type: pType });
-        typeIndex++;
+        
+        let bType = (n === 8) ? 'black' : (n <= 7 ? 'solids' : 'stripes');
+        // Color mapping for visuals
+        let bColor = '#ffffff';
+        if (n === 8) bColor = '#111111';
+        else if (n === 1 || n === 9) bColor = '#f1c40f'; // Yellow
+        else if (n === 2 || n === 10) bColor = '#2980b9'; // Blue
+        else if (n === 3 || n === 11) bColor = '#e74c3c'; // Red
+        else if (n === 4 || n === 12) bColor = '#8e44ad'; // Purple
+        else if (n === 5 || n === 13) bColor = '#d35400'; // Orange
+        else if (n === 6 || n === 14) bColor = '#27ae60'; // Green
+        else if (n === 7 || n === 15) bColor = '#c0392b'; // Maroon
+
+        balls.push({ x: bx, y: by, vx: 0, vy: 0, r: 5.5, color: bColor, isCue: false, type: bType, num: n, isStripe: n > 8 });
+        numIdx++;
       }
     }
 
     let aimAngle = 0;
-    let power = 6.5;
+    let power = 6.8;
 
     function showToast(text) {
       toast.innerText = text;
       toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2000);
+      setTimeout => { toast.classList.remove('show'); }, 2000);
+      setTimeout(() => { toast.classList.remove('show'); }, 2000);
     }
 
     function adjustAim(amount) {
@@ -430,11 +427,12 @@
         cueBall.vx = Math.cos(aimAngle) * power;
         cueBall.vy = Math.sin(aimAngle) * power;
         shotFired = true;
+        ballInHand = false;
       }
     }
 
     function isAnyBallMoving() {
-      return balls.some(b => Math.abs(b.vx) > 0.04 || Math.abs(b.vy) > 0.04);
+      return balls.some(b => Math.abs(b.vx) > 0.03 || Math.abs(b.vy) > 0.03);
     }
 
     function aiTurn() {
@@ -449,14 +447,16 @@
       }
 
       let target = validTargets[Math.floor(Math.random() * validTargets.length)];
-      let angleToTarget = Math.atan2(target.y - cueBall.y, target.x - cueBall.x) + (Math.random() - 0.5) * 0.25;
+      let angleToTarget = Math.atan2(target.y - cueBall.y, target.x - cueBall.x) + (Math.random() - 0.5) * 0.2;
       
-      cueBall.vx = Math.cos(angleToTarget) * 5.8;
-      cueBall.vy = Math.sin(angleToTarget) * 5.8;
+      cueBall.vx = Math.cos(angleToTarget) * 6.0;
+      cueBall.vy = Math.sin(angleToTarget) * 6.0;
       shotFired = true;
+      ballInHand = false;
     }
 
     let pottedThisTurn = [];
+    let firstBallHit = null;
 
     function updateGame() {
       let moving = isAnyBallMoving();
@@ -465,32 +465,34 @@
         let b = balls[i];
         b.x += b.vx;
         b.y += b.vy;
-        b.vx *= 0.985;
-        b.vy *= 0.985;
+        b.vx *= 0.988;
+        b.vy *= 0.988;
 
-        if (Math.abs(b.vx) < 0.03) b.vx = 0;
-        if (Math.abs(b.vy) < 0.03) b.vy = 0;
+        if (Math.abs(b.vx) < 0.02) b.vx = 0;
+        if (Math.abs(b.vy) < 0.02) b.vy = 0;
 
         if (b.x - b.r < 20) { b.x = 20 + b.r; b.vx *= -1; }
-        if (b.x + b.r > 320) { b.x = 320 - b.r; b.vx *= -1; }
+        if (b.x + b.r > 340) { b.x = 340 - b.r; b.vx *= -1; }
         if (b.y - b.r < 20) { b.y = 20 + b.r; b.vy *= -1; }
         if (b.y + b.r > 170) { b.y = 170 - b.r; b.vy *= -1; }
 
         pockets.forEach(p => {
           let currentPocketRadius = getPocketRadius();
-          if (Math.hypot(b.x - p.x, b.y - p.y) < currentPocketRadius + 3) {
+          if (Math.hypot(b.x - p.x, b.y - p.y) < currentPocketRadius + 2) {
             if (b.isCue) {
-              b.x = 85; b.y = 95; b.vx = 0; b.vy = 0;
-              showToast("🚨 SCRATCH! Cue ball pocketed (-1 liquidity)!");
+              b.x = 90; b.y = 95; b.vx = 0; b.vy = 0;
+              ballInHand = true;
               pottedThisTurn.push('scratch');
+              showToast("🚨 SCRATCH! White ball pocketed. Foul!");
             } else {
-              pottedThisTurn.push(b.type);
+              pottedThisTurn.push({type: b.type, num: b.num});
               balls.splice(i, 1);
             }
           }
         });
       }
 
+      // Collisions & tracking first contact
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
           let b1 = balls[i], b2 = balls[j];
@@ -499,6 +501,12 @@
           let minDist = b1.r + b2.r;
 
           if (dist < minDist && dist > 0) {
+            if ((b1.isCue && !b2.isCue) && !firstBallHit) {
+              firstBallHit = b2;
+            } else if ((b2.isCue && !b1.isCue) && !firstBallHit) {
+              firstBallHit = b1;
+            }
+
             let nx = dx / dist, ny = dy / dist;
             let overlap = minDist - dist;
             b1.x -= nx * overlap * 0.5; b1.y -= ny * overlap * 0.5;
@@ -517,77 +525,99 @@
       if (shotFired && !moving) {
         shotFired = false;
         let continueTurn = false;
-        let hasScratch = pottedThisTurn.includes('scratch');
-        let pottedBlack = pottedThisTurn.includes('black');
+        let hasScratch = pottedThisTurn.some(item => item === 'scratch');
+        let objectPots = pottedThisTurn.filter(item => item !== 'scratch');
+        let pottedBlack = objectPots.some(item => item.type === 'black');
 
-        let remainingReds = balls.filter(b => b.type === 'red').length;
-        let remainingYellows = balls.filter(b => b.type === 'yellow').length;
+        let remainingSolids = balls.filter(b => b.type === 'solids').length;
+        let remainingStripes = balls.filter(b => b.type === 'stripes').length;
 
         if (turn === 'Player') {
+          let foulOccurred = false;
+
+          // Rule check: Must hit own group first (if assigned)
           if (hasScratch) {
+            foulOccurred = true;
+          } else if (!firstBallHit) {
+            foulOccurred = true;
+            showToast("⚠️ Foul: Hit no balls!");
+          } else if (playerGroup && firstBallHit.type !== playerGroup && firstBallHit.type !== 'black') {
+            foulOccurred = true;
+            showToast("⚠️ Foul: Hit opponent group first!");
+          } else if (!playerGroup && firstBallHit.type === 'black') {
+            foulOccurred = true;
+            showToast("⚠️ Foul: Hit the 8-ball first while table is open!");
+          }
+
+          if (foulOccurred) {
             continueTurn = false;
           } else if (pottedBlack) {
-            let playerHasBallsLeft = (playerGroup === 'red' && remainingReds > 0) || 
-                                     (playerGroup === 'yellow' && remainingYellows > 0) ||
-                                     (!playerGroup && (remainingReds > 0 || remainingYellows > 0));
+            let playerHasBallsLeft = (playerGroup === 'solids' && remainingSolids > 0) || 
+                                     (playerGroup === 'stripes' && remainingStripes > 0) ||
+                                     (!playerGroup && (remainingSolids > 0 || remainingStripes > 0));
             if (playerHasBallsLeft) {
-              triggerEndGame(false, "💀 REKT! You potted the black ball before clearing your colors!");
+              triggerEndGame(false, "💀 REKT! You pocketed the 8-ball before clearing your group!");
               return;
             } else {
-              triggerEndGame(true, "🚀 TO THE MOON! You cleared your colors and potted the black!");
+              triggerEndGame(true, "🏆 VICTORY! You cleared your group and sank the 8-ball!");
               return;
             }
           } else {
-            let validPots = pottedThisTurn.filter(t => t !== 'scratch' && t !== 'black');
-            if (validPots.length > 0) {
+            if (objectPots.length > 0) {
               if (!playerGroup) {
-                playerGroup = validPots[0];
-                aiGroup = playerGroup === 'red' ? 'yellow' : 'red';
-                document.getElementById('groupDisplay').innerText = playerGroup.toUpperCase() + ' (YOURS)';
-                showToast(`🎯 GROUP LOCKED: You are on ${playerGroup.toUpperCase()}!`);
+                // First legally potted object ball sets the group
+                let firstPot = objectPots.find(i => i.type !== 'black');
+                if (firstPot) {
+                  playerGroup = firstPot.type;
+                  aiGroup = playerGroup === 'solids' ? 'stripes' : 'solids';
+                  document.getElementById('groupDisplay').innerText = playerGroup.toUpperCase() + ' (YOURS)';
+                  showToast(`🎯 GROUP CLAIMED: You are ${playerGroup.toUpperCase()}!`);
+                }
               }
 
-              let scoredOwnColor = validPots.includes(playerGroup);
-              let scoredOpponentColor = validPots.some(t => t === aiGroup);
+              let scoredOwnGroup = objectPots.some(i => i.type === playerGroup);
+              let scoredOpponentGroup = objectPots.some(i => i.type === aiGroup);
 
-              if (scoredOwnColor && !scoredOpponentColor) {
+              if (scoredOwnGroup && !scoredOpponentGroup) {
                 continueTurn = true;
-                showToast("🔥 EXTRA SHOT! Clean bag secured!");
+                showToast("🔥 EXTRA SHOT! Clean pot!");
               } else {
-                showToast("⚠️ Mixed or wrong color potted. Turn switches.");
+                showToast("⚠️ Mixed group potted. Turn switches.");
               }
             } else {
-              showToast("📉 PAPER HANDS! Shot missed completely!");
+              showToast("📉 Missed! Turn switches.");
             }
           }
         } else {
-          let aiHasBallsLeft = (aiGroup === 'red' && remainingReds > 0) || 
-                               (aiGroup === 'yellow' && remainingYellows > 0) ||
-                               (!aiGroup && (remainingReds > 0 || remainingYellows > 0));
+          // AI Turn Processing
+          let aiHasBallsLeft = (aiGroup === 'solids' && remainingSolids > 0) || 
+                               (aiGroup === 'stripes' && remainingStripes > 0) ||
+                               (!aiGroup && (remainingSolids > 0 || remainingStripes > 0));
           if (pottedBlack) {
             if (aiHasBallsLeft) {
-              triggerEndGame(true, "🎉 WHALE ERROR! The computer potted the black early and rugged itself!");
+              triggerEndGame(true, "🎉 COMPUTER ERROR! AI pocketed the 8-ball early and lost!");
               return;
             } else {
-              triggerEndGame(false, "💀 GET REKT! The whale cleared the table and sank the black.");
+              triggerEndGame(false, "💀 DEFEAT! The computer cleared its table and sank the 8-ball.");
               return;
             }
           }
-          let aiValidPots = pottedThisTurn.filter(t => t === aiGroup);
+          let aiValidPots = objectPots.filter(i => i.type === aiGroup);
           if (aiValidPots.length > 0 && !hasScratch) {
             continueTurn = true;
           }
         }
 
         pottedThisTurn = [];
+        firstBallHit = null;
 
         if (!continueTurn) {
-          turn = turn === 'Player' ? 'Computer (Whale)' : 'Player';
-          document.getElementById('turnDisplay').innerText = turn === 'Player' ? 'PLAYER (APE)' : 'COMPUTER (WHALE)';
-          if (turn === 'Computer (Whale)') {
+          turn = turn === 'Player' ? 'Computer' : 'Player';
+          document.getElementById('turnDisplay').innerText = turn === 'Player' ? 'PLAYER (SOLIDS/STRIPES)' : 'COMPUTER';
+          if (turn === 'Computer') {
             setTimeout(aiTurn, 1000);
           }
-        } else if (turn === 'Computer (Whale)') {
+        } else if (turn === 'Computer') {
           setTimeout(aiTurn, 1000);
         }
       }
@@ -603,13 +633,8 @@
       const desc = document.getElementById('modalDesc');
 
       modal.style.display = 'flex';
-      if (isWin) {
-        title.innerText = "🚀 VICTORY: BAGS MOONING!";
-        desc.innerText = customDesc;
-      } else {
-        title.innerText = "💀 LIQUIDATED!";
-        desc.innerText = customDesc;
-      }
+      title.innerText = isWin ? "🏆 MATCH WON!" : "💀 MATCH LOST!";
+      desc.innerText = customDesc;
     }
 
     function drawTable() {
@@ -633,8 +658,17 @@
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
         ctx.fill();
-        ctx.strokeStyle = b.type === 'black' ? '#555' : '#111';
-        ctx.lineWidth = 1;
+
+        // Draw stripe overlay if applicable
+        if (b.isStripe) {
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r * 0.55, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.strokeStyle = '#111';
+        ctx.lineWidth = 0.75;
         ctx.stroke();
       });
 
