@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v15.1 - American Pool Edition</title>
+  <title>The Rugged Bar v15.2 - Degen American Pool</title>
   <style>
     * {
       box-sizing: border-box;
@@ -282,21 +282,21 @@
 
   <div class="pool-container">
     <div class="header-bar">
-      <div class="title-text">🎱 AMERICAN POOL: BOOM EDITION</div>
+      <div class="title-text">🎱 DEGEN POOL: AMERICAN RUG EDITION</div>
       <div class="nav-buttons">
-        <button class="rule-btn" onclick="openRulesModal()">📖 RULES</button>
+        <button class="rule-btn" onclick="openRulesModal()">📖 WHITEPAPER</button>
         <a href="index.html" class="exit-btn">🚪 EXIT</a>
       </div>
     </div>
 
     <div class="settings-row">
-      <span>DIFFICULTY: <strong id="modeLabel" style="color:#00ffcc;">NORMAL</strong></span>
-      <button class="mode-switch-btn" onclick="toggleMode()">SWITCH MODE ⚙️</button>
+      <span>SLIPPAGE MODE: <strong id="modeLabel" style="color:#00ffcc;">NORMAL</strong></span>
+      <button class="mode-switch-btn" onclick="toggleMode()">TOGGLE ⚙️</button>
     </div>
 
     <div class="scoreboard">
-      <div class="score-item">TURN: <span id="turnDisplay">PLAYER (SOLIDS/STRIPES)</span></div>
-      <div class="score-item">GROUP: <span id="groupDisplay">OPEN TABLE</span></div>
+      <div class="score-item">SHIFT: <span id="turnDisplay">APE (SOLIDS / STRIPES)</span></div>
+      <div class="score-item">BAGS: <span id="groupDisplay">OPEN MARKET</span></div>
     </div>
 
     <div class="canvas-wrapper">
@@ -309,22 +309,22 @@
         <button class="btn-ctrl" onclick="adjustAim(-0.1)">◀ ROTATE</button>
         <button class="btn-ctrl" onclick="adjustAim(0.1)">ROTATE ▶</button>
       </div>
-      <button class="btn-shoot" onclick="executeShot()">⚡ SEND THE SHOT</button>
+      <button class="btn-shoot" onclick="executeShot()">⚡ SEND THE LIQUIDITY</button>
     </div>
   </div>
 
   <!-- Rules Modal -->
   <div class="modal-overlay" id="rulesModal">
     <div class="modal-card">
-      <div class="modal-title">📜 AMERICAN POOL WHITEPAPER</div>
+      <div class="modal-title">📜 DEGEN WHITEPAPER (RULES)</div>
       <div class="modal-desc">
-        <p><strong>1. The Racking Layout:</strong> 15 object balls (Solids 1–7, Stripes 9–15, and the 8-Ball dead center) plus the white cue ball.</p>
-        <p><strong>2. Claiming Your Group:</strong> The table starts open after the break. The first player to legally pocket a ball claims that group (Solids or Stripes) for the remainder of the match.</p>
-        <p><strong>3. Consecutive Shots:</strong> If you legally pocket a ball belonging to your assigned group, your turn continues (another shot). If you miss or pocket an illegal target, your turn ends.</p>
-        <p><strong>4. Fouls & Scratches:</strong> Pocketing the white cue ball or failing to hit your own group first results in a foul, granting your opponent "ball-in-hand" placement anywhere on the felt.</p>
-        <p><strong>5. The 8-Ball Finale:</strong> The black 8-ball is the final objective. You can only pocket it after completely clearing all 7 of your group balls. Sinking it early or committing a foul on the 8-ball results in an automatic loss.</p>
+        <p><strong>1. The Liquidity Rack:</strong> 15 token bags (Solids 1–7, Stripes 9–15, and the 8-Ball Mega Whale dead center) locked on the ledger.</p>
+        <p><strong>2. Claiming Your Bag:</strong> The market starts open. Whichever token group you legally sink first becomes your permanent bag (Solids or Stripes).</p>
+        <p><strong>3. Diamond Hands Streak:</strong> If you legally pocket your own token bag, you keep your shift for another trade. Miss or hit dirty, and the AI whale takes over.</p>
+        <p><strong>4. Getting Rugged (Foul):</strong> Sinking the white cue ball or hitting the wrong token group first results in a brutal liquidity drain, giving your opponent "Ball-in-Hand" anywhere on the charts.</p>
+        <p><strong>5. The 8-Ball Exit:</strong> The black 8-ball is your final exit liquidity. Clear all 7 of your assigned bags first, then sink the 8-ball to moon. Pocketing it early triggers instant liquidation and game over.</p>
       </div>
-      <button class="modal-btn" onclick="closeRulesModal()">GOT IT, LET'S PLAY 🚀</button>
+      <button class="modal-btn" onclick="closeRulesModal()">LFG, LET'S TRADE 🚀</button>
     </div>
   </div>
 
@@ -333,7 +333,7 @@
     <div class="modal-card" style="max-height: none;">
       <div class="modal-title" id="modalTitle">TITLE</div>
       <div class="modal-desc" id="modalDesc" style="max-height: none; overflow: visible; text-align: center;">Description goes here.</div>
-      <button class="modal-btn" onclick="location.reload()" style="margin-top: 15px;">PLAY ANOTHER ROUND 🔄</button>
+      <button class="modal-btn" onclick="location.reload()" style="margin-top: 15px;">APE AGAIN 🔄</button>
     </div>
   </div>
 
@@ -346,9 +346,9 @@
 
     function toggleMode() {
       isEasyMode = !isEasyMode;
-      document.getElementById('modeLabel').innerText = isEasyMode ? 'EASY (BIG POCKETS)' : 'NORMAL';
+      document.getElementById('modeLabel').innerText = isEasyMode ? 'PAPER HAND (BIG POCKETS)' : 'NORMAL';
       document.getElementById('modeLabel').style.color = isEasyMode ? '#00ff66' : '#00ffcc';
-      showToast(isEasyMode ? "🟢 EASY MODE: Pockets expanded!" : "🔴 NORMAL MODE: Standard American pockets.");
+      showToast(isEasyMode ? "🟢 PAPER HAND MODE: Pockets widened for easy bags!" : "🔴 NORMAL MODE: Standard degen slippage.");
     }
 
     function openRulesModal() { document.getElementById('rulesModal').style.display = 'flex'; }
@@ -479,7 +479,7 @@
               b.x = 90; b.y = 95; b.vx = 0; b.vy = 0;
               ballInHand = true;
               pottedThisTurn.push('scratch');
-              showToast("🚨 SCRATCH! White ball pocketed. Foul!");
+              showToast("🚨 RUGGED! Cue ball pocketed (-1 liquidity).");
             } else {
               pottedThisTurn.push({type: b.type, num: b.num});
               balls.splice(i, 1);
@@ -534,13 +534,13 @@
             foulOccurred = true;
           } else if (!firstBallHit) {
             foulOccurred = true;
-            showToast("⚠️ Foul: Hit no balls!");
+            showToast("⚠️ Foul: Empty block, hit nothing!");
           } else if (playerGroup && firstBallHit.type !== playerGroup && firstBallHit.type !== 'black') {
             foulOccurred = true;
-            showToast("⚠️ Foul: Hit opponent group first!");
+            showToast("⚠️ Foul: Hit opponent bag first!");
           } else if (!playerGroup && firstBallHit.type === 'black') {
             foulOccurred = true;
-            showToast("⚠️ Foul: Hit the 8-ball first while table is open!");
+            showToast("⚠️ Foul: Hit the Mega Whale 8-ball while market was open!");
           }
 
           if (foulOccurred) {
@@ -550,10 +550,10 @@
                                      (playerGroup === 'stripes' && remainingStripes > 0) ||
                                      (!playerGroup && (remainingSolids > 0 || remainingStripes > 0));
             if (playerHasBallsLeft) {
-              triggerEndGame(false, "💀 REKT! You pocketed the 8-ball before clearing your group!");
+              triggerEndGame(false, "💀 REKT! You pocketed the 8-ball before clearing your portfolio!");
               return;
             } else {
-              triggerEndGame(true, "🏆 VICTORY! You cleared your group and sank the 8-ball!");
+              triggerEndGame(true, "🚀 TO THE MOON! Portfolio cleared and 8-ball bagged!");
               return;
             }
           } else {
@@ -564,7 +564,7 @@
                   playerGroup = firstPot.type;
                   aiGroup = playerGroup === 'solids' ? 'stripes' : 'solids';
                   document.getElementById('groupDisplay').innerText = playerGroup.toUpperCase() + ' (YOURS)';
-                  showToast(`🎯 GROUP CLAIMED: You are ${playerGroup.toUpperCase()}!`);
+                  showToast(`🎯 BAG LOCKED: You are trading ${playerGroup.toUpperCase()}!`);
                 }
               }
 
@@ -573,12 +573,12 @@
 
               if (scoredOwnGroup && !scoredOpponentGroup) {
                 continueTurn = true;
-                showToast("🔥 EXTRA SHOT! Clean pot!");
+                showToast("🔥 DIAMOND HANDS! Clean bag secured, extra shift!");
               } else {
-                showToast("⚠️ Mixed group potted. Turn switches.");
+                showToast("⚠️ Mixed bags potted. Shift handed to the whale.");
               }
             } else {
-              showToast("📉 Missed! Turn switches.");
+              showToast("📉 PAPER HANDS! Missed completely.");
             }
           }
         } else {
@@ -587,10 +587,10 @@
                                (!aiGroup && (remainingSolids > 0 || remainingStripes > 0));
           if (pottedBlack) {
             if (aiHasBallsLeft) {
-              triggerEndGame(true, "🎉 COMPUTER ERROR! AI pocketed the 8-ball early and lost!");
+              triggerEndGame(true, "🎉 WHALE ERROR! The computer rugged itself by sinking the 8-ball early!");
               return;
             } else {
-              triggerEndGame(false, "💀 DEFEAT! The computer cleared its table and sank the 8-ball.");
+              triggerEndGame(false, "💀 LIQUIDATED! The whale cleared its bags and bagged the 8-ball.");
               return;
             }
           }
@@ -604,12 +604,12 @@
         firstBallHit = null;
 
         if (!continueTurn) {
-          turn = turn === 'Player' ? 'Computer' : 'Player';
-          document.getElementById('turnDisplay').innerText = turn === 'Player' ? 'PLAYER (SOLIDS/STRIPES)' : 'COMPUTER';
-          if (turn === 'Computer') {
+          turn = turn === 'Player' ? 'Computer (Whale)' : 'Player';
+          document.getElementById('turnDisplay').innerText = turn === 'Player' ? 'APE (SOLIDS/STRIPES)' : 'WHALE BOT';
+          if (turn === 'Computer (Whale)') {
             setTimeout(aiTurn, 1000);
           }
-        } else if (turn === 'Computer') {
+        } else if (turn === 'Computer (Whale)') {
           setTimeout(aiTurn, 1000);
         }
       }
@@ -625,7 +625,7 @@
       const desc = document.getElementById('modalDesc');
 
       modal.style.display = 'flex';
-      title.innerText = isWin ? "🏆 MATCH WON!" : "💀 MATCH LOST!";
+      title.innerText = isWin ? "🚀 BAGS MOONING!" : "💀 TOTALLY RUGGED!";
       desc.innerText = customDesc;
     }
 
