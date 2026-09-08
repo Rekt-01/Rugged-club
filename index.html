@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v14.2 - Space Command</title>
+  <title>The Rugged Bar v14.3 - Space Command</title>
   <style>
     * {
       box-sizing: border-box;
@@ -42,138 +42,10 @@
       .scene-container { width: 56.25vh; height: 100vh; }
     }
 
-    /* --- SPACESHIP COCKPIT ENVIRONMENT --- */
-    .space-view {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle at center, #0f1026 0%, #05050a 60%, #000000 100%);
-      z-index: 1;
-      overflow: hidden;
-      transition: filter 1.5s ease;
-    }
-
-    .stars {
-      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-      background-image: 
-        radial-gradient(1px 1.5px at 20px 30px, #fff, rgba(0,0,0,0)),
-        radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
-        radial-gradient(1.5px 1.5px at 90px 40px, #00ffcc, rgba(0,0,0,0)),
-        radial-gradient(1px 1.5px at 160px 120px, #fff, rgba(0,0,0,0));
-      background-repeat: repeat;
-      background-size: 200px 200px;
-      opacity: 0.7;
-      animation: spaceDrift 100s linear infinite;
-    }
-    @keyframes spaceDrift {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(200px); }
-    }
-
-    .earth-planet {
-      position: absolute; top: 20%; left: 50%; transform: translateX(-50%) scale(1);
-      font-size: 75px;
-      z-index: 2;
-      filter: drop-shadow(0 0 15px rgba(77, 166, 255, 0.6));
-      transition: transform 2.4s cubic-bezier(0.7, 0, 0.2, 1), filter 2s ease;
-    }
-
-    .cockpit-dashboard {
-      position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
-      background: linear-gradient(0deg, #111216 0%, #1a1b24 85%, rgba(26,27,36,0) 100%);
-      border-top: 4px solid #2a2c3d;
-      z-index: 4;
-      clip-path: polygon(0% 15%, 15% 0%, 85% 0%, 100% 15%, 100% 100%, 0% 100%);
-      padding: 12px 15px;
-      display: flex; flex-direction: column; justify-content: flex-end;
-      box-shadow: inset 0 15px 25px rgba(0,255,204,0.05);
-      transition: transform 1s ease-in;
-    }
-
-    .cockpit-windows-frame {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      border: 12px solid rgba(17, 18, 22, 0.95);
-      border-bottom: none; z-index: 3; pointer-events: none;
-      box-shadow: inset 0 0 40px rgba(0,0,0,0.9);
-    }
-
-    .telemetry-hud {
-      background: rgba(20, 0, 0, 0.6);
-      border: 1px solid rgba(255, 51, 51, 0.5);
-      border-radius: 6px;
-      padding: 6px 10px;
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: monospace;
-      font-size: 0.6rem;
-      color: #ff3333;
-      box-shadow: inset 0 0 8px rgba(255,51,51,0.15);
-    }
-    .telemetry-hud span.val {
-      color: #fff;
-      font-weight: bold;
-      text-shadow: 0 0 5px #ff3333;
-    }
-
-    /* --- Windows / PuTTY Terminal Style --- */
-    .spaceship-terminal {
-      background: #000000;
-      border: 2px solid #555555;
-      border-radius: 2px;
-      height: 155px;
-      padding: 6px 8px;
-      display: flex; flex-direction: column;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
-      margin-bottom: 8px;
-      position: relative;
-    }
-
-    .terminal-header {
-      display: flex; justify-content: space-between; align-items: center;
-      font-family: 'Consolas', 'Courier New', monospace; 
-      font-size: 0.65rem; color: #ffffff; background: #000080;
-      padding: 2px 4px; margin-bottom: 5px;
-    }
-
-    .terminal-screen-content {
-      flex: 1; overflow-y: auto; 
-      font-family: 'Consolas', 'Courier New', monospace; 
-      font-size: 0.7rem;
-      color: #cccccc;
-      line-height: 1.35; white-space: pre-wrap;
-    }
-    .terminal-screen-content::-webkit-scrollbar { width: 6px; }
-    .terminal-screen-content::-webkit-scrollbar-thumb { background: #555; }
-
-    .terminal-cursor {
-      display: inline-block;
-      width: 7px;
-      height: 12px;
-      background: #cccccc;
-      vertical-align: middle;
-      animation: cursorBlink 1s infinite;
-      margin-left: 2px;
-    }
-    @keyframes cursorBlink {
-      0%, 50% { opacity: 1; }
-      51%, 100% { opacity: 0; }
-    }
-
-    .viewport.hyperdrive .earth-planet {
-      transform: translateX(-50%) scale(22);
-      filter: drop-shadow(0 0 50px #fff) drop-shadow(0 0 100px #4da6ff);
-    }
-    .viewport.hyperdrive .cockpit-dashboard {
-      transform: translateY(120%);
-    }
-    .viewport.hyperdrive .stars {
-      animation-duration: 0.25s;
-    }
-
     /* --- CLUBHOUSE BAR ENVIRONMENT --- */
     .clubhouse-bg {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: url('clubhouse.JPG') center center / cover no-repeat;
+      background: #15161e radial-gradient(circle at center, #222536 0%, #0d0e14 100%);
       transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1), filter 0.5s ease;
       z-index: 1; opacity: 0;
     }
@@ -327,7 +199,10 @@
       border: 2px solid #555; border-radius: 6px;
       box-shadow: 0 0 12px rgba(0,0,0,0.9), inset 0 0 5px rgba(255,255,255,0.2);
       transform: translateY(-50%);
+      cursor: pointer;
+      transition: filter 0.2s ease;
     }
+    .handle:hover { filter: brightness(1.3); }
     .door-left .handle { right: 45px; }
     .door-right .handle { left: 45px; }
 
@@ -515,30 +390,9 @@
 </head>
 <body>
 
-  <div class="viewport" id="scene">
+  <div class="viewport bar-active" id="scene">
     <div class="scene-container">
       
-      <div class="space-view" id="spaceView">
-        <div class="stars"></div>
-        <div class="earth-planet" id="earthPlanet">🌎</div>
-        <div class="cockpit-windows-frame"></div>
-        
-        <div class="cockpit-dashboard" id="cockpitDashboard">
-          <div class="telemetry-hud">
-            <span>MISSION STATUS: EMERGENCY ABORT</span>
-            <span>TARGET: EARTH HOME</span>
-          </div>
-
-          <div class="spaceship-terminal">
-            <div class="terminal-header">
-              <span>Command Prompt - RUG_ALERT.log</span>
-              <span id="terminalStatus">STANDBY</span>
-            </div>
-            <div class="terminal-screen-content" id="terminalText">Awaiting flight sequence initialization...<span class="terminal-cursor"></span></div>
-          </div>
-        </div>
-      </div>
-
       <div class="clubhouse-bg"></div>
       
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
@@ -566,7 +420,7 @@
     </div>
 
     <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-    <div class="door-version">v14.2</div>
+    <div class="door-version">v14.3</div>
 
     <div class="front-buttons-container">
       <button class="degen-action-btn enter-btn" onclick="openDoors()">
@@ -580,8 +434,8 @@
     </div>
 
     <div class="doors-container">
-      <div class="door door-left"><div class="handle"></div></div>
-      <div class="door door-right"><div class="handle"></div></div>
+      <div class="door door-left"><div class="handle" onclick="openDoors()"></div></div>
+      <div class="door door-right"><div class="handle" onclick="openDoors()"></div></div>
     </div>
   </div>
 
@@ -607,7 +461,7 @@
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
       <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.2</div>
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.3</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
@@ -652,88 +506,13 @@
   </div>
 
   <script>
-    const ruggedTerminalText = "SYS_ALERT: INCOMING TRANSMISSION FROM [WALLET: 0xDEAD...BEEF]\nDECRYPTING... [DONE]\n\n--------------------------------------------------\n[CRITICAL] DEV WALLET DRAINED - 420 ETH TRANSFERRED TO TORNADO CASH\n[STATUS] \"MOON MISSION\" RUGGED. LIQUIDITY PULLED.\n[ERROR] FLOOR PRICE: 0.0000 ETH\n--------------------------------------------------\n\nRE-CALIBRATING NAVIGATION MATRIX...\nOLD DESTINATION: THE MOON (CANCELLED)\nNEW TARGET: SHITCOIN CASINO // REKT SECTOR\n\nRADAR SWEEP: [ / ] WIPING DISCORD CHANNELS...\nRADAR SWEEP: [ - ] DELETING TWITTER ACCOUNT...\nRADAR SWEEP: [ \\ ] DUSTING OFF THE LAUNCHPAD...\nRADAR SWEEP: [ | ] DEPLOYING SMART CONTRACT V2: \"ELONPUMP_INU\"\n\nENTER NEW CONTRACT ADDRESS > ";
-
-    let isTyping = false;
-
-    function startRuggedStream() {
-      if (isTyping) return;
-      isTyping = true;
-      
-      const statusEl = document.getElementById('terminalStatus');
-      if (statusEl) statusEl.innerText = 'CONNECTED';
-      
-      const terminalBox = document.getElementById('terminalText');
-      if (!terminalBox) return;
-      
-      terminalBox.innerText = "";
-      
-      let charIndex = 0;
-      function typeNextChar() {
-        if (charIndex < ruggedTerminalText.length) {
-          terminalBox.innerText = ruggedTerminalText.substring(0, charIndex + 1);
-          
-          let cursor = document.createElement('span');
-          cursor.className = 'terminal-cursor';
-          terminalBox.appendChild(cursor);
-
-          terminalBox.scrollTop = terminalBox.scrollHeight;
-          charIndex++;
-          
-          setTimeout(typeNextChar, 45);
-        } else {
-          terminalBox.innerHTML += "\n\n> WARP ENGINES ENGAGING...";
-          let cursor = document.createElement('span');
-          cursor.className = 'terminal-cursor';
-          terminalBox.appendChild(cursor);
-          terminalBox.scrollTop = terminalBox.scrollHeight;
-          
-          if (statusEl) statusEl.innerText = 'TRANSMITTING';
-          
-          setTimeout(() => {
-            triggerHyperdrive();
-          }, 1200);
-        }
-      }
-      typeNextChar();
-    }
-
     window.addEventListener('load', () => {
-      // Check if URL parameters request the bar to load with open doors directly
+      const scene = document.getElementById('scene');
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('doors') === 'open') {
-        const scene = document.getElementById('scene');
-        const spaceView = document.getElementById('spaceView');
-        if (spaceView) spaceView.style.display = 'none';
-        scene.classList.add('bar-active');
         scene.classList.add('open');
-      } else {
-        setTimeout(() => {
-          startRuggedStream();
-        }, 1000);
       }
     });
-
-    let moonMiles = 238900;
-    setInterval(() => {
-      if (moonMiles > 235000) {
-        moonMiles -= Math.floor(Math.random() * 12) + 3;
-        const distEl = document.getElementById('moonDistanceVal');
-        if (distEl) distEl.innerText = moonMiles.toLocaleString();
-      }
-    }, 2000);
-
-    function triggerHyperdrive() {
-      const scene = document.getElementById('scene');
-      scene.classList.add('hyperdrive');
-      
-      setTimeout(() => {
-        scene.classList.remove('hyperdrive');
-        scene.classList.add('bar-active');
-        const spaceView = document.getElementById('spaceView');
-        if (spaceView) spaceView.style.display = 'none';
-      }, 2300);
-    }
 
     let isLightsOff = false;
     let speechBubbleTimer = null;
