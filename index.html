@@ -101,6 +101,46 @@
     }
     .otter-hotspot:hover, .otter-hotspot:active { background: rgba(32, 129, 226, 0.25); }
 
+    /* --- ROCKET LINK ELEMENT (FRONT TABLE) --- */
+    .rocket-table-link {
+      position: absolute;
+      top: 59.5%;
+      left: 60.5%;
+      width: 7%;
+      height: 18%;
+      z-index: 4;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .viewport.open .rocket-table-link { display: flex; }
+    .rocket-table-link:hover {
+      transform: scale(1.08) translateY(-4px);
+    }
+    .rocket-icon {
+      font-size: 2.2rem;
+      filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.8));
+      line-height: 1;
+      transform: rotate(0deg); /* Standing straight up */
+    }
+    .moon-indes-badge {
+      font-family: monospace;
+      font-size: 0.55rem;
+      font-weight: bold;
+      color: #00ffcc;
+      background: rgba(0, 0, 0, 0.85);
+      border: 1px solid #00ffcc;
+      padding: 2px 5px;
+      border-radius: 4px;
+      margin-top: 2px;
+      box-shadow: 0 0 6px rgba(0, 255, 204, 0.5);
+      white-space: nowrap;
+    }
+
     .top-controls-bar {
       position: absolute; top: 23%; left: 50%; transform: translateX(-50%);
       width: 92%; max-width: 420px; display: flex; justify-content: space-between;
@@ -401,6 +441,11 @@
       <div class="hotspot table-hotspot" onclick="openWebModal('desk')"></div>
       <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
+
+      <a href="moon.html" target="_blank" class="rocket-table-link" title="moon.indes">
+        <div class="rocket-icon">🚀</div>
+        <div class="moon-indes-badge">moon.indes</div>
+      </a>
     </div>
 
     <div class="top-controls-bar">
