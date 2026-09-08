@@ -215,7 +215,7 @@
     let frightTimer = 0;
 
     // Map Legend: 
-    // 1 = Wall, 0 = Chain Link ⛓️, 2 = Empty Path, 3 = Diamond 💎, 4 = Money Bag 💰
+    // 1 = Wall, 0 = Classic Dot, 2 = Empty Path, 3 = Diamond 💎, 4 = Money Bag 💰
     const map = [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
@@ -242,7 +242,7 @@
 
     let currentMap = JSON.parse(JSON.stringify(map));
 
-    // Player character: 🦍 APE-man (speed divisor set cleanly to 1 to stick precisely to grid lanes)
+    // Player character: 🦍 APE-man (locked strictly to grid lines)
     let player = {
       x: 9 * tileSize,
       y: 16 * tileSize,
@@ -278,16 +278,14 @@
 
       if (frightTimer > 0) frightTimer--;
 
-      // Precise grid intersection alignment handling to prevent wall clipping / out of bounds
+      // Precise grid intersection alignment handling
       if (player.x % tileSize === 0 && player.y % tileSize === 0) {
-        // Check if next intended direction is clear
         let nextTx = Math.floor(player.x / tileSize) + player.nextDx;
         let nextTy = Math.floor(player.y / tileSize) + player.nextDy;
         if (nextTx >= 0 && nextTx < 19 && nextTy >= 0 && nextTy < 21 && currentMap[nextTy][nextTx] !== 1) {
           player.dx = player.nextDx;
           player.dy = player.nextDy;
         }
-        // Stop if current heading hits a wall
         let currTx = Math.floor(player.x / tileSize) + player.dx;
         let currTy = Math.floor(player.y / tileSize) + player.dy;
         if (currTx < 0 || currTx >= 19 || currTy < 0 || currTy >= 21 || currentMap[currTy][currTx] === 1) {
@@ -303,7 +301,7 @@
       if (player.x < 0) player.x = 18 * tileSize;
       if (player.x >= 19 * tileSize) player.x = 0;
 
-      // Eat items on path (Chain links ⛓️, Money bags 💰, Diamonds 💎)
+      // Eat items on path (Dots, Money bags 💰, Diamonds 💎)
       let pCol = Math.floor((player.x + tileSize/2) / tileSize);
       let pRow = Math.floor((player.y + tileSize/2) / tileSize);
       if (pCol >= 0 && pCol < 19 && pRow >= 0 && pRow < 21) {
@@ -400,22 +398,11 @@
             ctx.lineWidth = 0.5;
             ctx.strokeRect(c * tileSize, r * tileSize, tileSize, tileSize);
           } else if (currentMap[r][c] === 0) {
-            // Chains ⛓️: Horizontal corridors = sideways, Vertical corridors = normal
-            let leftOpen = (c > 0 && currentMap[r][c-1] !== 1);
-            let rightOpen = (c < 18 && currentMap[r][c+1] !== 1);
-            let isHorizontalCorridor = leftOpen || rightOpen;
-
-            ctx.save();
-            ctx.translate(c * tileSize + 8, r * tileSize + 8);
-            if (isHorizontalCorridor) {
-              ctx.rotate(Math.PI / 2); // Rotated sideways on horizontal stretches
-            }
-            ctx.font = '11px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('⛓️', 0, 0);
-            ctx.restore();
-
+            // Classic Dot
+            ctx.fillStyle = '#ffcc00';
+            ctx.beginPath();
+            ctx.arc(c * tileSize + 8, r * tileSize + 8, 2.5, 0, Math.PI * 2);
+            ctx.fill();
           } else if (currentMap[r][c] === 4) {
             // Money Bag 💰
             ctx.font = '13px sans-serif';
