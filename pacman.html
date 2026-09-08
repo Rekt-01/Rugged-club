@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PACMAN.HTML - Degen NFT Edition</title>
+  <title>pacman.html - APE-man Edition</title>
   <style>
     * {
       box-sizing: border-box;
@@ -175,7 +175,7 @@
 
   <div class="arcade-container">
     <div class="header-bar">
-      <div class="title-text">🪙 PACMAN.HTML: NFT FLEECE RUN</div>
+      <div class="title-text">🦍 APE-man: CHASE THE DEV 🦦</div>
       <a href="index.html" class="exit-btn">🚪 EXIT</a>
     </div>
 
@@ -199,7 +199,7 @@
   <div class="modal-overlay" id="endGameModal">
     <div class="modal-card">
       <div class="modal-title" id="modalTitle">GAME OVER</div>
-      <div class="modal-desc" id="modalDesc">You got rekt by the otter syndicate.</div>
+      <div class="modal-desc" id="modalDesc">The dev otter rugged your bags!</div>
       <button class="modal-btn" onclick="resetGame()">APE BACK IN 🔄</button>
     </div>
   </div>
@@ -241,7 +241,7 @@
 
     let currentMap = JSON.parse(JSON.stringify(map));
 
-    // Player character: 🦍 (ape)
+    // Player character: 🦍 APE-man (slightly slowed down using fractional speed step like 0.8)
     let player = {
       x: 9 * tileSize,
       y: 16 * tileSize,
@@ -249,15 +249,15 @@
       dy: 0,
       nextDx: 0,
       nextDy: 0,
-      speed: 1
+      speed: 0.8
     };
 
-    // Ghosts: 🦦 Otters syndicate
+    // Ghosts: 🦦 The Devs
     let ghosts = [
-      { x: 9 * tileSize, y: 9 * tileSize, dx: 1, dy: 0, color: '#ff3333', baseSpeed: 1 },
-      { x: 8 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, color: '#33ff33', baseSpeed: 1 },
-      { x: 9 * tileSize, y: 10 * tileSize, dx: 0, dy: -1, color: '#3333ff', baseSpeed: 1 },
-      { x: 10 * tileSize, y: 10 * tileSize, dx: 0, dy: 1, color: '#ffff33', baseSpeed: 1 }
+      { x: 9 * tileSize, y: 9 * tileSize, dx: 1, dy: 0, baseSpeed: 1 },
+      { x: 8 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, baseSpeed: 1 },
+      { x: 9 * tileSize, y: 10 * tileSize, dx: 0, dy: -1, baseSpeed: 1 },
+      { x: 10 * tileSize, y: 10 * tileSize, dx: 0, dy: 1, baseSpeed: 1 }
     ];
 
     function setDirection(x, y) {
@@ -284,15 +284,17 @@
 
       if (frightTimer > 0) frightTimer--;
 
-      // Try turning next direction if aligned
-      if (player.x % tileSize === 0 && player.y % tileSize === 0) {
+      // Try turning next direction if perfectly aligned on tile grid
+      if (Math.abs(player.x % tileSize) < 0.001 && Math.abs(player.y % tileSize) < 0.001) {
+        player.x = Math.round(player.x);
+        player.y = Math.round(player.y);
+
         let nextTx = Math.floor(player.x / tileSize) + player.nextDx;
         let nextTy = Math.floor(player.y / tileSize) + player.nextDy;
         if (nextTx >= 0 && nextTx < 19 && nextTy >= 0 && nextTy < 21 && currentMap[nextTy][nextTx] !== 1) {
           player.dx = player.nextDx;
           player.dy = player.nextDy;
         }
-        // Stop if hitting wall in current direction
         let currTx = Math.floor(player.x / tileSize) + player.dx;
         let currTy = Math.floor(player.y / tileSize) + player.dy;
         if (currTx >= 0 && currTx < 19 && currTy >= 0 && currTy < 21 && currentMap[currTy][currTx] === 1) {
@@ -318,20 +320,19 @@
         } else if (currentMap[pRow][pCol] === 3) {
           currentMap[pRow][pCol] = 2;
           score += 50;
-          frightTimer = 350; // Otter panic mode
+          frightTimer = 350; // Dev panic mode
         }
       }
 
       document.getElementById('scoreDisplay').innerText = score;
       document.getElementById('livesDisplay').innerText = lives;
 
-      // Move ghosts
+      // Move ghosts (Devs)
       ghosts.forEach(g => {
         if (g.x % tileSize === 0 && g.y % tileSize === 0) {
           let directions = [
             {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
           ];
-          // Filter out walls and immediate reverse direction if possible
           let valid = directions.filter(d => {
             let ntx = Math.floor(g.x / tileSize) + d.dx;
             let nty = Math.floor(g.y / tileSize) + d.dy;
@@ -345,14 +346,14 @@
           }
         }
 
-        g.x += g.dx * (frightTimer > 0 ? 0.5 : 1);
-        g.y += g.dy * (frightTimer > 0 ? 0.5 : 1);
+        g.x += g.dx * (frightTimer > 0 ? 0.4 : 1);
+        g.y += g.dy * (frightTimer > 0 ? 0.4 : 1);
 
         // Check collision with player
         let dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
         if (dist < 10) {
           if (frightTimer > 0) {
-            // Eat otter syndicate
+            // Eat dev otter
             score += 200;
             g.x = 9 * tileSize;
             g.y = 9 * tileSize;
@@ -417,13 +418,13 @@
         }
       }
 
-      // Draw Player 🦍
+      // Draw Player 🦍 (APE-man)
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('🦍', player.x + 8, player.y + 8);
 
-      // Draw Ghosts 🦦
+      // Draw Ghosts 🦦 (The Dev Otters)
       ghosts.forEach(g => {
         ctx.fillText(frightTimer > 0 ? '💧' : '🦦', g.x + 8, g.y + 8);
       });
@@ -439,4 +440,3 @@
   </script>
 </body>
 </html>
-
