@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Degen Spaceship Cockpit - Elite Edition</title>
+    <title>Degen Spaceship Cockpit - Perfect Fit Edition</title>
     <style>
         * {
             box-sizing: border-box;
@@ -20,7 +20,7 @@
             -webkit-font-smoothing: antialiased;
         }
         
-        /* CRT Scanline Overlay */
+        /* Subtle CRT Scanline Overlay */
         body::after {
             content: " ";
             display: block;
@@ -39,79 +39,79 @@
             flex-direction: column;
             background: #020307;
             position: relative;
+            overflow: hidden;
         }
 
-        /* --- UPPER VIEWPORT WINDOW --- */
+        /* --- UPPER VIEWPORT WINDOW (Smaller Moon) --- */
         .window-frame {
-            height: 38vh;
-            min-height: 180px;
+            height: 32vh;
+            min-height: 140px;
             background: radial-gradient(circle at center, #070b19 0%, #010204 100%);
             position: relative;
             overflow: hidden;
-            border-bottom: 6px solid #111827;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 5px 15px rgba(0,0,0,0.8);
+            border-bottom: 4px solid #111827;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
         }
 
         .stars {
             position: absolute;
             width: 200%;
             height: 200%;
-            background-image: radial-gradient(white 1.5px, transparent 0);
-            background-size: 35px 35px;
+            background-image: radial-gradient(white 1.2px, transparent 0);
+            background-size: 30px 30px;
             opacity: 0.85;
             z-index: 1;
-            animation: drift-stars 100s linear infinite;
+            animation: drift-stars 120s linear infinite;
         }
         @keyframes drift-stars {
             from { transform: translate(0, 0); }
             to { transform: translate(-50%, -50%); }
         }
 
-        .distant-moon {
+        /* Realistic, Smaller Distant Moon */
+        .realistic-moon {
             position: absolute;
-            width: min(170px, 38vw);
-            height: min(170px, 38vw);
-            background: radial-gradient(circle at 35% 35%, #94a3b8 0%, #334155 50%, #090d16 90%);
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle at 30% 30%, #cbd5e1 0%, #64748b 45%, #1e293b 80%, #0f172a 100%);
             border-radius: 50%;
-            top: 45%;
-            left: 55%;
+            top: 42%;
+            left: 60%;
             transform: translate(-50%, -50%);
-            box-shadow: inset -20px -20px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(56, 189, 248, 0.25);
+            box-shadow: inset -12px -12px 20px rgba(0, 0, 0, 0.95), 0 0 15px rgba(56, 189, 248, 0.2);
             z-index: 2;
         }
 
-        .moon-crater {
+        .lunar-crater {
             position: absolute;
-            background: rgba(10, 15, 25, 0.8);
+            background: rgba(15, 23, 42, 0.65);
             border-radius: 50%;
-            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.9);
+            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8);
         }
-        .mc1 { width: 26%; height: 14%; top: 25%; left: 22%; transform: rotate(-15deg); }
-        .mc2 { width: 20%; height: 18%; top: 52%; left: 52%; }
-        .mc3 { width: 32%; height: 15%; top: 42%; left: 15%; transform: rotate(20deg); }
+        .lc1 { width: 22%; height: 14%; top: 28%; left: 25%; transform: rotate(-15deg); }
+        .lc2 { width: 30%; height: 20%; top: 50%; left: 45%; }
+        .lc3 { width: 18%; height: 18%; top: 25%; left: 60%; }
 
         .distant-flag {
             position: absolute;
-            top: 38%;
-            left: 44%;
-            font-size: min(22px, 5.5vw);
+            top: 36%;
+            left: 52%;
+            font-size: 14px;
             z-index: 3;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.9));
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.9));
         }
 
 
-        /* --- LOWER DASHBOARD (Fully Scrollable & Clean on Mobile) --- */
+        /* --- LOWER DASHBOARD (Scaled to fit mobile screen without clipping) --- */
         .dashboard {
-            flex: 1;
+            height: 68vh;
             background: linear-gradient(180deg, #0b0f19 0%, #04060a 100%);
             display: grid;
-            grid-template-columns: 1fr 1.3fr 1fr;
-            padding: 10px;
-            gap: 10px;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            padding: 8px;
+            gap: 6px;
             border-top: 3px solid #1f2937;
-            box-shadow: inset 0 20px 30px rgba(0,0,0,0.9);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            box-shadow: inset 0 15px 25px rgba(0,0,0,0.9);
             position: relative;
             z-index: 10;
         }
@@ -119,22 +119,23 @@
         .console-panel {
             background: linear-gradient(145deg, #070a12, #04060a);
             border: 2px solid #1e293b;
-            border-radius: 8px;
-            padding: 8px;
+            border-radius: 6px;
+            padding: 6px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 4px 6px rgba(0,0,0,0.4);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            min-height: 0;
         }
 
         /* High-End Futuristic Screens */
         .screen-monitor {
             width: 100%;
-            height: 85px;
+            height: 55px;
             background: radial-gradient(circle, #001e3d 0%, #000814 100%);
             border: 2px solid #0284c7;
-            border-radius: 6px;
-            box-shadow: inset 0 0 15px rgba(2, 132, 199, 0.4), 0 0 8px rgba(2, 132, 199, 0.2);
+            border-radius: 5px;
+            box-shadow: inset 0 0 12px rgba(2, 132, 199, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -150,13 +151,13 @@
         }
         .screen-content {
             color: #38bdf8;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
-            letter-spacing: 0.5px;
-            line-height: 1.4;
+            letter-spacing: 0.4px;
+            line-height: 1.3;
             text-align: center;
             padding: 2px;
-            text-shadow: 0 0 5px rgba(56, 189, 248, 0.8);
+            text-shadow: 0 0 4px rgba(56, 189, 248, 0.8);
         }
 
         .center-console {
@@ -166,36 +167,37 @@
             justify-content: space-between;
             background: linear-gradient(145deg, #090e18, #05070d);
             border: 2px solid #334155;
-            border-radius: 8px;
-            padding: 8px;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+            border-radius: 6px;
+            padding: 6px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            min-height: 0;
         }
 
         .warning-grid {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            gap: 3px;
+            gap: 2px;
             width: 100%;
             background: #010204;
-            padding: 4px;
-            border-radius: 4px;
+            padding: 3px;
+            border-radius: 3px;
             border: 1px solid #1e293b;
         }
 
         .warn-light {
-            height: 14px;
+            height: 11px;
             background: #dc2626;
             border-radius: 2px;
-            box-shadow: 0 0 6px #ef4444;
+            box-shadow: 0 0 5px #ef4444;
             animation: pulse-light 1.2s infinite alternate;
         }
         .warn-light.orange {
             background: #ea580c;
-            box-shadow: 0 0 6px #f97316;
+            box-shadow: 0 0 5px #f97316;
         }
         @keyframes pulse-light {
             0% { opacity: 0.4; }
-            100% { opacity: 1; box-shadow: 0 0 10px #ff3300; }
+            100% { opacity: 1; box-shadow: 0 0 8px #ff3300; }
         }
 
         /* --- INTERACTIVE DIALS --- */
@@ -203,35 +205,35 @@
             display: flex;
             justify-content: space-around;
             width: 100%;
-            gap: 6px;
+            gap: 4px;
         }
         .dial-box {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 3px;
+            gap: 2px;
         }
         .dial-label {
-            font-size: 8px;
+            font-size: 7.5px;
             color: #94a3b8;
             font-weight: bold;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
         .dial {
-            width: 52px;
-            height: 52px;
-            border: 3px solid #475569;
+            width: 44px;
+            height: 44px;
+            border: 2px solid #475569;
             border-radius: 50%;
             background: radial-gradient(circle, #1e293b 0%, #020617 85%);
             position: relative;
-            box-shadow: inset 0 0 8px #000, 0 3px 6px rgba(0,0,0,0.6);
+            box-shadow: inset 0 0 6px #000, 0 2px 4px rgba(0,0,0,0.6);
             cursor: pointer;
             touch-action: manipulation;
         }
         .dial::before {
             content: '';
             position: absolute;
-            inset: 5px;
+            inset: 4px;
             border: 1px dashed #64748b;
             border-radius: 50%;
         }
@@ -239,61 +241,59 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 3px;
+            width: 2.5px;
             height: 38%;
             background: #22c55e;
             transform-origin: top center;
             transform: translate(-50%, 0) rotate(0deg);
-            box-shadow: 0 0 6px #22c55e;
+            box-shadow: 0 0 5px #22c55e;
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .copium-dial .dial-needle {
             background: #a855f7;
-            box-shadow: 0 0 6px #a855f7;
+            box-shadow: 0 0 5px #a855f7;
         }
         .dial-value {
-            font-size: 9px;
+            font-size: 8.5px;
             color: #fff;
             font-weight: bold;
-            text-shadow: 0 0 4px rgba(255,255,255,0.5);
         }
 
         .switch-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
+            gap: 3px;
         }
         .toggle-switch {
-            height: 12px;
+            height: 10px;
             background: linear-gradient(90deg, #1e293b, #0f172a);
             border: 1px solid #475569;
             border-radius: 2px;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
         }
 
         .action-btns {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
         }
 
-        /* Upgraded Slick Action Buttons */
+        /* Perfectly Sized Action Buttons */
         .action-btn {
             display: block;
             border: 1px solid rgba(255,255,255,0.2);
-            padding: 7px 4px;
-            border-radius: 5px;
+            padding: 6px 2px;
+            border-radius: 4px;
             font-weight: bold;
             font-family: monospace;
-            font-size: 10px;
+            font-size: 9.5px;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
             width: 100%;
             text-align: center;
             text-decoration: none;
             touch-action: manipulation;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.3);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.3);
             transition: transform 0.1s ease;
         }
         .action-btn:active { transform: scale(0.96); }
@@ -303,7 +303,7 @@
         .return-btn { background: linear-gradient(180deg, #4ade80, #16a34a); color: #000; text-shadow: 0 1px rgba(255,255,255,0.4); }
 
 
-        /* --- TERMINAL WINDOW MODAL --- */
+        /* --- TERMINAL MODAL WINDOW --- */
         .cmd-overlay {
             display: none;
             position: fixed;
@@ -315,103 +315,103 @@
             padding: 10px;
         }
         .cmd-window {
-            width: min(650px, 100%);
-            height: min(420px, 85vh);
+            width: min(600px, 100%);
+            height: min(380px, 85vh);
             background: #020408;
             border: 2px solid #22c55e;
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
+            border-radius: 6px;
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.3);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
         .cmd-header {
             background: #051b11;
-            padding: 8px 12px;
+            padding: 6px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #22c55e;
             color: #22c55e;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 10px;
         }
         .cmd-close {
             background: #dc2626;
             color: white;
             border: none;
-            padding: 4px 10px;
+            padding: 3px 8px;
             cursor: pointer;
             font-weight: bold;
             border-radius: 3px;
         }
         .cmd-body {
             flex: 1;
-            padding: 10px;
+            padding: 8px;
             overflow-y: auto;
             color: #22c55e;
-            font-size: 11px;
-            line-height: 1.5;
+            font-size: 10.5px;
+            line-height: 1.4;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
             -webkit-overflow-scrolling: touch;
         }
         .cmd-input-line {
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
+            gap: 5px;
+            padding: 6px 10px;
             background: #030806;
             border-top: 1px solid #14532d;
         }
-        .cmd-input-line span { color: #22c55e; font-weight: bold; font-size: 11px; }
+        .cmd-input-line span { color: #22c55e; font-weight: bold; font-size: 10px; }
         .cmd-input {
             flex: 1;
             background: transparent;
             border: none;
             color: #22c55e;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
+            font-size: 10.5px;
             outline: none;
         }
         .prompt-list-help {
             color: #38bdf8;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             border-bottom: 1px dashed #1e293b;
-            padding-bottom: 6px;
+            padding-bottom: 4px;
         }
 
-        /* --- MOBILE LAYOUT FIX --- */
+        /* --- MOBILE LAYOUT ADJUSTMENT FOR 1-SCREEN VIEW --- */
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
-                grid-template-rows: repeat(3, auto);
-                gap: 8px;
-                padding: 8px;
+                grid-template-rows: repeat(3, 1fr);
+                gap: 4px;
+                padding: 6px;
             }
-            .console-panel { min-height: 125px; }
-            .screen-monitor { height: 70px; }
-            .switch-grid { display: none; } /* Reduces visual clutter on mobile screens */
-            .window-frame { height: 32vh; }
+            .console-panel { padding: 4px; }
+            .screen-monitor { height: 42px; }
+            .switch-grid { display: none; } /* Keeps things compact and clean on phones */
+            .window-frame { height: 26vh; }
         }
     </style>
 </head>
 <body>
 
     <div class="cockpit-view">
-        <!-- TOP VIEWPORT WINDOW -->
+        <!-- TOP VIEWPORT WINDOW WITH SMALL MOON -->
         <div class="window-frame">
             <div class="stars"></div>
-            <div class="distant-moon">
-                <div class="moon-crater mc1"></div>
-                <div class="moon-crater mc2"></div>
-                <div class="moon-crater mc3"></div>
+            <div class="realistic-moon">
+                <div class="lunar-crater lc1"></div>
+                <div class="lunar-crater lc2"></div>
+                <div class="lunar-crater lc3"></div>
                 <div class="distant-flag">🇺🇸</div>
             </div>
         </div>
 
-        <!-- LOWER INSTRUMENT DASHBOARD -->
+        <!-- LOWER INSTRUMENT DASHBOARD (Fit entirely without clipping) -->
         <div class="dashboard">
             <!-- Left Console Panel -->
             <div class="console-panel">
@@ -466,7 +466,7 @@
             <!-- Right Console Panel -->
             <div class="console-panel">
                 <div class="screen-monitor" style="border-color: #0369a1;">
-                    <div class="screen-content" style="color: #34d399; text-shadow: 0 0 5px rgba(52,211,153,0.8);">
+                    <div class="screen-content" style="color: #34d399; text-shadow: 0 0 4px rgba(52,211,153,0.8);">
                         * TERMINAL READY *<br>
                         CORE TEMP: MELTING<br>
                         BRAINCELLS: 0
@@ -488,7 +488,7 @@
         </div>
     </div>
 
-    <!-- CMD TERMINAL WINDOW MODAL -->
+    <!-- CMD TERMINAL MODAL WINDOW -->
     <div class="cmd-overlay" id="cmdOverlay">
         <div class="cmd-window">
             <div class="cmd-header">
@@ -497,7 +497,7 @@
             </div>
             <div class="cmd-body" id="cmdBody">
                 <div class="prompt-list-help">
-                    SYSTEM ONLINE. Tap/type a command:<br>
+                    SYSTEM ONLINE. Tap a command:<br>
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('market')">market</b> | 
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('wife')">wife</b> | 
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('strategy')">strategy</b> | 
