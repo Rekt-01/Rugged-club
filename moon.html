@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Degen Spaceship Cockpit - Crisp Edition</title>
+    <title>Degen Spaceship Cockpit - Elite Edition</title>
     <style>
         * {
             box-sizing: border-box;
@@ -14,21 +14,19 @@
         body, html {
             width: 100%;
             height: 100%;
-            background-color: #000;
+            background-color: #020205;
             overflow: hidden;
             font-family: 'Courier New', Courier, monospace;
-            position: fixed;
-            -webkit-font-smoothing: antialiased; /* Crisp font rendering */
-            -moz-osx-font-smoothing: grayscale;
+            -webkit-font-smoothing: antialiased;
         }
         
-        /* Subtle Clean Scanlines */
+        /* CRT Scanline Overlay */
         body::after {
             content: " ";
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
             z-index: 999;
             background-size: 100% 3px;
             pointer-events: none;
@@ -39,18 +37,19 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            background: #030407;
+            background: #020307;
             position: relative;
         }
 
         /* --- UPPER VIEWPORT WINDOW --- */
         .window-frame {
-            flex: 1.2;
-            background: #010205;
+            height: 38vh;
+            min-height: 180px;
+            background: radial-gradient(circle at center, #070b19 0%, #010204 100%);
             position: relative;
             overflow: hidden;
-            clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%);
-            border-bottom: 6px solid #080c14;
+            border-bottom: 6px solid #111827;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 5px 15px rgba(0,0,0,0.8);
         }
 
         .stars {
@@ -58,10 +57,10 @@
             width: 200%;
             height: 200%;
             background-image: radial-gradient(white 1.5px, transparent 0);
-            background-size: 40px 40px;
-            opacity: 0.9;
+            background-size: 35px 35px;
+            opacity: 0.85;
             z-index: 1;
-            animation: drift-stars 120s linear infinite;
+            animation: drift-stars 100s linear infinite;
         }
         @keyframes drift-stars {
             from { transform: translate(0, 0); }
@@ -70,80 +69,94 @@
 
         .distant-moon {
             position: absolute;
-            width: min(220px, 45vw);
-            height: min(220px, 45vw);
-            background: radial-gradient(circle at 35% 35%, #94a3b8 0%, #334155 50%, #0f172a 90%);
+            width: min(170px, 38vw);
+            height: min(170px, 38vw);
+            background: radial-gradient(circle at 35% 35%, #94a3b8 0%, #334155 50%, #090d16 90%);
             border-radius: 50%;
-            top: 30%;
+            top: 45%;
             left: 55%;
             transform: translate(-50%, -50%);
-            box-shadow: inset -25px -25px 40px rgba(0, 0, 0, 0.9), 0 0 35px rgba(56, 189, 248, 0.2);
+            box-shadow: inset -20px -20px 35px rgba(0, 0, 0, 0.95), 0 0 25px rgba(56, 189, 248, 0.25);
             z-index: 2;
         }
 
         .moon-crater {
             position: absolute;
-            background: rgba(15, 23, 42, 0.7);
+            background: rgba(10, 15, 25, 0.8);
             border-radius: 50%;
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.9);
         }
-        .mc1 { width: 25%; height: 12%; top: 25%; left: 25%; transform: rotate(-15deg); }
-        .mc2 { width: 18%; height: 16%; top: 55%; left: 50%; }
-        .mc3 { width: 30%; height: 14%; top: 45%; left: 15%; transform: rotate(20deg); }
+        .mc1 { width: 26%; height: 14%; top: 25%; left: 22%; transform: rotate(-15deg); }
+        .mc2 { width: 20%; height: 18%; top: 52%; left: 52%; }
+        .mc3 { width: 32%; height: 15%; top: 42%; left: 15%; transform: rotate(20deg); }
 
         .distant-flag {
             position: absolute;
-            top: 40%;
-            left: 45%;
-            font-size: min(24px, 6vw);
+            top: 38%;
+            left: 44%;
+            font-size: min(22px, 5.5vw);
             z-index: 3;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.9));
         }
 
 
-        /* --- LOWER DASHBOARD --- */
+        /* --- LOWER DASHBOARD (Fully Scrollable & Clean on Mobile) --- */
         .dashboard {
-            min-height: 290px;
-            max-height: 440px;
-            background: linear-gradient(180deg, #0d111a 0%, #030407 100%);
+            flex: 1;
+            background: linear-gradient(180deg, #0b0f19 0%, #04060a 100%);
             display: grid;
-            grid-template-columns: 1fr 1.6fr 1fr;
-            padding: 12px;
-            gap: 12px;
-            border-top: 4px solid #1e293b;
-            box-shadow: inset 0 25px 35px rgba(0,0,0,0.9);
+            grid-template-columns: 1fr 1.3fr 1fr;
+            padding: 10px;
+            gap: 10px;
+            border-top: 3px solid #1f2937;
+            box-shadow: inset 0 20px 30px rgba(0,0,0,0.9);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             position: relative;
             z-index: 10;
         }
 
         .console-panel {
-            background: #06090f;
+            background: linear-gradient(145deg, #070a12, #04060a);
             border: 2px solid #1e293b;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 8px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 4px 6px rgba(0,0,0,0.4);
         }
 
-        /* CRISP Screens - No blur */
+        /* High-End Futuristic Screens */
         .screen-monitor {
             width: 100%;
-            height: clamp(95px, 14vh, 140px);
-            background: #00040a;
+            height: 85px;
+            background: radial-gradient(circle, #001e3d 0%, #000814 100%);
             border: 2px solid #0284c7;
-            border-radius: 4px;
-            box-shadow: inset 0 0 15px rgba(2, 132, 199, 0.2);
+            border-radius: 6px;
+            box-shadow: inset 0 0 15px rgba(2, 132, 199, 0.4), 0 0 8px rgba(2, 132, 199, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+        }
+        .screen-monitor::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 50%);
+            background-size: 100% 2px;
+            pointer-events: none;
         }
         .screen-content {
             color: #38bdf8;
-            font-size: clamp(10px, 1.3vw, 12px);
+            font-size: 10px;
             font-weight: bold;
             letter-spacing: 0.5px;
-            line-height: 1.5;
+            line-height: 1.4;
             text-align: center;
-            padding: 4px;
+            padding: 2px;
+            text-shadow: 0 0 5px rgba(56, 189, 248, 0.8);
         }
 
         .center-console {
@@ -151,72 +164,75 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            background: #080c14;
-            border: 2px solid #27272a;
-            border-radius: 6px;
+            background: linear-gradient(145deg, #090e18, #05070d);
+            border: 2px solid #334155;
+            border-radius: 8px;
             padding: 8px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
         }
 
         .warning-grid {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            gap: 4px;
+            gap: 3px;
             width: 100%;
-            background: #020305;
-            padding: 5px;
+            background: #010204;
+            padding: 4px;
             border-radius: 4px;
-            border: 1px solid #3f3f46;
+            border: 1px solid #1e293b;
         }
 
         .warn-light {
-            height: clamp(14px, 2.5vh, 20px);
+            height: 14px;
             background: #dc2626;
             border-radius: 2px;
-            animation: pulse-light 1.5s infinite alternate;
+            box-shadow: 0 0 6px #ef4444;
+            animation: pulse-light 1.2s infinite alternate;
         }
         .warn-light.orange {
             background: #ea580c;
+            box-shadow: 0 0 6px #f97316;
         }
         @keyframes pulse-light {
             0% { opacity: 0.4; }
-            100% { opacity: 1; }
+            100% { opacity: 1; box-shadow: 0 0 10px #ff3300; }
         }
 
-        /* --- INTERACTIVE DIALS (Fixed & Working) --- */
+        /* --- INTERACTIVE DIALS --- */
         .dials-container {
             display: flex;
             justify-content: space-around;
             width: 100%;
-            gap: 8px;
+            gap: 6px;
         }
         .dial-box {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
         }
         .dial-label {
-            font-size: 9px;
+            font-size: 8px;
             color: #94a3b8;
             font-weight: bold;
             letter-spacing: 1px;
         }
         .dial {
-            width: clamp(50px, 9vw, 65px);
-            height: clamp(50px, 9vw, 65px);
-            border: 3px solid #64748b;
+            width: 52px;
+            height: 52px;
+            border: 3px solid #475569;
             border-radius: 50%;
-            background: radial-gradient(circle, #0f172a 0%, #020617 80%);
+            background: radial-gradient(circle, #1e293b 0%, #020617 85%);
             position: relative;
-            box-shadow: inset 0 0 8px #000;
+            box-shadow: inset 0 0 8px #000, 0 3px 6px rgba(0,0,0,0.6);
             cursor: pointer;
             touch-action: manipulation;
         }
         .dial::before {
             content: '';
             position: absolute;
-            inset: 6px;
-            border: 1px dashed #334155;
+            inset: 5px;
+            border: 1px dashed #64748b;
             border-radius: 50%;
         }
         .dial-needle {
@@ -224,19 +240,22 @@
             top: 50%;
             left: 50%;
             width: 3px;
-            height: 42%;
+            height: 38%;
             background: #22c55e;
             transform-origin: top center;
             transform: translate(-50%, 0) rotate(0deg);
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 6px #22c55e;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .copium-dial .dial-needle {
             background: #a855f7;
+            box-shadow: 0 0 6px #a855f7;
         }
         .dial-value {
-            font-size: 10px;
+            font-size: 9px;
             color: #fff;
             font-weight: bold;
+            text-shadow: 0 0 4px rgba(255,255,255,0.5);
         }
 
         .switch-grid {
@@ -245,10 +264,11 @@
             gap: 4px;
         }
         .toggle-switch {
-            height: 14px;
-            background: #1e293b;
+            height: 12px;
+            background: linear-gradient(90deg, #1e293b, #0f172a);
             border: 1px solid #475569;
             border-radius: 2px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
         }
 
         .action-btns {
@@ -257,14 +277,15 @@
             gap: 5px;
         }
 
+        /* Upgraded Slick Action Buttons */
         .action-btn {
             display: block;
-            border: none;
-            padding: clamp(6px, 1.5vh, 9px);
-            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 7px 4px;
+            border-radius: 5px;
             font-weight: bold;
             font-family: monospace;
-            font-size: clamp(10px, 1.2vw, 11px);
+            font-size: 10px;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -272,24 +293,22 @@
             text-align: center;
             text-decoration: none;
             touch-action: manipulation;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.3);
+            transition: transform 0.1s ease;
         }
+        .action-btn:active { transform: scale(0.96); }
         
-        .cmd-btn { background: #0ea5e9; color: #000; }
-        .cmd-btn:hover { background: #38bdf8; }
-
-        .wen-btn { background: #eab308; color: #000; }
-        .wen-btn:hover { background: #facc15; }
-
-        .return-btn { background: #22c55e; color: #000; }
-        .return-btn:hover { background: #16a34a; }
+        .cmd-btn { background: linear-gradient(180deg, #38bdf8, #0284c7); color: #000; text-shadow: 0 1px rgba(255,255,255,0.4); }
+        .wen-btn { background: linear-gradient(180deg, #facc15, #ca8a04); color: #000; text-shadow: 0 1px rgba(255,255,255,0.4); }
+        .return-btn { background: linear-gradient(180deg, #4ade80, #16a34a); color: #000; text-shadow: 0 1px rgba(255,255,255,0.4); }
 
 
-        /* --- TERMINAL WINDOW --- */
+        /* --- TERMINAL WINDOW MODAL --- */
         .cmd-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.88);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 2000;
             justify-content: center;
             align-items: center;
@@ -297,10 +316,11 @@
         }
         .cmd-window {
             width: min(650px, 100%);
-            height: min(440px, 90vh);
+            height: min(420px, 85vh);
             background: #020408;
             border: 2px solid #22c55e;
-            border-radius: 6px;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -327,10 +347,10 @@
         }
         .cmd-body {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             overflow-y: auto;
             color: #22c55e;
-            font-size: 12px;
+            font-size: 11px;
             line-height: 1.5;
             display: flex;
             flex-direction: column;
@@ -352,7 +372,7 @@
             border: none;
             color: #22c55e;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
+            font-size: 11px;
             outline: none;
         }
         .prompt-list-help {
@@ -362,22 +382,18 @@
             padding-bottom: 6px;
         }
 
-        /* --- MOBILE LAYOUT ADJUSTMENTS --- */
+        /* --- MOBILE LAYOUT FIX --- */
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
                 grid-template-rows: repeat(3, auto);
-                max-height: 58vh;
-                overflow-y: auto;
                 gap: 8px;
                 padding: 8px;
             }
-            .console-panel { height: 115px; }
-            .screen-monitor { height: 50px; }
-            .switch-grid { display: none; }
-            .center-console { height: auto; padding: 6px; }
-            .warning-grid { grid-template-columns: repeat(4, 1fr); }
-            .window-frame { clip-path: none; border-bottom: 3px solid #080c14; }
+            .console-panel { min-height: 125px; }
+            .screen-monitor { height: 70px; }
+            .switch-grid { display: none; } /* Reduces visual clutter on mobile screens */
+            .window-frame { height: 32vh; }
         }
     </style>
 </head>
@@ -408,7 +424,7 @@
                 </div>
                 <div class="switch-grid">
                     <div class="toggle-switch"></div>
-                    <div class="toggle-switch" style="background: #7f1d1d;"></div>
+                    <div class="toggle-switch" style="background: linear-gradient(90deg, #7f1d1d, #450a0a);"></div>
                     <div class="toggle-switch"></div>
                     <div class="toggle-switch"></div>
                 </div>
@@ -450,7 +466,7 @@
             <!-- Right Console Panel -->
             <div class="console-panel">
                 <div class="screen-monitor" style="border-color: #0369a1;">
-                    <div class="screen-content" style="color: #34d399;">
+                    <div class="screen-content" style="color: #34d399; text-shadow: 0 0 5px rgba(52,211,153,0.8);">
                         * TERMINAL READY *<br>
                         CORE TEMP: MELTING<br>
                         BRAINCELLS: 0
@@ -459,7 +475,7 @@
                 <div class="switch-grid">
                     <div class="toggle-switch"></div>
                     <div class="toggle-switch"></div>
-                    <div class="toggle-switch" style="background: #14532d;"></div>
+                    <div class="toggle-switch" style="background: linear-gradient(90deg, #14532d, #052e16);"></div>
                     <div class="toggle-switch"></div>
                 </div>
                 
@@ -472,7 +488,7 @@
         </div>
     </div>
 
-    <!-- CMD TERMINAL MODAL WINDOW -->
+    <!-- CMD TERMINAL WINDOW MODAL -->
     <div class="cmd-overlay" id="cmdOverlay">
         <div class="cmd-window">
             <div class="cmd-header">
@@ -481,7 +497,7 @@
             </div>
             <div class="cmd-body" id="cmdBody">
                 <div class="prompt-list-help">
-                    SYSTEM ONLINE. Tap or type a command:<br>
+                    SYSTEM ONLINE. Tap/type a command:<br>
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('market')">market</b> | 
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('wife')">wife</b> | 
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('strategy')">strategy</b> | 
@@ -497,7 +513,7 @@
     </div>
 
     <script>
-        // --- WORKING DIAL LOGIC ---
+        // --- DIAL LOGIC ---
         let hopiumDeg = 45;
         let hopiumLevel = 420;
         let copiumDeg = -30;
@@ -517,7 +533,7 @@
             }
         }
 
-        // --- WEN EASTER EGG BUTTON ---
+        // --- WEN EASTER EGG ---
         function triggerWen() {
             openTerminal();
             runPreset('wen');
