@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v14.3 - Space Command</title>
+  <title>The Rugged Bar v14.4 - Space Command</title>
   <style>
     * {
       box-sizing: border-box;
@@ -71,7 +71,7 @@
       20% { transform: translate(-3px, 3px) scale(1.05); }
       40% { transform: translate(3px, -2px) scale(1.05); }
       60% { transform: translate(-2px, -3px) scale(1.05); }
-      80% { transform: translate(2px, 2px) scale(1.05); }
+      80% { transform: translate2px, 2px) scale(1.05); }
       100% { transform: translate(0, 0) scale(1.05); }
     }
 
@@ -101,44 +101,25 @@
     }
     .otter-hotspot:hover, .otter-hotspot:active { background: rgba(32, 129, 226, 0.25); }
 
-    /* --- ROCKET LINK ELEMENT (FRONT TABLE) --- */
+    /* --- HIDDEN ROCKET LINK OVERLAY (PRECISELY ON THE DRAWN TABLE ROCKET) --- */
     .rocket-table-link {
       position: absolute;
-      top: 59.5%;
-      left: 60.5%;
-      width: 7%;
-      height: 18%;
+      top: 61.5%;
+      left: 64.2%;
+      width: 3.5%;
+      height: 13.5%;
       z-index: 4;
       display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
+      background: transparent;
+      border: none;
       text-decoration: none;
       cursor: pointer;
-      transition: transform 0.3s ease;
+      transition: background 0.3s ease;
     }
-    .viewport.open .rocket-table-link { display: flex; }
+    .viewport.open .rocket-table-link { display: block; }
     .rocket-table-link:hover {
-      transform: scale(1.08) translateY(-4px);
-    }
-    .rocket-icon {
-      font-size: 2.2rem;
-      filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.8));
-      line-height: 1;
-      transform: rotate(0deg); /* Standing straight up */
-    }
-    .moon-indes-badge {
-      font-family: monospace;
-      font-size: 0.55rem;
-      font-weight: bold;
-      color: #00ffcc;
-      background: rgba(0, 0, 0, 0.85);
-      border: 1px solid #00ffcc;
-      padding: 2px 5px;
+      background: rgba(255, 0, 122, 0.25);
       border-radius: 4px;
-      margin-top: 2px;
-      box-shadow: 0 0 6px rgba(0, 255, 204, 0.5);
-      white-space: nowrap;
     }
 
     .top-controls-bar {
@@ -435,6 +416,7 @@
       
       <div class="clubhouse-bg"></div>
       
+      <!-- Interactive Hotspots & Hidden Rocket Link -->
       <div class="hotspot arcade-hotspot" onclick="openGame('pacman')"></div>
       <div class="hotspot pool-hotspot" onclick="openGame('pool')"></div>
       <div class="hotspot laptop-hotspot" onclick="openWebModal('dex')"></div>
@@ -442,10 +424,8 @@
       <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
       <a href="https://discord.com/invite/YkzcUuRSv" target="_blank" class="hotspot sofa-hotspot"></a>
 
-      <a href="moon.html" target="_blank" class="rocket-table-link" title="moon.indes">
-        <div class="rocket-icon">🚀</div>
-        <div class="moon-indes-badge">moon.indes</div>
-      </a>
+      <!-- Hidden link precisely over the drawn rocket model on the table -->
+      <a href="moon.html" target="_blank" class="rocket-table-link" title="moon"></a>
     </div>
 
     <div class="top-controls-bar">
@@ -465,7 +445,7 @@
     </div>
 
     <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-    <div class="door-version">v14.3</div>
+    <div class="door-version">v14.4</div>
 
     <div class="front-buttons-container">
       <button class="degen-action-btn enter-btn" onclick="openDoors()">
@@ -506,7 +486,7 @@
       <iframe class="web-iframe" id="webIframe" src=""></iframe>
       
       <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.3</div>
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.4</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
