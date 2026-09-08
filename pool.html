@@ -1,1 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>The Rugged Bar v14.4 - Degen Billiards</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: #020205;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: monospace;
+    }
+
+    .pool-container {
+      background: #0d0d12;
+      border: 3px solid #00ff66;
+      border-radius: 12px;
+      padding: 15px;
+      width: 96vw;
+      max-width: 480px;
+      box-shadow: 0 0 30px rgba(0, 255, 102, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .title-text {
+      color: #00ff66;
+      font-size: 0.85rem;
+      font-weight: bold;
+      text-shadow: 0 0 6px #00ff66;
+    }
+
+    .exit-btn {
+      background: rgba(255, 51, 51, 0.15);
+      border: 2px solid #ff3333;
+      color: #ff3333;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 0 8px rgba(255, 51, 51, 0.4);
+      transition: all 0.2s ease;
+    }
+    .exit-btn:hover {
+      background: #ff3333;
+      color: #000;
+      transform: scale(1.05);
+    }
+
+    .scoreboard {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      background: #121218;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      font-size: 0.75rem;
+      color: #fff;
+    }
+    .score-item span { color: #ffe600; font-weight: bold; }
+
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #222;
+      background: #000;
+    }
+
+    canvas {
+      display: block;
+      background: #0f5220;
+      touch-action: none;
+    }
+
+    /* Pop-up Overlay for Misses / Events */
+    .event-toast {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: rgba(0, 0, 0, 0.95);
+      border: 2px solid #ff007a;
+      border-radius: 8px;
+      padding: 12px 18px;
+      color: #ff007a;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 0, 122, 0.8);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 10;
+      width: 85%;
+    }
+    .event-toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* Controls Layout */
+    .controls-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .aim-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .btn-ctrl {
+      flex: 1;
+      max-width: 120px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid #00ffcc;
+      border-radius: 6px;
+      color: #00ffcc;
+      font-size: 1rem;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0, 255, 204, 0.2);
+    }
+    .btn-ctrl:active {
+      background: rgba(0, 255, 204, 0.3);
+      transform: scale(0.96);
+    }
+
+    .btn-shoot {
+      width: 100%;
+      height: 44px;
+      background: #00ff66;
+      color: #000;
+      font-weight: bold;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(0, 255, 102, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .btn-shoot:active {
+      transform: scale(0.97);
+    }
+
+    /* Game Over / Win Modal Overlay */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 20;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-card {
+      background: #0d0d12;
+      border: 3px solid #ffe600;
+      border-radius: 12px;
+      padding: 25px;
+      width: 88vw;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 0 35px rgba(255, 230, 0, 0.6);
+    }
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ffe600;
+      margin-bottom: 10px;
+      text-shadow: 0 0 8px rgba(255, 230, 0, 0.5);
+    }
+    .modal-desc {
+      font-size: 0.8rem;
+      color: #fff;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+    .modal-btn {
+      background: #ffe600;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-family: monospace;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 230, 0, 0.6);
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="pool-container">
+    <div class="header-bar">
+      <div class="title-text">🎱 DEGEN POOL: PAPER vs WHALES</div>
+      <a href="index.html" class="exit-btn">🚪 EXIT BAR</a>
+    </div>
+
+    <div class="scoreboard">
+      <div class="score-item">TURN: <span id="turnDisplay">PLAYER (APE)</span></div>
+      <div class="score-item">POTS: <span id="scoreDisplay">0</span></div>
+    </div>
+
+    <div class="canvas-wrapper">
+      <canvas id="poolCanvas" width="340" height="190"></canvas>
+      <div class="event-toast" id="eventToast"></div>
+    </div>
+
+    <div class="controls-container">
+      <div class="aim-row">
+        <button class="btn-ctrl" onclick="adjustAim(-0.1)">◀ ROTATE</button>
+        <button class="btn-ctrl" onclick="adjustAim(0.1)">ROTATE ▶</button>
+      </div>
+      <button class="btn-shoot" onclick="executeShot()">⚡ SEND THE LIQUIDITY (SHOOT)</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="endGameModal">
+    <div class="modal-card">
+      <div class="modal-title" id="modalTitle">TITLE</div>
+      <div class="modal-desc" id="modalDesc">Description goes here.</div>
+      <button class="modal-btn" onclick="location.reload()">PLAY ANOTHER ROUND 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('poolCanvas');
+    const ctx = canvas.getContext('2d');
+    const toast = document.getElementById('eventToast');
+
+    const pockets = [
+      { x: 16, y: 16 }, { x: 170, y: 13 }, { x: 324, y: 16 },
+      { x: 16, y: 174 }, { x: 170, y: 177 }, { x: 324, y: 174 }
+    ];
+
+    let playerPots = 0;
+    let aiPots = 0;
+    let turn = 'Player';
+    let shotFired = false;
+    let gameOver = false;
+
+    // Cue ball + 7 standard object balls with exact billiard colors
+    let cueBall = { x: 85, y: 95, vx: 0, vy: 0, r: 6.5, color: '#ffffff', isCue: true, id: 0 };
+    let ballColors = ['#f1c40f', '#2980b9', '#e74c3c', '#8e44ad', '#e67e22', '#2ecc71', '#34495e'];
+    let balls = [cueBall];
+
+    // Setup triangle rack layout
+    let rackX = 230, rackY = 95, spacing = 14;
+    let colorIndex = 0;
+    for (let col = 0; col < 3; col++) {
+      for (let row = 0; row <= col; row++) {
+        let bx = rackX + (col * spacing * 0.866);
+        let by = rackY + (row * spacing) - (col * spacing / 2);
+        balls.push({ x: bx, y: by, vx: 0, vy: 0, r: 6.5, color: ballColors[colorIndex % ballColors.length], isCue: false, id: colorIndex + 1 });
+        colorIndex++;
+      }
+    }
+
+    let aimAngle = 0;
+    let power = 6.5;
+
+    function showToast(text) {
+      toast.innerText = text;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    function adjustAim(amount) {
+      if (turn === 'Player' && !isAnyBallMoving() && !shotFired) {
+        aimAngle += amount;
+      }
+    }
+
+    function executeShot() {
+      if (turn === 'Player' && !isAnyBallMoving() && !shotFired && !gameOver) {
+        cueBall.vx = Math.cos(aimAngle) * power;
+        cueBall.vy = Math.sin(aimAngle) * power;
+        shotFired = true;
+      }
+    }
+
+    function isAnyBallMoving() {
+      return balls.some(b => Math.abs(b.vx) > 0.04 || Math.abs(b.vy) > 0.04);
+    }
+
+    function aiTurn() {
+      if (gameOver) return;
+      let targetBalls = balls.filter(b => !b.isCue);
+      if (targetBalls.length === 0) return;
+
+      // Pick a random target object ball on the table
+      let target = targetBalls[Math.floor(Math.random() * targetBalls.length)];
+      let angleToTarget = Math.atan2(target.y - cueBall.y, target.x - cueBall.x) + (Math.random() - 0.5) * 0.3;
+      
+      cueBall.vx = Math.cos(angleToTarget) * 5.8;
+      cueBall.vy = Math.sin(angleToTarget) * 5.8;
+      shotFired = true;
+    }
+
+    function updateGame() {
+      let moving = isAnyBallMoving();
+      let totalBallsBefore = balls.length;
+
+      // Physics motion & boundary dampening
+      for (let i = balls.length - 1; i >= 0; i--) {
+        let b = balls[i];
+        b.x += b.vx;
+        b.y += b.vy;
+        b.vx *= 0.985;
+        b.vy *= 0.985;
+
+        if (Math.abs(b.vx) < 0.03) b.vx = 0;
+        if (Math.abs(b.vy) < 0.03) b.vy = 0;
+
+        // Table edge bounces (boundaries inside the rails)
+        if (b.x - b.r < 20) { b.x = 20 + b.r; b.vx *= -1; }
+        if (b.x + b.r > 320) { b.x = 320 - b.r; b.vx *= -1; }
+        if (b.y - b.r < 20) { b.y = 20 + b.r; b.vy *= -1; }
+        if (b.y + b.r > 170) { b.y = 170 - b.r; b.vy *= -1; }
+
+        // Pocket detection
+        pockets.forEach(p => {
+          if (Math.hypot(b.x - p.x, b.y - p.y) < 16) {
+            if (b.isCue) {
+              // Scratch penalty
+              b.x = 85; b.y = 95; b.vx = 0; b.vy = 0;
+              showToast("🚨 SCRATCH! You rugged your own cue liquidity!");
+            } else {
+              balls.splice(i, 1);
+              if (turn === 'Player') {
+                playerPots++;
+                showToast("🔥 WHALE PUMP! Bag successfully pocketed!");
+              } else {
+                aiPots++;
+                showToast("📉 BEAR RAID! Whale pocketed a bag!");
+              }
+              document.getElementById('scoreDisplay').innerText = `${playerPots} (You) / ${aiPots} (Whale)`;
+            }
+          }
+        });
+      }
+
+      // Ball-to-ball elastic collisions
+      for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) {
+          let b1 = balls[i], b2 = balls[j];
+          let dx = b2.x - b1.x, dy = b2.y - b1.y;
+          let dist = Math.hypot(dx, dy);
+          let minDist = b1.r + b2.r;
+
+          if (dist < minDist && dist > 0) {
+            let nx = dx / dist, ny = dy / dist;
+            let overlap = minDist - dist;
+            b1.x -= nx * overlap * 0.5; b1.y -= ny * overlap * 0.5;
+            b2.x += nx * overlap * 0.5; b2.y += ny * overlap * 0.5;
+
+            let kx = b1.vx - b2.vx, ky = b1.vy - b2.vy;
+            let p = 2 * (nx * kx + ny * ky) / 2;
+            if (p > 0) {
+              b1.vx -= p * nx * 0.96; b1.vy -= p * ny * 0.96;
+              b2.vx += p * nx * 0.96; b2.vy += p * ny * 0.96;
+            }
+          }
+        }
+      }
+
+      // Turn resolution once all balls come to a complete stop
+      if (shotFired && !moving) {
+        shotFired = false;
+        let objectBallsLeft = balls.filter(b => !b.isCue).length;
+
+        // Check Win/Loss conditions
+        if (objectBallsLeft === 0) {
+          gameOver = true;
+          triggerEndGame(true);
+          return;
+        }
+
+        // If player took turn and potted nothing, trigger miss pop-up message
+        if (balls.length === totalBallsBefore && turn === 'Player') {
+          showToast("📉 PAPER HANDS! Shot missed completely!");
+        }
+
+        // Switch turns
+        if (turn === 'Player') {
+          turn = 'Computer (Whale)';
+          document.getElementById('turnDisplay').innerText = turn;
+          setTimeout(aiTurn, 1000);
+        } else {
+          turn = 'Player';
+          document.getElementById('turnDisplay').innerText = 'PLAYER (APE)';
+        }
+      }
+
+      drawTable();
+      requestAnimationFrame(updateGame);
+    }
+
+    function triggerEndGame(isWin) {
+      const modal = document.getElementById('endGameModal');
+      const title = document.getElementById('modalTitle');
+      const desc = document.getElementById('modalDesc');
+
+      modal.style.display = 'flex';
+      if (isWin) {
+        title.innerText = "🚀 TO THE MOON! TABLE CLEARED!";
+        desc.innerText = "Congratulations legend! You out-traded the whales and secured generational wealth. Your bags are fully mooning.";
+      } else {
+        title.innerText = "💀 COMPLETELY REKT!";
+        desc.innerText = "The whale cartel wiped your portfolio clean. Better luck next time, exit liquidity.";
+      }
+    }
+
+    function drawTable() {
+      ctx.fillStyle = '#0f5220';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Wooden Frame borders
+      ctx.strokeStyle = '#4a2c11';
+      ctx.lineWidth = 14;
+      ctx.strokeRect(7, 7, canvas.width - 14, canvas.height - 14);
+
+      // Pockets
+      pockets.forEach(p => {
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 13, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Billiard Balls
+      balls.forEach(b => {
+        ctx.fillStyle = b.color;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#111';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Inner circle detail for numbered balls
+        if (!b.isCue) {
+          ctx.fillStyle = '#fff';
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Aiming Guide Line (Only when it's the player's turn and balls are idle)
+      if (!isAnyBallMoving() && turn === 'Player' && !shotFired && !gameOver) {
+        ctx.strokeStyle = '#00ff66';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(cueBall.x, cueBall.y);
+        ctx.lineTo(cueBall.x + Math.cos(aimAngle) * 65, cueBall.y + Math.sin(aimAngle) * 65);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+
+    // Start game execution loop
+    updateGame();
+  </script>
+</body>
+</html>
 
