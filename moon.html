@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Degen Spaceship Cockpit - Extreme Hopium/Copium Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Degen Spaceship Cockpit - Mobile & PC Edition</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
         body, html {
             width: 100%;
@@ -16,9 +17,10 @@
             background-color: #000;
             overflow: hidden;
             font-family: 'Courier New', Courier, monospace;
+            position: fixed; /* Prevents mobile bounce scroll */
         }
         
-        /* CRT Scanline Effect Overlay for max aesthetics */
+        /* CRT Scanline Effect Overlay */
         body::after {
             content: " ";
             display: block;
@@ -47,11 +49,11 @@
             position: relative;
             overflow: hidden;
             clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%);
-            border-bottom: 8px solid #080c14;
+            border-bottom: 6px solid #080c14;
             box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
         }
 
-        /* Starfield background with a slow drift */
+        /* Starfield background */
         .stars {
             position: absolute;
             width: 200%;
@@ -67,17 +69,17 @@
             to { transform: translate(-50%, -50%); }
         }
 
-        /* Distant Moon Body with glow */
+        /* Distant Moon Body */
         .distant-moon {
             position: absolute;
-            width: 280px;
-            height: 280px;
+            width: min(220px, 45vw);
+            height: min(220px, 45vw);
             background: radial-gradient(circle at 35% 35%, #94a3b8 0%, #334155 50%, #0f172a 90%);
             border-radius: 50%;
-            top: 25%;
+            top: 30%;
             left: 55%;
             transform: translate(-50%, -50%);
-            box-shadow: inset -35px -35px 50px rgba(0, 0, 0, 0.9), 0 0 35px rgba(56, 189, 248, 0.2);
+            box-shadow: inset -25px -25px 40px rgba(0, 0, 0, 0.9), 0 0 35px rgba(56, 189, 248, 0.2);
             z-index: 2;
         }
 
@@ -87,46 +89,52 @@
             border-radius: 50%;
             box-shadow: inset 1px 1px 4px rgba(0,0,0,0.9);
         }
-        .mc1 { width: 55px; height: 25px; top: 60px; left: 70px; transform: rotate(-15deg); }
-        .mc2 { width: 40px; height: 35px; top: 140px; left: 130px; }
-        .mc3 { width: 70px; height: 30px; top: 110px; left: 30px; transform: rotate(20deg); }
+        .mc1 { width: 25%; height: 12%; top: 25%; left: 25%; transform: rotate(-15deg); }
+        .mc2 { width: 18%; height: 16%; top: 55%; left: 50%; }
+        .mc3 { width: 30%; height: 14%; top: 45%; left: 15%; transform: rotate(20deg); }
 
         .distant-flag {
             position: absolute;
-            top: 110px;
-            left: 125px;
-            font-size: 24px;
+            top: 40%;
+            left: 45%;
+            font-size: min(24px, 6vw);
             z-index: 3;
             filter: drop-shadow(0 2px 3px rgba(0,0,0,0.9));
         }
 
 
-        /* --- LOWER CONSOLE DASHBOARD --- */
+        /* --- LOWER CONSOLE DASHBOARD (Responsive Grid) --- */
         .dashboard {
-            height: 380px;
+            min-height: 280px;
+            max-height: 420px;
             background: linear-gradient(180deg, #0d111a 0%, #030407 100%);
             display: grid;
             grid-template-columns: 1fr 1.6fr 1fr;
-            padding: 15px 25px;
-            gap: 20px;
+            padding: 10px;
+            gap: 10px;
             border-top: 4px solid #1e293b;
             box-shadow: inset 0 25px 35px rgba(0,0,0,0.9), 0 -10px 30px rgba(0,0,0,0.8);
             position: relative;
+            z-index: 10;
         }
 
         .console-panel {
             background: #06090f;
             border: 2px solid #1e293b;
             border-radius: 6px;
-            padding: 10px;
+            padding: 8px;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+            overflow: hidden;
         }
 
         /* Holographic Screens */
         .screen-monitor {
             width: 100%;
-            height: 150px;
+            height: clamp(90px, 14vh, 140px);
             background: #00040a;
             border: 2px solid #0284c7;
             border-radius: 4px;
@@ -139,10 +147,11 @@
         }
         .screen-content {
             color: #38bdf8;
-            font-size: 11px;
+            font-size: clamp(9px, 1.2vw, 11px);
             text-shadow: 0 0 6px #38bdf8;
-            line-height: 1.6;
+            line-height: 1.5;
             text-align: center;
+            padding: 4px;
         }
 
         /* Center Console Panel */
@@ -150,80 +159,78 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            gap: 10px;
+            justify-content: space-between;
             background: #080c14;
             border: 2px solid #27272a;
             border-radius: 6px;
-            padding: 10px;
+            padding: 8px;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.9), 0 0 15px rgba(239, 68, 68, 0.15);
         }
 
         .warning-grid {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            gap: 5px;
+            gap: 4px;
             width: 100%;
             background: #020305;
-            padding: 6px;
+            padding: 5px;
             border-radius: 4px;
             border: 1px solid #3f3f46;
         }
 
         .warn-light {
-            height: 20px;
+            height: clamp(14px, 2.5vh, 20px);
             background: #dc2626;
             border-radius: 2px;
-            box-shadow: 0 0 8px #ef4444;
+            box-shadow: 0 0 6px #ef4444;
             animation: pulse-light 1.5s infinite alternate;
         }
         .warn-light.orange {
             background: #ea580c;
-            box-shadow: 0 0 8px #f97316;
+            box-shadow: 0 0 6px #f97316;
         }
         @keyframes pulse-light {
             0% { opacity: 0.5; }
-            100% { opacity: 1; box-shadow: 0 0 14px #ff3300; }
+            100% { opacity: 1; box-shadow: 0 0 12px #ff3300; }
         }
 
-        /* --- INTERACTIVE DIALS SECTION (Hopium & Copium) --- */
+        /* --- INTERACTIVE DIALS SECTION --- */
         .dials-container {
             display: flex;
             justify-content: space-around;
             width: 100%;
-            margin-top: 5px;
-            gap: 10px;
+            gap: 5px;
         }
         .dial-box {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
         }
         .dial-label {
-            font-size: 9px;
+            font-size: 8px;
             color: #94a3b8;
             font-weight: bold;
             letter-spacing: 1px;
         }
         .dial {
-            width: 60px;
-            height: 60px;
+            width: clamp(45px, 9vw, 60px);
+            height: clamp(45px, 9vw, 60px);
             border: 3px solid #64748b;
             border-radius: 50%;
             background: radial-gradient(circle, #0f172a 0%, #020617 80%);
             position: relative;
             box-shadow: inset 0 0 8px #000, 0 0 8px rgba(0,0,0,0.5);
             cursor: pointer;
+            touch-action: manipulation;
             transition: transform 0.1s ease;
         }
-        /* Rotating Needle */
         .dial-needle {
             position: absolute;
             top: 50%;
             left: 50%;
             width: 3px;
-            height: 22px;
+            height: 40%;
             background: #22c55e;
             transform-origin: top center;
             transform: translate(-50%, 0) rotate(0deg);
@@ -235,7 +242,7 @@
             box-shadow: 0 0 6px #a855f7;
         }
         .dial-value {
-            font-size: 10px;
+            font-size: 9px;
             color: #e2e8f0;
             font-weight: bold;
         }
@@ -245,10 +252,9 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 4px;
-            margin-top: 6px;
         }
         .toggle-switch {
-            height: 16px;
+            height: 14px;
             background: #1e293b;
             border: 1px solid #475569;
             border-radius: 2px;
@@ -257,64 +263,55 @@
         .action-btns {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            margin-top: 8px;
+            gap: 5px;
         }
 
+        .cmd-btn, .return-btn {
+            display: block;
+            border: none;
+            padding: clamp(6px, 1.5vh, 10px);
+            border-radius: 4px;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: clamp(10px, 1.2vw, 12px);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            text-align: center;
+            text-decoration: none;
+            touch-action: manipulation;
+        }
+        
         .cmd-btn {
-            display: inline-block;
             background: #0ea5e9;
             color: #000;
-            border: none;
-            padding: 8px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-family: monospace;
-            font-size: 0.75rem;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            width: 100%;
-            text-align: center;
+            box-shadow: 0 0 8px rgba(14, 165, 233, 0.5);
         }
-        .cmd-btn:hover { background: #38bdf8; box-shadow: 0 0 15px rgba(14, 165, 233, 0.8); }
+        .cmd-btn:hover { background: #38bdf8; }
 
         .return-btn {
-            display: inline-block;
             background: #22c55e;
             color: #000;
-            border: none;
-            padding: 8px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-family: monospace;
-            font-size: 0.75rem;
-            text-decoration: none;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            width: 100%;
-            text-align: center;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
         }
-        .return-btn:hover { background: #16a34a; box-shadow: 0 0 15px rgba(34, 197, 94, 0.8); }
+        .return-btn:hover { background: #16a34a; }
+
 
         /* --- CMD TERMINAL MODAL OVERLAY --- */
         .cmd-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
+            background: rgba(0, 0, 0, 0.88);
+            z-index: 2000;
             justify-content: center;
             align-items: center;
+            padding: 10px;
         }
         .cmd-window {
-            width: 650px;
-            height: 420px;
+            width: min(650px, 100%);
+            height: min(420px, 90vh);
             background: #020408;
             border: 2px solid #22c55e;
             border-radius: 6px;
@@ -332,26 +329,27 @@
             border-bottom: 1px solid #22c55e;
             color: #22c55e;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
         }
         .cmd-close {
             background: #dc2626;
             color: white;
             border: none;
-            padding: 2px 8px;
+            padding: 4px 10px;
             cursor: pointer;
             font-weight: bold;
             border-radius: 3px;
         }
         .cmd-body {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             overflow-y: auto;
             color: #22c55e;
-            font-size: 12px;
+            font-size: clamp(11px, 2.5vw, 12px);
             display: flex;
             flex-direction: column;
             gap: 6px;
+            -webkit-overflow-scrolling: touch;
         }
         .cmd-input-line {
             display: flex;
@@ -361,7 +359,7 @@
             background: #030806;
             border-top: 1px solid #14532d;
         }
-        .cmd-input-line span { color: #22c55e; font-weight: bold; }
+        .cmd-input-line span { color: #22c55e; font-weight: bold; font-size: 11px; }
         .cmd-input {
             flex: 1;
             background: transparent;
@@ -376,13 +374,46 @@
             margin-bottom: 5px;
             border-bottom: 1px dashed #1e293b;
             padding-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        /* --- MOBILE ADAPTIVE BREAKPOINTS --- */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(3, auto);
+                max-height: 55vh;
+                overflow-y: auto;
+                gap: 8px;
+                padding: 8px;
+            }
+            .console-panel {
+                height: 110px;
+            }
+            .screen-monitor {
+                height: 55px;
+            }
+            .switch-grid {
+                display: none; /* Hide switch clutter on tiny screens to save space */
+            }
+            .center-console {
+                height: auto;
+                padding: 6px;
+            }
+            .warning-grid {
+                grid-template-columns: repeat(4, 1fr); /* Shrink light footprint */
+            }
+            .window-frame {
+                clip-path: none; /* Strip trapezoid frame on portrait mobile for clean viewing */
+                border-bottom: 3px solid #080c14;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="cockpit-view">
-        <!-- TOP VIEWWINDOW -->
+        <!-- TOP VIEWPORT WINDOW -->
         <div class="window-frame">
             <div class="stars"></div>
             <div class="distant-moon">
@@ -404,7 +435,7 @@
                         STATUS: FULL SEND 🚀
                     </div>
                 </div>
-                <div class="switch-grid" style="margin-top: 10px;">
+                <div class="switch-grid">
                     <div class="toggle-switch"></div>
                     <div class="toggle-switch" style="background: #7f1d1d;"></div>
                     <div class="toggle-switch"></div>
@@ -423,22 +454,13 @@
                     <div class="warn-light orange"></div>
                     <div class="warn-light"></div>
                     <div class="warn-light orange"></div>
-                    
-                    <div class="warn-light orange"></div>
-                    <div class="warn-light"></div>
-                    <div class="warn-light orange"></div>
-                    <div class="warn-light"></div>
-                    <div class="warn-light orange"></div>
-                    <div class="warn-light"></div>
-                    <div class="warn-light orange"></div>
-                    <div class="warn-light"></div>
                 </div>
 
                 <!-- Interactive Dials for Hopium & Copium -->
                 <div class="dials-container">
                     <div class="dial-box">
                         <span class="dial-label">HOPIUM</span>
-                        <div class="dial" id="hopium-dial" onclick="boostDial('hopium')">
+                        <div class="dial" id="hopium-dial" onclick="boostDial('hopium')" ontouchstart="boostDial('hopium')">
                             <div class="dial-needle" id="hopium-needle"></div>
                         </div>
                         <span class="dial-value" id="hopium-val">420%</span>
@@ -446,7 +468,7 @@
 
                     <div class="dial-box">
                         <span class="dial-label">COPIUM</span>
-                        <div class="dial copium-dial" id="copium-dial" onclick="boostDial('copium')">
+                        <div class="dial copium-dial" id="copium-dial" onclick="boostDial('copium')" ontouchstart="boostDial('copium')">
                             <div class="dial-needle" id="copium-needle"></div>
                         </div>
                         <span class="dial-value" id="copium-val">69%</span>
@@ -463,7 +485,7 @@
                         BRAINCELLS: 0 REMAINING
                     </div>
                 </div>
-                <div class="switch-grid" style="margin-top: 10px;">
+                <div class="switch-grid">
                     <div class="toggle-switch"></div>
                     <div class="toggle-switch"></div>
                     <div class="toggle-switch" style="background: #14532d;"></div>
@@ -482,22 +504,22 @@
     <div class="cmd-overlay" id="cmdOverlay">
         <div class="cmd-window">
             <div class="cmd-header">
-                <span>DEGEN-OS v6.9.420 - SECURE INTEL FEED</span>
+                <span>DEGEN-OS v6.9.420</span>
                 <button class="cmd-close" onclick="closeTerminal()">[X]</button>
             </div>
             <div class="cmd-body" id="cmdBody">
                 <div class="prompt-list-help">
-                    SYSTEM ONLINE. Type a prompt command below or click one to execute:<br>
-                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('market')">market</b> : Check current financial wellness<br>
-                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('wife')">wife</b> : Check relationship status<br>
-                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('strategy')">strategy</b> : Get alpha trading blueprint<br>
-                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('vibe')">vibe</b> : Analyze cockpit cabin frequency<br>
+                    SYSTEM ONLINE. Tap/type a command below:<br>
+                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('market')">market</b> : Financial health check<br>
+                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('wife')">wife</b> : Relationship status<br>
+                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('strategy')">strategy</b> : Alpha blueprint<br>
+                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('vibe')">vibe</b> : Cockpit frequency<br>
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('help')">help</b> : Show manual
                 </div>
             </div>
             <div class="cmd-input-line">
                 <span>C:\DEGEN\></span>
-                <input type="text" class="cmd-input" id="cmdInput" placeholder="type a prompt here..." autofocus onkeydown="handleCmd(event)">
+                <input type="text" class="cmd-input" id="cmdInput" placeholder="type a prompt..." onkeydown="handleCmd(event)">
             </div>
         </div>
     </div>
@@ -526,7 +548,9 @@
         // --- TERMINAL LOGIC ---
         function openTerminal() {
             document.getElementById('cmdOverlay').style.display = 'flex';
-            document.getElementById('cmdInput').focus();
+            setTimeout(() => {
+                document.getElementById('cmdInput').focus();
+            }, 100);
         }
 
         function closeTerminal() {
@@ -561,24 +585,23 @@
 
         function processCommand(cmd) {
             const responses = {
-                'market': "CRITICAL ALERT: Your portfolio is down 94% today. However, technical analysis confirms a macro-pennant wedge formation on the 4-second chart. We are literally one green candle away from generational wealth. Do not look at your bank account.",
-                'wife': "QUERY ERROR: Significant other status unknown. Last recorded communication was: 'Why is there a hardware wallet taped to the microwave?' Relationship sentiment index: -1000%. Deploying maximum copium shield buffers.",
-                'strategy': "STEP 1: Sell furniture on Facebook Marketplace to buy high-leverage microcap meme tokens. STEP 2: Stare blindly at a blank Excel sheet until your eyes bleed. STEP 3: Blame market manipulation on shadowy cabals of market makers.",
-                'vibe': "CABIN ATMOSPHERE: Pure uncut terminal velocity psychosis. The oxygen mix has been entirely replaced by nitrogen and pure unadulterated hubris. Strap in, your brain cells are officially overclocked.",
-                'help': "AVAILABLE COMMANDS: 'market', 'wife', 'strategy', 'vibe', 'liquidation', 'rug', 'moon'. Type any word to receive immediate unhinged spiritual guidance.",
-                'liquidation': "WARNING: Margin call incoming. Your long position has been violently deleted from existence by an exchange clerk named 'Chad_99' who is currently laughing at your misfortune in a Telegram group chat.",
-                'rug': "ANALYSIS COMPLETE: The dev abandoned the project and spent the liquidity pool on a jet ski in Dubai. You are now officially the proud owner of a community-led bag of absolute air. Congrats.",
-                'moon': "TRAJECTORY RECALCULATED: Trajectory is locked dead-center onto a dumpster behind a Wendy's. Initiating thrusters anyway because giving up is for paper-handed cowards."
+                'market': "CRITICAL ALERT: Portfolio down 94% today. However, technical analysis confirms a macro-pennant wedge formation on the 4-second chart. We are literally one green candle away from generational wealth.",
+                'wife': "QUERY ERROR: Significant other status unknown. Last recorded communication: 'Why is there a hardware wallet taped to the microwave?' Relationship sentiment index: -1000%.",
+                'strategy': "STEP 1: Sell furniture on Facebook Marketplace to buy high-leverage microcap tokens. STEP 2: Stare blindly at a blank Excel sheet until your eyes bleed. STEP 3: Blame market makers.",
+                'vibe': "CABIN ATMOSPHERE: Pure uncut terminal velocity psychosis. The oxygen mix has been entirely replaced by nitrogen and pure unadulterated hubris. Strap in.",
+                'help': "AVAILABLE COMMANDS: 'market', 'wife', 'strategy', 'vibe', 'liquidation', 'rug', 'moon'. Type any word for immediate unhinged spiritual guidance.",
+                'liquidation': "WARNING: Margin call incoming. Your long position has been violently deleted from existence by an exchange clerk named 'Chad_99' laughing in a Telegram group chat.",
+                'rug': "ANALYSIS COMPLETE: The dev abandoned the project and spent the liquidity pool on a jet ski in Dubai. You now own a community-led bag of absolute air. Congrats.",
+                'moon': "TRAJECTORY RECALCULATED: Locked dead-center onto a dumpster behind a Wendy's. Initiating thrusters anyway because giving up is for paper-handed cowards."
             };
 
-            // Fallback for random typing
             let reply = responses[cmd];
             if (!reply) {
                 const defaults = [
                     "ERROR 404: Brain cells not found. Try typing 'market', 'wife', or 'strategy'.",
                     "SYSTEM OVERRIDE: That command makes zero sense, but your confidence is inspiring. Buy more bags.",
                     "ANALYSIS: Absolute nonsense input received. Rerouting processing power to maximize leverage capacity.",
-                    "FATAL EXCEPTION: You've been staring at charts for too long. Go touch grass or buy a meme coin."
+                    "FATAL EXCEPTION: You've been staring at charts too long. Go touch grass."
                 ];
                 reply = defaults[Math.floor(Math.random() * defaults.length)];
             }
