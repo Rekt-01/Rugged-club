@@ -241,7 +241,7 @@
 
     let currentMap = JSON.parse(JSON.stringify(map));
 
-    // Player character: 🦝 (Trash Panda / Degen Raccoon)
+    // Player character: 🦍 (ape)
     let player = {
       x: 9 * tileSize,
       y: 16 * tileSize,
@@ -417,11 +417,11 @@
         }
       }
 
-      // Draw Player 🦝
+      // Draw Player 🦍
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('🦝', player.x + 8, player.y + 8);
+      ctx.fillText('🦍', player.x + 8, player.y + 8);
 
       // Draw Ghosts 🦦
       ghosts.forEach(g => {
