@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v14.2 - Restroom</title>
+  <title>The Rugged Bar v14.3 - Toilets</title>
   <style>
     * {
       box-sizing: border-box;
@@ -26,10 +26,7 @@
     .viewport {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      overflow: hidden; perspective: 1200px;
     }
 
     .scene-container {
@@ -38,119 +35,50 @@
       max-height: 100vh; max-width: 56.25vh;
       transform: translate(-50%, -50%);
       overflow: hidden;
-      background: url('Toilet.JPG') center center / cover no-repeat;
+      background: #000;
     }
 
     @media (min-aspect-ratio: 9/16) {
       .scene-container { width: 56.25vh; height: 100vh; }
     }
 
-    /* --- INTERACTIVE HOTSPOTS --- */
-    .hotspot {
-      position: absolute;
-      z-index: 5;
-      cursor: pointer;
-      background: transparent;
-      border: none;
-      transition: background 0.2s ease;
+    /* --- TOILET ENVIRONMENT --- */
+    .toilet-bg {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: #111; /* Fallback if toilet.JPG is missing */
+      background-size: cover;
+      background-position: center;
+      z-index: 1;
     }
 
-    /* Hidden button on the stall latch/lock mechanism */
+    /* Hotspot representing the latch/door handle to return to the bar */
     .stall-lock-hotspot {
-      top: 42%;
-      right: 23%;
-      width: 15%;
-      height: 8%;
-    }
-    .stall-lock-hotspot:hover, .stall-lock-hotspot:active {
-      background: rgba(0, 255, 102, 0.2);
-      border-radius: 6px;
-    }
-
-    /* "LORE" graffiti hotspot on the left wall */
-    .lore-hotspot {
-      top: 56%;
-      left: 3%;
-      width: 12%;
-      height: 7%;
-    }
-    .lore-hotspot:hover, .lore-hotspot:active {
-      background: rgba(255, 0, 122, 0.25);
-      border-radius: 4px;
-    }
-
-    /* --- POPUP WINDOW MODAL --- */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.85);
-      z-index: 20;
+      position: absolute;
+      top: 45%;
+      left: 40%;
+      width: 20%;
+      height: 15%;
+      z-index: 3;
+      cursor: pointer;
+      border: 2px dashed rgba(0, 255, 102, 0.4);
+      background: rgba(0, 255, 102, 0.1);
+      border-radius: 8px;
+      display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
-      backdrop-filter: blur(4px);
-    }
-
-    .modal-content {
-      position: relative;
-      background: #0d0d12;
-      border: 2px solid #ff007a;
-      border-radius: 12px;
-      padding: 30px 20px 20px 20px;
-      width: 90vw;
-      max-width: 380px;
+      text-decoration: none;
+      color: #00ff66;
+      font-family: monospace;
+      font-size: 0.7rem;
+      font-weight: bold;
       text-align: center;
-      box-shadow: 0 0 30px rgba(255, 0, 122, 0.5);
-      font-family: monospace;
+      transition: all 0.3s ease;
     }
 
-    .close-btn {
-      position: absolute;
-      top: 10px; right: 15px;
-      color: #fff;
-      font-size: 1.8rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .close-btn:hover {
-      color: #ff007a;
-    }
-
-    .modal-title {
-      color: #ff007a;
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: 12px;
-      text-shadow: 0 0 8px rgba(255, 0, 122, 0.6);
-      letter-spacing: 1px;
-    }
-
-    .modal-body-text {
-      color: #ccc;
-      font-size: 0.85rem;
-      line-height: 1.4;
-      margin-bottom: 20px;
-      max-height: 50vh;
-      overflow-y: auto;
-      text-align: left;
-    }
-
-    .modal-action-btn {
-      background: #ff007a;
-      color: #fff;
-      border: none;
-      border-radius: 20px;
-      padding: 10px 20px;
-      font-family: monospace;
-      font-weight: bold;
-      font-size: 0.8rem;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(255, 0, 122, 0.5);
-    }
-    .modal-action-btn:active {
-      transform: scale(0.95);
+    .stall-lock-hotspot:hover {
+      background: rgba(0, 255, 102, 0.3);
+      box-shadow: 0 0 15px rgba(0, 255, 102, 0.6);
+      transform: scale(1.03);
     }
   </style>
 </head>
@@ -159,38 +87,16 @@
   <div class="viewport">
     <div class="scene-container">
       
-      <!-- Hidden hotspot over the bathroom stall lock/latch pointing back to the bar -->
-      <a href="index.html?doors=open" class="hotspot stall-lock-hotspot" title="Unlock Stall & Return to Bar"></a>
-
-      <!-- Hotspot covering the "LORE" text on the left wall -->
-      <button class="hotspot lore-hotspot" onclick="openLoreModal()" title="Inspect Lore"></button>
-
+      <!-- Toilet background image container -->
+      <div class="toilet-bg"></div>
+      
+      <!-- Interactive Latch Link back to index.html -->
+      <a href="index.html" class="stall-lock-hotspot" title="Unlock Stall & Return to Bar">
+        UNLATCH & EXIT
+      </a>
+      
     </div>
   </div>
-
-  <!-- Lore Popup Window Modal -->
-  <div class="modal" id="loreModal">
-    <div class="modal-content">
-      <span class="close-btn" onclick="closeLoreModal()">&times;</span>
-      <div class="modal-title">📜 RESTROOM LORE ARCHIVE</div>
-      <div class="modal-body-text" id="loreTextContainer">
-        Legend has it that this very stall was built during the legendary bloodbath, when the gas fees were higher than the community's collective IQ and every green candle was just a cruel optical illusion engineered by a founder named Chad who promised utility before vanishing to Dubai with the mint funds.<br><br>
-        They say if you stare long enough into the 404 Degen graffiti while down 99% on your third consecutive "revolutionary AI meme coin," you can still hear the faint, echoing cries of paper hands hitting the emergency sell button. The plumbing here doesn’t actually flush wastewater—it directly pipes your remaining liquidity straight into a wallet labeled <em>"Liquidity Provision (Trust Me Bro)"</em>.<br><br>
-        Local legends claim that the only way to break the curse of the red candle is to hit the latch, walk back out to the bar, and pretend you didn't just mortgage your mother’s garage for a JPEG of a bored primate wearing a pirate hat.
-      </div>
-      <button class="modal-action-btn" onclick="closeLoreModal()">CLOSE WRITING</button>
-    </div>
-  </div>
-
-  <script>
-    function openLoreModal() {
-      document.getElementById('loreModal').style.display = 'flex';
-    }
-
-    function closeLoreModal() {
-      document.getElementById('loreModal').style.display = 'none';
-    }
-  </script>
 
 </body>
 </html>
