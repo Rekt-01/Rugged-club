@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Degen Spaceship Cockpit - Perfect Fit Edition</title>
+    <title>Degen Spaceship Cockpit - Random Stars Edition</title>
     <style>
         * {
             box-sizing: border-box;
@@ -42,7 +42,7 @@
             overflow: hidden;
         }
 
-        /* --- UPPER VIEWPORT WINDOW (Smaller Moon) --- */
+        /* --- UPPER VIEWPORT WINDOW --- */
         .window-frame {
             height: 32vh;
             min-height: 140px;
@@ -53,19 +53,14 @@
             box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
         }
 
-        .stars {
+        #starfieldCanvas {
             position: absolute;
-            width: 200%;
-            height: 200%;
-            background-image: radial-gradient(white 1.2px, transparent 0);
-            background-size: 30px 30px;
-            opacity: 0.85;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 1;
-            animation: drift-stars 120s linear infinite;
-        }
-        @keyframes drift-stars {
-            from { transform: translate(0, 0); }
-            to { transform: translate(-50%, -50%); }
+            pointer-events: none;
         }
 
         /* Realistic, Smaller Distant Moon */
@@ -102,7 +97,7 @@
         }
 
 
-        /* --- LOWER DASHBOARD (Scaled to fit mobile screen without clipping) --- */
+        /* --- LOWER DASHBOARD --- */
         .dashboard {
             height: 68vh;
             background: linear-gradient(180deg, #0b0f19 0%, #04060a 100%);
@@ -277,7 +272,6 @@
             gap: 4px;
         }
 
-        /* Perfectly Sized Action Buttons */
         .action-btn {
             display: block;
             border: 1px solid rgba(255,255,255,0.2);
@@ -382,7 +376,7 @@
             padding-bottom: 4px;
         }
 
-        /* --- MOBILE LAYOUT ADJUSTMENT FOR 1-SCREEN VIEW --- */
+        /* --- MOBILE LAYOUT ADJUSTMENT --- */
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -392,7 +386,7 @@
             }
             .console-panel { padding: 4px; }
             .screen-monitor { height: 42px; }
-            .switch-grid { display: none; } /* Keeps things compact and clean on phones */
+            .switch-grid { display: none; }
             .window-frame { height: 26vh; }
         }
     </style>
@@ -400,9 +394,9 @@
 <body>
 
     <div class="cockpit-view">
-        <!-- TOP VIEWPORT WINDOW WITH SMALL MOON -->
+        <!-- TOP VIEWPORT WINDOW WITH DYNAMIC RANDOM STARS -->
         <div class="window-frame">
-            <div class="stars"></div>
+            <canvas id="starfieldCanvas"></canvas>
             <div class="realistic-moon">
                 <div class="lunar-crater lc1"></div>
                 <div class="lunar-crater lc2"></div>
@@ -411,7 +405,7 @@
             </div>
         </div>
 
-        <!-- LOWER INSTRUMENT DASHBOARD (Fit entirely without clipping) -->
+        <!-- LOWER INSTRUMENT DASHBOARD -->
         <div class="dashboard">
             <!-- Left Console Panel -->
             <div class="console-panel">
@@ -430,7 +424,7 @@
                 </div>
             </div>
 
-            <!-- Center Console Panel (Dials & Warnings) -->
+            <!-- Center Console Panel -->
             <div class="center-console">
                 <div class="warning-grid">
                     <div class="warn-light"></div>
@@ -443,7 +437,7 @@
                     <div class="warn-light orange"></div>
                 </div>
 
-                <!-- Interactive Dials for Hopium & Copium -->
+                <!-- Interactive Dials -->
                 <div class="dials-container">
                     <div class="dial-box">
                         <span class="dial-label">HOPIUM</span>
@@ -513,6 +507,60 @@
     </div>
 
     <script>
+        // --- RANDOM REALISTIC STARFIELD CANVAS ENGINE ---
+        const canvas = document.getElementById('starfieldCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const starsCount = 90;
+        const stars = [];
+
+        for (let i = 0; i < starsCount; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.5 + 0.3,
+                alpha: Math.random() * 0.7 + 0.3,
+                twinkleSpeed: Math.random() * 0.02 + 0.005,
+                vx: (Math.random() - 0.5) * 0.05,
+                vy: (Math.random() - 0.5) * 0.05
+            });
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            stars.forEach(star => {
+                star.alpha += star.twinkleSpeed;
+                if (star.alpha > 1 || star.alpha < 0.2) {
+                    star.twinkleSpeed = -star.twinkleSpeed;
+                }
+
+                star.x += star.vx;
+                star.y += star.vy;
+
+                if (star.x < 0) star.x = canvas.width;
+                if (star.x > canvas.width) star.x = 0;
+                if (star.y < 0) star.y = canvas.height;
+                if (star.y > canvas.height) star.y = 0;
+
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
+
+
         // --- DIAL LOGIC ---
         let hopiumDeg = 45;
         let hopiumLevel = 420;
