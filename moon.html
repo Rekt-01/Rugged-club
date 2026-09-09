@@ -3,11 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>REKT-OS v4.20 - Puter AI Edition</title>
+    <title>REKT-OS v4.20 - BRAINCELL-0 EDITION</title>
     
-    <!-- PUTER.JS -->
-    <script src="https://js.puter.com/v2/puter.js"></script>
-
     <style>
         * {
             box-sizing: border-box;
@@ -467,21 +464,22 @@
     <div class="cmd-overlay" id="cmdOverlay">
         <div class="cmd-window">
             <div class="cmd-header">
-                <span>REKT-OS v4.20 (PUTER KEYLESS AI)</span>
+                <span>REKT-OS v4.20 (DEGEN-BOT ZERO-IQ)</span>
                 <button class="cmd-close" onclick="closeTerminal()">[X]</button>
             </div>
             <div class="cmd-body" id="cmdBody">
                 <div class="prompt-list-help">
-                    AI LIVE (Zero API keys). Tap a command:<br>
-                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('market')">market</b> | 
-                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('strategy')">strategy</b> | 
-                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('vibe')">vibe</b> | 
-                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('wen')">wen</b>
+                    ZERO-IQ OFFLINE BOT. Try commands:<br>
+                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('/wen')">/wen</b> | 
+                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('/pump')">/pump</b> | 
+                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('/rekt')">/rekt</b> | 
+                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('/hodl')">/hodl</b> |
+                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('help')">help</b>
                 </div>
             </div>
             <div class="cmd-input-line">
                 <span>C:\REKT\></span>
-                <input type="text" class="cmd-input" id="cmdInput" placeholder="talk to safe degen ai..." onkeydown="handleCmd(event)">
+                <input type="text" class="cmd-input" id="cmdInput" placeholder="type a discord command like /wen..." onkeydown="handleCmd(event)">
             </div>
         </div>
     </div>
@@ -552,26 +550,8 @@
 
         function triggerWen() {
             openTerminal();
-            runPreset('wen');
+            runPreset('/wen');
         }
-
-        const forbiddenWords = [
-            'sex', 'porn', 'nsfw', 'nude', 'naked', 'xxx', 'dick', 'cock', 'pussy', 
-            'shit', 'fuck', 'bitch', 'asshole', 'damn', 'cunt', 'bastard', 'whore', 
-            'slut', 'kill', 'suicide', 'murder', 'blood', 'bomb', 'weapon', 'drug', 'heroin'
-        ];
-
-        function containsInappropriateContent(text) {
-            const lower = text.toLowerCase();
-            return forbiddenWords.some(word => lower.includes(word));
-        }
-
-        const chatMessages = [
-            { 
-                role: "system", 
-                content: "You are a fun crypto spaceship co-pilot AI. Speak in high-energy trading and space slang (like WEN MOON, DIAMOND HANDS, LFG, HODL). STRICT SAFETY RULE: You must NEVER use foul language, profanity, vulgarity, or any sexual content whatsoever. Keep all jokes clean, family-friendly, and focused purely on charts, rockets, space travel, and trading meme coins." 
-            }
-        ];
 
         function openTerminal() {
             document.getElementById('cmdOverlay').style.display = 'flex';
@@ -582,16 +562,11 @@
             document.getElementById('cmdOverlay').style.display = 'none';
         }
 
-        function appendToTerminal(text, isUser = false, isWarning = false) {
+        function appendToTerminal(text, isUser = false) {
             const body = document.getElementById('cmdBody');
             const div = document.createElement('div');
-            if (isWarning) {
-                div.style.color = '#ef4444';
-                div.style.fontWeight = 'bold';
-            } else {
-                div.style.color = isUser ? '#38bdf8' : '#22c55e';
-            }
-            div.innerHTML = (isUser ? 'C:\\REKT\\> ' : (isWarning ? 'WARNING: ' : 'AI: ')) + text;
+            div.style.color = isUser ? '#38bdf8' : '#22c55e';
+            div.innerHTML = (isUser ? 'C:\\REKT\\> ' : 'BOT: ') + text;
             body.appendChild(div);
             body.scrollTop = body.scrollHeight;
         }
@@ -603,50 +578,56 @@
                 if (!val) return;
                 appendToTerminal(val, true);
                 input.value = '';
-                processCommand(val);
+                processDegenBot(val);
             }
         }
 
         function runPreset(cmd) {
             appendToTerminal(cmd, true);
-            processCommand(cmd);
+            processDegenBot(cmd);
         }
 
-        async function processCommand(userText) {
-            if (containsInappropriateContent(userText)) {
-                appendToTerminal("Input rejected by safety protocol. Keep it space-safe!", false, true);
-                return;
-            }
+        // PRE-WRITTEN ZERO-IQ DEGEN REPLIES & DISCORD COMMANDS
+        const degenReplies = [
+            "WEN MOON? Bro we are already past Jupiter, buy the dip LFG! 🚀",
+            "Diamond hands only! 💎🙌 If your portfolio isn't down 90%, are you even trying?",
+            "DEV IS DOXXED... wait no, dev just rugged into a hardware wallet. GG WP.",
+            "Up only! Green candles straight to Valhalla! 🕯️📈",
+            "Just aped another 4 sol into a random dog coin named after Elon's toaster. Wish me luck.",
+            "Touching grass is bearish. Stay locked in the Discord voice chat.",
+            "Liquidation price? Right below current market price, exactly how we like the adrenaline.",
+            "Bro trust me, it's a structural redistribution event before the mega-pump. Pass the hopium tank.",
+            "NGMI if you sell here. Real chads go down with the spaceship. 🚢💥",
+            "Copy trading my cat right now and she's outperforming Wall Street."
+        ];
 
-            chatMessages.push({ role: "user", content: userText });
+        function processDegenBot(input) {
+            const lower = input.toLowerCase();
+            let response = "";
 
-            const body = document.getElementById('cmdBody');
-            const loadingDiv = document.createElement('div');
-            loadingDiv.style.color = '#facc15';
-            loadingDiv.id = 'loading-indicator';
-            loadingDiv.innerHTML = 'AI: scanning deep space charts...';
-            body.appendChild(loadingDiv);
-            body.scrollTop = body.scrollHeight;
-
-            try {
-                // Using explicit provider syntax for Puter.js
-                const response = await puter.chat(chatMessages, { model: "openai/gpt-4o-mini" });
-                
-                if (document.getElementById('loading-indicator')) {
-                    document.getElementById('loading-indicator').remove();
+            setTimeout(() => {
+                if (lower.includes('/wen') || lower.includes('wen')) {
+                    const wenAnswers = [
+                        "Moon is scheduled for tomorrow at 2:32 PM UTC. Bring snacks.",
+                        "Wen? Now. Always now. Stop asking questions and buy more.",
+                        "The moon was last Tuesday. We are heading for deep space exile now."
+                    ];
+                    response = wenAnswers[Math.floor(Math.random() * wenAnswers.length)];
+                } else if (lower.includes('/pump') || lower.includes('pump')) {
+                    response = "PUMPING INITIATED. Main thrusters screaming! 🚀🔥🔥";
+                } else if (lower.includes('/rekt') || lower.includes('rekt') || lower.includes('liquidat')) {
+                    response = "🚨 WARNING: Position completely wiped out! Margin call answered with tears. F.";
+                } else if (lower.includes('/hodl') || lower.includes('hodl')) {
+                    response = "HODL mode locked with industrial welding equipment. Keys thrown into a black hole.";
+                } else if (lower.includes('help')) {
+                    response = "Available discord commands: /wen, /pump, /rekt, /hodl, or just type random text for pure degen wisdom.";
+                } else {
+                    // Pick a totally random zero-iq quote
+                    response = degenReplies[Math.floor(Math.random() * degenReplies.length)];
                 }
 
-                const aiReply = response?.message?.content || response.toString();
-                appendToTerminal(aiReply);
-                chatMessages.push({ role: "assistant", content: aiReply });
-
-            } catch (err) {
-                if (document.getElementById('loading-indicator')) {
-                    document.getElementById('loading-indicator').remove();
-                }
-                console.error(err);
-                appendToTerminal("ERROR: " + (err.message || "Signal lost. Make sure you're connected to the internet."));
-            }
+                appendToTerminal(response);
+            }, 300);
         }
     </script>
 </body>
