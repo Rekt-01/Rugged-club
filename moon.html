@@ -24,7 +24,6 @@
             -webkit-font-smoothing: antialiased;
         }
         
-        /* CRT Scanline Overlay */
         body::after {
             content: " ";
             display: block;
@@ -46,7 +45,6 @@
             overflow: hidden;
         }
 
-        /* UPPER VIEWPORT WINDOW */
         .window-frame {
             height: 32vh;
             min-height: 140px;
@@ -95,7 +93,6 @@
             filter: drop-shadow(0 1px 2px rgba(0,0,0,0.9));
         }
 
-        /* LOWER DASHBOARD */
         .dashboard {
             height: 68vh;
             background: linear-gradient(180deg, #0b0f19 0%, #04060a 100%);
@@ -290,7 +287,6 @@
         .wen-btn { background: linear-gradient(180deg, #facc15, #ca8a04); color: #000; text-shadow: 0 1px rgba(255,255,255,0.4); }
         .return-btn { background: linear-gradient(180deg, #4ade80, #16a34a); color: #000; text-shadow: 0 1px rgba(255,255,255,0.4); }
 
-        /* TERMINAL MODAL WINDOW */
         .cmd-overlay {
             display: none;
             position: fixed;
@@ -633,14 +629,13 @@
             body.scrollTop = body.scrollHeight;
 
             try {
-                // Correct Puter JS API method syntax using puter.chat()
-                const response = await puter.chat(chatMessages, { model: "gpt-4o-mini" });
+                // Using explicit provider syntax for Puter.js
+                const response = await puter.chat(chatMessages, { model: "openai/gpt-4o-mini" });
                 
                 if (document.getElementById('loading-indicator')) {
                     document.getElementById('loading-indicator').remove();
                 }
 
-                // Handle standardized response object text extraction
                 const aiReply = response?.message?.content || response.toString();
                 appendToTerminal(aiReply);
                 chatMessages.push({ role: "assistant", content: aiReply });
@@ -649,7 +644,8 @@
                 if (document.getElementById('loading-indicator')) {
                     document.getElementById('loading-indicator').remove();
                 }
-                appendToTerminal("ERROR: Signal lost behind asteroid belt. Try again!");
+                console.error(err);
+                appendToTerminal("ERROR: " + (err.message || "Signal lost. Make sure you're connected to the internet."));
             }
         }
     </script>
