@@ -411,7 +411,7 @@
             <div class="console-panel">
                 <div class="screen-monitor">
                     <div class="screen-content">
-                        [SYSTEM: ULTRA_DEGEN]<br>
+                        [SYSTEM: REKT-OS 4.20]<br>
                         LIQUIDATION RISK: 99.8%<br>
                         STATUS: FULL SEND 🚀
                     </div>
@@ -486,22 +486,21 @@
     <div class="cmd-overlay" id="cmdOverlay">
         <div class="cmd-window">
             <div class="cmd-header">
-                <span>DEGEN-OS v6.9.420</span>
+                <span>REKT-OS v4.20 (SECURE FILTER)</span>
                 <button class="cmd-close" onclick="closeTerminal()">[X]</button>
             </div>
             <div class="cmd-body" id="cmdBody">
                 <div class="prompt-list-help">
-                    SYSTEM ONLINE. Tap a command:<br>
+                    AI LIVE (Strict Filter Active). Tap a command:<br>
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('market')">market</b> | 
-                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('wife')">wife</b> | 
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('strategy')">strategy</b> | 
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('vibe')">vibe</b> | 
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('wen')">wen</b>
                 </div>
             </div>
             <div class="cmd-input-line">
-                <span>C:\DEGEN\></span>
-                <input type="text" class="cmd-input" id="cmdInput" placeholder="type command..." onkeydown="handleCmd(event)">
+                <span>C:\REKT\></span>
+                <input type="text" class="cmd-input" id="cmdInput" placeholder="talk to safe degen ai..." onkeydown="handleCmd(event)">
             </div>
         </div>
     </div>
@@ -587,7 +586,26 @@
             runPreset('wen');
         }
 
-        // --- TERMINAL LOGIC ---
+        // --- CLIENT-SIDE CONTENT MODERATION FILTER ---
+        const forbiddenWords = [
+            'sex', 'porn', 'nsfw', 'nude', 'naked', 'xxx', 'dick', 'cock', 'pussy', 
+            'shit', 'fuck', 'bitch', 'asshole', 'damn', 'cunt', 'bastard', 'whore', 
+            'slut', 'kill', 'suicide', 'murder', 'blood', 'bomb', 'weapon', 'drug', 'heroin'
+        ];
+
+        function containsInappropriateContent(text) {
+            const lower = text.toLowerCase();
+            return forbiddenWords.some(word => lower.includes(word));
+        }
+
+        // --- TERMINAL LOGIC & SAFE AI INTEGRATION ---
+        const chatMessages = [
+            { 
+                role: "system", 
+                content: "You are a fun crypto spaceship co-pilot AI. Speak in high-energy trading and space slang (like WEN MOON, DIAMOND HANDS, LFG, HODL). Keep all jokes clean, family-friendly, and focused purely on charts, rockets, space travel, and trading meme coins." 
+            }
+        ];
+
         function openTerminal() {
             document.getElementById('cmdOverlay').style.display = 'flex';
             setTimeout(() => { document.getElementById('cmdInput').focus(); }, 100);
@@ -597,11 +615,16 @@
             document.getElementById('cmdOverlay').style.display = 'none';
         }
 
-        function appendToTerminal(text, isUser = false) {
+        function appendToTerminal(text, isUser = false, isWarning = false) {
             const body = document.getElementById('cmdBody');
             const div = document.createElement('div');
-            div.style.color = isUser ? '#38bdf8' : '#22c55e';
-            div.innerHTML = (isUser ? 'C:\\DEGEN\\> ' : '') + text;
+            if (isWarning) {
+                div.style.color = '#ef4444'; // Red warning color
+                div.style.fontWeight = 'bold';
+            } else {
+                div.style.color = isUser ? '#38bdf8' : '#22c55e';
+            }
+            div.innerHTML = (isUser ? 'C:\\REKT\\> ' : (isWarning ? 'WARNING: ' : 'AI: ')) + text;
             body.appendChild(div);
             body.scrollTop = body.scrollHeight;
         }
@@ -609,7 +632,7 @@
         function handleCmd(e) {
             if (e.key === 'Enter') {
                 const input = document.getElementById('cmdInput');
-                const val = input.value.trim().toLowerCase();
+                const val = input.value.trim();
                 if (!val) return;
                 
                 appendToTerminal(val, true);
@@ -623,32 +646,46 @@
             processCommand(cmd);
         }
 
-        function processCommand(cmd) {
-            const responses = {
-                'wen': "WEN LAMBO? WEN MOON? WEN RECOVERY? Answer: Never. You are trapped in this cockpit forever because you bought a layer-3 meme chain token with a telegram channel of 4 people. Enjoy the view.",
-                'market': "CRITICAL ALERT: Your portfolio is down 94% today. However, technical analysis confirms a macro-pennant wedge formation on the 4-second chart. We are literally one green candle away from generational wealth.",
-                'wife': "QUERY ERROR: Significant other status unknown. Last recorded communication: 'Why is there a hardware wallet taped to the microwave?' Relationship sentiment index: -1000%.",
-                'strategy': "STEP 1: Sell furniture on Facebook Marketplace to buy high-leverage microcap tokens. STEP 2: Stare blindly at a blank Excel sheet until your eyes bleed. STEP 3: Blame market makers.",
-                'vibe': "CABIN ATMOSPHERE: Pure uncut terminal velocity psychosis. The oxygen mix has been entirely replaced by nitrogen and pure unadulterated hubris. Strap in.",
-                'help': "AVAILABLE COMMANDS: 'wen', 'market', 'wife', 'strategy', 'vibe', 'liquidation', 'rug'. Type any word for immediate unhinged spiritual guidance.",
-                'liquidation': "WARNING: Margin call incoming. Your long position has been violently deleted from existence by an exchange clerk named 'Chad_99' laughing in a Telegram group chat.",
-                'rug': "ANALYSIS COMPLETE: The dev abandoned the project and spent the liquidity pool on a jet ski in Dubai. You now own a community-led bag of absolute air. Congrats."
-            };
-
-            let reply = responses[cmd];
-            if (!reply) {
-                const defaults = [
-                    "ERROR 404: Brain cells not found. Try typing 'wen', 'market', or 'strategy'.",
-                    "SYSTEM OVERRIDE: That command makes zero sense, but your confidence is inspiring. Buy more bags.",
-                    "ANALYSIS: Absolute nonsense input received. Rerouting processing power to maximize leverage capacity.",
-                    "FATAL EXCEPTION: You've been staring at charts too long. Go touch grass."
-                ];
-                reply = defaults[Math.floor(Math.random() * defaults.length)];
+        async function processCommand(userText) {
+            // CHECK FOR INAPPROPRIATE CONTENT BEFORE CONTACTING API
+            if (containsInappropriateContent(userText)) {
+                appendToTerminal("Input rejected by safety protocol. Inappropriate language or content detected. Please keep communications space-safe!", false, true);
+                return; // Blocks the network request entirely
             }
 
-            setTimeout(() => {
-                appendToTerminal(reply);
-            }, 300);
+            chatMessages.push({ role: "user", content: userText });
+
+            const body = document.getElementById('cmdBody');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.style.color = '#facc15';
+            loadingDiv.id = 'loading-indicator';
+            loadingDiv.innerHTML = 'AI: scanning deep space charts...';
+            body.appendChild(loadingDiv);
+            body.scrollTop = body.scrollHeight;
+
+            try {
+                const response = await fetch('https://text.pollinations.ai/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: chatMessages,
+                        model: 'openai'
+                    })
+                });
+
+                const aiReply = await response.text();
+                
+                document.getElementById('loading-indicator').remove();
+
+                appendToTerminal(aiReply);
+                chatMessages.push({ role: "assistant", content: aiReply });
+
+            } catch (err) {
+                if (document.getElementById('loading-indicator')) {
+                    document.getElementById('loading-indicator').remove();
+                }
+                appendToTerminal("ERROR: Signal lost behind asteroid belt. Try again!");
+            }
         }
     </script>
 </body>
