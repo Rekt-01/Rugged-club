@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>pacman.html - APE-man Edition</title>
+  <title>pacman.html - APE-man 10-Level Ultimate Edition</title>
   <style>
     * {
       box-sizing: border-box;
@@ -129,11 +129,11 @@
       display: none;
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.9);
       z-index: 20;
       justify-content: center;
       align-items: center;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(5px);
     }
     .modal-card {
       background: #0d0d12;
@@ -168,6 +168,19 @@
       cursor: pointer;
       font-size: 0.7rem;
       text-transform: uppercase;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+    .modal-btn:hover { background: #ff00ff; color: #fff; }
+
+    /* Celebration Canvas Overlay */
+    #particleCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: none;
     }
   </style>
 </head>
@@ -175,17 +188,18 @@
 
   <div class="arcade-container">
     <div class="header-bar">
-      <div class="title-text">🦍 APE-man: CHASE THE DEV 🦦</div>
+      <div class="title-text" id="levelTitle">🦍 APE-man: LVL 1 (VERY EASY)</div>
       <a href="index.html" class="exit-btn">🚪 EXIT</a>
     </div>
 
     <div class="scoreboard">
-      <div class="score-item">LIQUIDITY (SCORE): <span id="scoreDisplay">0</span></div>
-      <div class="score-item">BAGS (LIVES): <span id="livesDisplay">3</span></div>
+      <div class="score-item">LIQUIDITY: <span id="scoreDisplay">0</span></div>
+      <div class="score-item">BAGS: <span id="livesDisplay">3</span></div>
     </div>
 
     <div class="canvas-wrapper">
       <canvas id="arcadeCanvas" width="304" height="336"></canvas>
+      <canvas id="particleCanvas" width="304" height="336"></canvas>
     </div>
 
     <div class="dpad">
@@ -196,53 +210,123 @@
     </div>
   </div>
 
+  <!-- End Game / Win Modal -->
   <div class="modal-overlay" id="endGameModal">
     <div class="modal-card">
       <div class="modal-title" id="modalTitle">GAME OVER</div>
       <div class="modal-desc" id="modalDesc">The dev otter rugged your bags!</div>
-      <button class="modal-btn" onclick="resetGame()">APE BACK IN 🔄</button>
+      <button class="modal-btn" id="modalActionBtn" onclick="resetGame()">APE BACK IN 🔄</button>
     </div>
   </div>
 
   <script>
     const canvas = document.getElementById('arcadeCanvas');
     const ctx = canvas.getContext('2d');
+    const pCanvas = document.getElementById('particleCanvas');
+    const pCtx = pCanvas.getContext('2d');
 
     const tileSize = 16;
     let score = 0;
     let lives = 3;
-    let gameOver = false;
+    let currentLevel = 1;
+    let gameState = 'PLAYING'; // PLAYING, CELEBRATION, GAMEOVER, VICTORY
     let frightTimer = 0;
+    let celebrationTimer = 0;
+    let particles = [];
+    let textPopups = [];
 
-    // Map Legend: 
-    // 1 = Wall, 0 = Classic Dot, 2 = Empty Path, 3 = Diamond 💎, 4 = Money Bag 💰
-    const map = [
-      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-      [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
-      [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-      [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-      [1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1],
-      [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
-      [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
-      [1,1,1,1,0,1,1,1,2,1,2,1,1,1,0,1,1,1,1],
-      [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
-      [1,1,1,1,0,1,2,1,1,2,1,1,2,1,0,1,1,1,1],
-      [2,2,2,2,0,2,2,1,2,2,2,1,2,2,0,2,2,2,2],
-      [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
-      [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
-      [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1],
-      [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
-      [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-      [1,0,0,1,0,0,0,0,0,4,0,0,0,0,0,1,0,0,1],
-      [1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1],
-      [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
-      [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
-      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    // 10 Level configurations ranging from Very Easy to Extremely Ultra Hard
+    const levelConfigs = [
+      { name: "LVL 1: VERY EASY", ghostSpeed: 0.6, smartness: 0.1, ghostCount: 2, mapType: 0 },
+      { name: "LVL 2: EASY", ghostSpeed: 0.8, smartness: 0.2, ghostCount: 2, mapType: 1 },
+      { name: "LVL 3: CASUAL", ghostSpeed: 1.0, smartness: 0.3, ghostCount: 3, mapType: 2 },
+      { name: "LVL 4: MEDIUM", ghostSpeed: 1.1, smartness: 0.4, ghostCount: 3, mapType: 0 },
+      { name: "LVL 5: HARD", ghostSpeed: 1.25, smartness: 0.5, ghostCount: 4, mapType: 1 },
+      { name: "LVL 6: VERY HARD", ghostSpeed: 1.4, smartness: 0.65, ghostCount: 4, mapType: 2 },
+      { name: "LVL 7: INSANE", ghostSpeed: 1.55, smartness: 0.8, ghostCount: 4, mapType: 0 },
+      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1.7, smartness: 0.9, ghostCount: 4, mapType: 1 },
+      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1.9, smartness: 0.95, ghostCount: 4, mapType: 2 },
+      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 2.2, smartness: 1.0, ghostCount: 4, mapType: 0 }
     ];
 
-    let currentMap = JSON.parse(JSON.stringify(map));
+    // Base templates for structural layout variations
+    const baseMaps = [
+      // Map Type 0 (Classic Open)
+      [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
+        [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
+        [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
+        [1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
+        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
+        [1,1,1,1,0,1,1,1,2,1,2,1,1,1,0,1,1,1,1],
+        [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
+        [1,1,1,1,0,1,2,1,1,2,1,1,2,1,0,1,1,1,1],
+        [2,2,2,2,0,2,2,1,2,2,2,1,2,2,0,2,2,2,2],
+        [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
+        [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
+        [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1],
+        [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
+        [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
+        [1,0,0,1,0,0,0,0,0,4,0,0,0,0,0,1,0,0,1],
+        [1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1],
+        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
+        [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+      ],
+      // Map Type 1 (Labyrinth Maze)
+      [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,3,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,3,1],
+        [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
+        [1,0,0,0,0,1,0,0,0,4,0,0,0,1,0,0,0,0,1],
+        [1,1,1,0,1,1,1,1,0,1,0,1,1,1,1,0,1,1,1],
+        [2,2,1,0,0,0,0,1,0,2,0,1,0,0,0,0,1,2,2],
+        [1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1],
+        [1,0,0,0,1,2,2,2,2,2,2,2,2,2,1,0,0,0,1],
+        [1,0,1,1,1,2,1,1,1,2,1,1,1,2,1,1,1,0,1],
+        [1,0,0,0,0,2,1,2,2,2,2,2,1,2,0,0,0,0,1],
+        [1,1,1,1,0,2,1,2,1,2,1,2,1,2,0,1,1,1,1],
+        [2,2,2,1,0,2,1,2,2,2,2,2,1,2,0,1,2,2,2],
+        [1,1,1,1,0,2,1,1,1,1,1,1,1,2,0,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,0,1,1,0,1,1,1,0,1,1,0,1,1,0,1],
+        [1,3,0,1,0,0,0,0,0,2,0,0,0,0,0,1,0,3,1],
+        [1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1],
+        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
+        [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
+        [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+      ],
+      // Map Type 2 (Tight Corridor Trap)
+      [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,3,0,0,0,1,0,0,0,4,0,0,0,1,0,0,0,3,1],
+        [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
+        [1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1],
+        [1,0,1,0,1,1,1,1,0,1,0,1,1,1,1,0,1,0,1],
+        [1,0,0,0,0,0,0,1,0,2,0,1,0,0,0,0,0,0,1],
+        [1,1,1,1,0,1,0,1,1,2,1,1,0,1,0,1,1,1,1],
+        [2,2,2,1,0,1,0,2,2,2,2,2,0,1,0,1,2,2,2],
+        [1,1,1,1,0,1,0,1,1,2,1,1,0,1,0,1,1,1,1],
+        [2,2,2,2,0,0,0,1,2,2,2,1,0,0,0,2,2,2,2],
+        [1,1,1,1,0,1,0,1,2,2,2,1,0,1,0,1,1,1,1],
+        [2,2,2,1,0,1,0,1,1,1,1,1,0,1,0,1,2,2,2],
+        [1,1,1,1,0,1,0,0,0,4,0,0,0,1,0,1,1,1,1],
+        [1,0,0,0,0,1,1,1,0,1,0,1,1,1,0,0,0,0,1],
+        [1,0,1,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,1],
+        [1,3,0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,3,1],
+        [1,1,0,1,0,0,0,1,0,2,0,1,0,0,0,1,0,1,1],
+        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
+        [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
+        [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+      ]
+    ];
 
-    // Player character: 🦍 APE-man (locked strictly to grid lines)
+    let currentMap = [];
+
     let player = {
       x: 9 * tileSize,
       y: 16 * tileSize,
@@ -250,18 +334,39 @@
       dy: 0,
       nextDx: 0,
       nextDy: 0,
-      speed: 1
+      speed: 1.2
     };
 
-    // Ghosts: 🦦 The Devs
-    let ghosts = [
-      { x: 9 * tileSize, y: 9 * tileSize, dx: 1, dy: 0 },
-      { x: 8 * tileSize, y: 10 * tileSize, dx: -1, dy: 0 },
-      { x: 9 * tileSize, y: 10 * tileSize, dx: 0, dy: -1 },
-      { x: 10 * tileSize, y: 10 * tileSize, dx: 0, dy: 1 }
-    ];
+    let ghosts = [];
+
+    function initLevel() {
+      let cfg = levelConfigs[currentLevel - 1];
+      document.getElementById('levelTitle').innerText = `🦍 ${cfg.name}`;
+      currentMap = JSON.parse(JSON.stringify(baseMaps[cfg.mapType]));
+      
+      resetPositions();
+
+      // Initialize ghosts according to level configuration
+      ghosts = [];
+      let startCoords = [
+        {x: 9, y: 9, dx: 1, dy: 0},
+        {x: 8, y: 10, dx: -1, dy: 0},
+        {x: 9, y: 10, dx: 0, dy: -1},
+        {x: 10, y: 10, dx: 0, dy: 1}
+      ];
+
+      for(let i = 0; i < cfg.ghostCount; i++) {
+        ghosts.push({
+          x: startCoords[i].x * tileSize,
+          y: startCoords[i].y * tileSize,
+          dx: startCoords[i].dx,
+          dy: startCoords[i].dy
+        });
+      }
+    }
 
     function setDirection(x, y) {
+      if (gameState !== 'PLAYING') return;
       player.nextDx = x;
       player.nextDy = y;
     }
@@ -274,7 +379,11 @@
     });
 
     function update() {
-      if (gameOver) return;
+      if (gameState === 'CELEBRATION') {
+        updateCelebrationParticles();
+        return;
+      }
+      if (gameState !== 'PLAYING') return;
 
       if (frightTimer > 0) frightTimer--;
 
@@ -308,20 +417,25 @@
         if (currentMap[pRow][pCol] === 0) {
           currentMap[pRow][pCol] = 2;
           score += 10;
+          checkLevelCompletion();
         } else if (currentMap[pRow][pCol] === 4) {
           currentMap[pRow][pCol] = 2;
           score += 100;
+          checkLevelCompletion();
         } else if (currentMap[pRow][pCol] === 3) {
           currentMap[pRow][pCol] = 2;
           score += 50;
-          frightTimer = 350; // Dev panic mode
+          frightTimer = 300; // Dev panic mode
+          checkLevelCompletion();
         }
       }
 
       document.getElementById('scoreDisplay').innerText = score;
       document.getElementById('livesDisplay').innerText = lives;
 
-      // Move ghosts (Devs)
+      let cfg = levelConfigs[currentLevel - 1];
+
+      // Move ghosts (Devs) with tactical AI scaling per level
       ghosts.forEach(g => {
         if (g.x % tileSize === 0 && g.y % tileSize === 0) {
           let directions = [
@@ -334,14 +448,30 @@
           });
 
           if (valid.length > 0) {
-            let chosen = valid[Math.floor(Math.random() * valid.length)];
+            let chosen = valid[0];
+            // Intelligent targeting based on level smartness parameter
+            if (Math.random() < cfg.smartness && frightTimer === 0) {
+              let bestDist = Infinity;
+              valid.forEach(d => {
+                let ntx = Math.floor(g.x / tileSize) + d.dx;
+                let nty = Math.floor(g.y / tileSize) + d.dy;
+                let dist = Math.hypot(ntx - pCol, nty - pRow);
+                if (dist < bestDist) {
+                  bestDist = dist;
+                  chosen = d;
+                }
+              });
+            } else {
+              chosen = valid[Math.floor(Math.random() * valid.length)];
+            }
             g.dx = chosen.dx;
             g.dy = chosen.dy;
           }
         }
 
-        g.x += g.dx * (frightTimer > 0 ? 0.5 : 1);
-        g.y += g.dy * (frightTimer > 0 ? 0.5 : 1);
+        let gSpeed = frightTimer > 0 ? 0.5 : cfg.ghostSpeed;
+        g.x += g.dx * gSpeed;
+        g.y += g.dy * gSpeed;
 
         // Check collision with player
         let dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
@@ -355,14 +485,96 @@
             // Player lost life
             lives--;
             if (lives <= 0) {
-              gameOver = true;
-              document.getElementById('endGameModal').style.display = 'flex';
+              gameState = 'GAMEOVER';
+              triggerGameOverModal("GAME OVER", "The dev otter rugged your bags!", "APE BACK IN 🔄", resetGame);
             } else {
               resetPositions();
             }
           }
         }
       });
+    }
+
+    function checkLevelCompletion() {
+      // Check if any edible items (0, 3, 4) remain on map
+      let itemsRemaining = false;
+      for(let r = 0; r < currentMap.length; r++) {
+        for(let c = 0; c < currentMap[r].length; c++) {
+          if(currentMap[r][c] === 0 || currentMap[r][c] === 3 || currentMap[r][c] === 4) {
+            itemsRemaining = true;
+            break;
+          }
+        }
+        if(itemsRemaining) break;
+      }
+
+      if(!itemsRemaining) {
+        triggerCelebration();
+      }
+    }
+
+    function triggerCelebration() {
+      gameState = 'CELEBRATION';
+      celebrationTimer = 180; // ~3 seconds at 60fps
+      pCanvas.style.display = 'block';
+      
+      // Spawn Degen Celebration Confetti Particles
+      particles = [];
+      const emojis = ['🚀', '🌕', '💎', '💰', '🦍', '🍾', '🔥', '📈'];
+      for(let i = 0; i < 50; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 6,
+          vy: (Math.random() - 0.7) * 7,
+          emoji: emojis[Math.floor(Math.random() * emojis.length)],
+          size: 14 + Math.random() * 10,
+          alpha: 1,
+          rot: Math.random() * Math.PI
+        });
+      }
+    }
+
+    function updateCelebrationParticles() {
+      celebrationTimer--;
+      pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+
+      // Draw floating Degen text banner in center
+      pCtx.font = "bold 16px monospace";
+      pCtx.textAlign = "center";
+      pCtx.fillStyle = "#00ffff";
+      pCtx.shadowColor = "#ff00ff";
+      pCtx.shadowBlur = 12;
+      pCtx.fillText(`🎉 LEVEL ${currentLevel} CLEARED! 🎉`, pCanvas.width / 2, pCanvas.height / 2 - 20);
+      pCtx.fillStyle = "#ffcc00";
+      pCtx.fillText("DIAMOND HANDS WIN 🚀", pCanvas.width / 2, pCanvas.height / 2 + 10);
+      pCtx.shadowBlur = 0;
+
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.2; // gravity
+        p.alpha -= 0.005;
+
+        pCtx.save();
+        pCtx.globalAlpha = Math.max(p.alpha, 0);
+        pCtx.font = `${p.size}px sans-serif`;
+        pCtx.textAlign = 'center';
+        pCtx.fillText(p.emoji, p.x, p.y);
+        pCtx.restore();
+      });
+
+      if (celebrationTimer <= 0) {
+        pCanvas.style.display = 'none';
+        currentLevel++;
+        if (currentLevel > 10) {
+          gameState = 'VICTORY';
+          triggerGameOverModal("CHAD MOON LANDING 🌕", `Absolute legend! You survived all 10 levels with ${score} Liquidity!`, "PLAY AGAIN 🔄", resetGame);
+        } else {
+          gameState = 'PLAYING';
+          initLevel();
+        }
+      }
     }
 
     function resetPositions() {
@@ -377,11 +589,21 @@
     function resetGame() {
       score = 0;
       lives = 3;
-      gameOver = false;
+      currentLevel = 1;
+      gameState = 'PLAYING';
       frightTimer = 0;
-      currentMap = JSON.parse(JSON.stringify(map));
       document.getElementById('endGameModal').style.display = 'none';
-      resetPositions();
+      pCanvas.style.display = 'none';
+      initLevel();
+    }
+
+    function triggerGameOverModal(title, desc, btnText, callback) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalDesc').innerText = desc;
+      let btn = document.getElementById('modalActionBtn');
+      btn.innerText = btnText;
+      btn.onclick = callback;
+      document.getElementById('endGameModal').style.display = 'flex';
     }
 
     function draw() {
@@ -392,9 +614,9 @@
       for (let r = 0; r < 21; r++) {
         for (let c = 0; c < 19; c++) {
           if (currentMap[r][c] === 1) {
-            ctx.fillStyle = '#1a1a3a';
+            ctx.fillStyle = currentLevel > 7 ? '#3a003a' : '#1a1a3a';
             ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
-            ctx.strokeStyle = '#00ffff';
+            ctx.strokeStyle = currentLevel > 7 ? '#ff0055' : '#00ffff';
             ctx.lineWidth = 0.5;
             ctx.strokeRect(c * tileSize, r * tileSize, tileSize, tileSize);
           } else if (currentMap[r][c] === 0) {
@@ -437,6 +659,8 @@
       requestAnimationFrame(loop);
     }
 
+    // Initialize first level on boot
+    initLevel();
     loop();
   </script>
 </body>
