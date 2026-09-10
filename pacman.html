@@ -378,6 +378,7 @@
 
       if (frightTimer > 0) frightTimer--;
 
+      // Player Grid Collision Check (Strictly blocked by walls: 1)
       if (player.x % tileSize === 0 && player.y % tileSize === 0) {
         let nextTx = Math.floor(player.x / tileSize) + player.nextDx;
         let nextTy = Math.floor(player.y / tileSize) + player.nextDy;
@@ -424,6 +425,7 @@
       let cfg = levelConfigs[currentLevel - 1];
 
       ghosts.forEach(g => {
+        // Ghost Grid Collision Check (Strictly blocked by walls: 1)
         if (g.x % tileSize === 0 && g.y % tileSize === 0) {
           let directions = [
             {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
