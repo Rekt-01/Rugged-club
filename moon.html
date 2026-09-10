@@ -362,6 +362,71 @@
             padding-bottom: 4px;
         }
 
+        /* Degen Easter Egg Popup Styles */
+        .degen-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .degen-popup-box {
+            background: linear-gradient(145deg, #0f172a, #020617);
+            border: 2px solid #a855f7;
+            border-radius: 10px;
+            width: min(420px, 100%);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 35px rgba(168, 85, 247, 0.4);
+            position: relative;
+        }
+        .degen-popup-title {
+            color: #f43f5e;
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(244, 63, 94, 0.6);
+        }
+        .degen-popup-code {
+            color: #38bdf8;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 8px 0;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.7);
+        }
+        .degen-popup-text {
+            color: #cbd5e1;
+            font-size: 11px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        .degen-popup-btn {
+            background: linear-gradient(180deg, #a855f7, #7e22ce);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 11px;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+            text-transform: uppercase;
+        }
+        .degen-popup-btn:active {
+            transform: scale(0.95);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -461,6 +526,19 @@
         </div>
     </div>
 
+    <!-- Hidden Degen Easter Egg Popup -->
+    <div class="degen-popup-overlay" id="degenPopup">
+        <div class="degen-popup-box">
+            <div class="degen-popup-title">⚠️ SYSTEM OVERLOAD ⚠️</div>
+            <div class="degen-popup-code">404</div>
+            <div class="degen-popup-text">
+                Braincells not found. Financial advisors hate you. You just mainlined enough chemical vapor to successfully reverse-engineer a rugpull using pure unfiltered delusion.<br><br>
+                <b>YOU ARE THE GREATEST DEGEN OF ALL TIME.</b>
+            </div>
+            <button class="degen-popup-btn" onclick="closeDegenPopup()">Accept Your Crown 👑</button>
+        </div>
+    </div>
+
     <div class="cmd-overlay" id="cmdOverlay">
         <div class="cmd-window">
             <div class="cmd-header">
@@ -534,18 +612,56 @@
         let hopiumDeg = 45, hopiumLevel = 420;
         let copiumDeg = -30, copiumLevel = 69;
 
+        // Easter egg tracking variables
+        let hopiumClicks = 0;
+        let copiumClicks = 0;
+        let comboTimeout = null;
+
         function boostDial(type) {
             if (type === 'hopium') {
                 hopiumDeg = (hopiumDeg + 55) % 360;
                 hopiumLevel += 133.7;
                 document.getElementById('hopium-needle').style.transform = `translate(-50%, 0) rotate(${hopiumDeg}deg)`;
                 document.getElementById('hopium-val').innerText = Math.floor(hopiumLevel) + '%';
+
+                // Easter egg sequence logic
+                hopiumClicks++;
+                checkDegenCombo();
             } else {
                 copiumDeg = (copiumDeg + 55) % 360;
                 copiumLevel += 88.8;
                 document.getElementById('copium-needle').style.transform = `translate(-50%, 0) rotate(${copiumDeg}deg)`;
                 document.getElementById('copium-val').innerText = Math.floor(copiumLevel) + '%';
+
+                // Easter egg sequence logic
+                copiumClicks++;
+                checkDegenCombo();
             }
+        }
+
+        function checkDegenCombo() {
+            // Reset combo if user waits too long between clicks (e.g., 2.5 seconds)
+            clearTimeout(comboTimeout);
+            comboTimeout = setTimeout(() => {
+                hopiumClicks = 0;
+                copiumClicks = 0;
+            }, 2500);
+
+            // Target: exactly 3 hopium and 2 copium continuously/in sequence
+            if (hopiumClicks === 3 && copiumClicks === 2) {
+                showDegenPopup();
+                hopiumClicks = 0;
+                copiumClicks = 0;
+                clearTimeout(comboTimeout);
+            }
+        }
+
+        function showDegenPopup() {
+            document.getElementById('degenPopup').style.display = 'flex';
+        }
+
+        function closeDegenPopup() {
+            document.getElementById('degenPopup').style.display = 'none';
         }
 
         function triggerWen() {
@@ -622,7 +738,6 @@
                 } else if (lower.includes('help')) {
                     response = "Available discord commands: /wen, /pump, /rekt, /hodl, or just type random text for pure degen wisdom.";
                 } else {
-                    // Pick a totally random zero-iq quote
                     response = degenReplies[Math.floor(Math.random() * degenReplies.length)];
                 }
 
