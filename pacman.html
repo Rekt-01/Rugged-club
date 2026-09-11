@@ -254,7 +254,6 @@
     let celebrationTimer = 0;
     let particles = [];
 
-    // Web Audio API Synthesized Synthwave / Chiptune Background Track
     let audioCtx = null;
     let musicPlaying = false;
     let musicInterval = null;
@@ -336,10 +335,10 @@
       }
     }, { once: true });
 
-    // 10 Levels with gentler otter speeds and much lower tracking intelligence (more random/dumber)
+    // Level configs with a super easy Level 1 setup
     const levelConfigs = [
-      { name: "LVL 1: VERY EASY", ghostSpeed: 0.7, smartness: 0.1, ghostCount: 2, mapType: 0, playerStart: {r: 16, c: 9} },
-      { name: "LVL 2: EASY", ghostSpeed: 0.75, smartness: 0.15, ghostCount: 2, mapType: 1, playerStart: {r: 3, c: 9} },
+      { name: "LVL 1: VERY EASY", ghostSpeed: 0.5, smartness: 0.05, ghostCount: 1, mapType: 0, playerStart: {r: 16, c: 9} },
+      { name: "LVL 2: EASY", ghostSpeed: 0.7, smartness: 0.1, ghostCount: 2, mapType: 1, playerStart: {r: 3, c: 9} },
       { name: "LVL 3: CASUAL", ghostSpeed: 0.8, smartness: 0.2, ghostCount: 3, mapType: 2, playerStart: {r: 17, c: 9} },
       { name: "LVL 4: MEDIUM", ghostSpeed: 0.85, smartness: 0.25, ghostCount: 3, mapType: 0, playerStart: {r: 10, c: 2} },
       { name: "LVL 5: HARD", ghostSpeed: 0.9, smartness: 0.3, ghostCount: 4, mapType: 1, playerStart: {r: 13, c: 16} },
@@ -375,7 +374,7 @@
         [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
       ],
-      // Map Type 1 (Fixed enclosed areas)
+      // Map Type 1 (Fixed enclosed areas / inaccessible yellow dots)
       [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,3,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,3,1],
@@ -385,8 +384,8 @@
         [2,2,1,0,0,0,0,1,0,2,0,1,0,0,0,0,1,2,2],
         [1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1],
         [1,0,0,0,1,2,2,2,2,2,2,2,2,2,1,0,0,0,1],
-        [1,0,1,1,1,2,1,1,1,2,1,1,1,2,1,1,1,0,1],
-        [1,0,0,0,0,2,1,2,2,2,2,2,1,2,0,0,0,0,1],
+        [1,0,1,0,1,2,1,1,1,2,1,1,1,2,1,0,1,0,1], // Fixed wall gap to access side dots
+        [1,0,0,0,0,2,1,0,0,2,0,0,1,2,0,0,0,0,1], // Opened path into center ring
         [1,1,1,1,0,2,1,2,1,2,1,2,1,2,0,1,1,1,1],
         [2,2,2,1,0,2,1,2,2,2,2,2,1,2,0,1,2,2,2],
         [1,1,1,1,0,2,1,1,1,1,1,1,1,2,0,1,1,1,1],
