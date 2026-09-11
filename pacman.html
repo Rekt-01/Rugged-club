@@ -232,20 +232,22 @@
     let celebrationTimer = 0;
     let particles = [];
 
+    // 10 Level configurations with explicit player start tiles & unique map layout assignments
     const levelConfigs = [
-      { name: "LVL 1: VERY EASY", ghostSpeed: 1, smartness: 0.1, ghostCount: 2, mapType: 0 },
-      { name: "LVL 2: EASY", ghostSpeed: 1, smartness: 0.2, ghostCount: 2, mapType: 1 },
-      { name: "LVL 3: CASUAL", ghostSpeed: 1, smartness: 0.3, ghostCount: 3, mapType: 2 },
-      { name: "LVL 4: MEDIUM", ghostSpeed: 1, smartness: 0.4, ghostCount: 3, mapType: 0 },
-      { name: "LVL 5: HARD", ghostSpeed: 1, smartness: 0.5, ghostCount: 4, mapType: 1 },
-      { name: "LVL 6: VERY HARD", ghostSpeed: 1, smartness: 0.65, ghostCount: 4, mapType: 2 },
-      { name: "LVL 7: INSANE", ghostSpeed: 1, smartness: 0.8, ghostCount: 4, mapType: 0 },
-      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1, smartness: 0.9, ghostCount: 4, mapType: 1 },
-      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1, smartness: 0.95, ghostCount: 4, mapType: 2 },
-      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 1, smartness: 1.0, ghostCount: 4, mapType: 0 }
+      { name: "LVL 1: VERY EASY", ghostSpeed: 1, smartness: 0.1, ghostCount: 2, mapType: 0, playerStart: {r: 16, c: 9} },
+      { name: "LVL 2: EASY", ghostSpeed: 1, smartness: 0.2, ghostCount: 2, mapType: 1, playerStart: {r: 3, c: 9} },
+      { name: "LVL 3: CASUAL", ghostSpeed: 1, smartness: 0.3, ghostCount: 3, mapType: 2, playerStart: {r: 17, c: 9} },
+      { name: "LVL 4: MEDIUM", ghostSpeed: 1, smartness: 0.4, ghostCount: 3, mapType: 0, playerStart: {r: 10, c: 9} },
+      { name: "LVL 5: HARD", ghostSpeed: 1, smartness: 0.5, ghostCount: 4, mapType: 1, playerStart: {r: 13, c: 9} },
+      { name: "LVL 6: VERY HARD", ghostSpeed: 1, smartness: 0.65, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 9} },
+      { name: "LVL 7: INSANE", ghostSpeed: 1, smartness: 0.8, ghostCount: 4, mapType: 0, playerStart: {r: 16, c: 9} },
+      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1, smartness: 0.9, ghostCount: 4, mapType: 1, playerStart: {r: 9, c: 9} },
+      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1, smartness: 0.95, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 9} },
+      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 1, smartness: 1.0, ghostCount: 4, mapType: 0, playerStart: {r: 16, c: 9} }
     ];
 
     const baseMaps = [
+      // Map Type 0
       [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
@@ -269,6 +271,7 @@
         [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
       ],
+      // Map Type 1
       [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,3,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,3,1],
@@ -292,6 +295,7 @@
         [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
       ],
+      // Map Type 2
       [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,3,0,0,0,1,0,0,0,4,0,0,0,1,0,0,0,3,1],
@@ -331,27 +335,59 @@
 
     let ghosts = [];
 
+    // Helper to find valid open floor tile coordinates (where map cell !== 1) near a preferred location
+    function findOpenTile(mapData, prefR, prefC) {
+      if (mapData[prefR] && mapData[prefR][prefC] !== 1) {
+        return {r: prefR, c: prefC};
+      }
+      // Spiral search outward for nearest open floor tile
+      for (let dist = 1; dist < 10; dist++) {
+        for (let dr = -dist; dr <= dist; dr++) {
+          for (let dc = -dist; dc <= dist; dc++) {
+            let r = prefR + dr;
+            let c = prefC + dc;
+            if (r >= 0 && r < 21 && c >= 0 && c < 19 && mapData[r][c] !== 1) {
+              return {r: r, c: c};
+            }
+          }
+        }
+      }
+      return {r: 9, c: 9}; // absolute fallback
+    }
+
     function initLevel() {
       let cfg = levelConfigs[currentLevel - 1];
       document.getElementById('levelTitle').innerText = `🦍 ${cfg.name}`;
       currentMap = JSON.parse(JSON.stringify(baseMaps[cfg.mapType]));
       
-      resetPositions();
+      // Position player strictly on level configuration start tile
+      let pPos = findOpenTile(currentMap, cfg.playerStart.r, cfg.playerStart.c);
+      player.x = pPos.c * tileSize;
+      player.y = pPos.r * tileSize;
+      player.dx = 0;
+      player.dy = 0;
+      player.nextDx = 0;
+      player.nextDy = 0;
 
-      ghosts = [];
-      let startCoords = [
-        {x: 9, y: 9, dx: 1, dy: 0},
-        {x: 8, y: 10, dx: -1, dy: 0},
-        {x: 9, y: 10, dx: 0, dy: -1},
-        {x: 10, y: 10, dx: 0, dy: 1}
+      // Define diverse valid open starting spawn points inside the maze for ghosts per level configuration
+      let ghostSpawnPrefabs = [
+        [{r: 9, c: 9}, {r: 10, c: 9}, {r: 9, c: 8}, {r: 9, c: 10}],
+        [{r: 5, c: 9}, {r: 15, c: 9}, {r: 10, c: 4}, {r: 10, c: 14}],
+        [{r: 7, c: 9}, {r: 13, c: 5}, {r: 13, c: 13}, {r: 3, c: 9}],
+        [{r: 10, c: 2}, {r: 10, c: 16}, {r: 5, c: 5}, {r: 15, c: 13}]
       ];
 
+      let spawnSet = ghostSpawnPrefabs[(currentLevel - 1) % ghostSpawnPrefabs.length];
+
+      ghosts = [];
       for(let i = 0; i < cfg.ghostCount; i++) {
+        let pref = spawnSet[i % spawnSet.length];
+        let tile = findOpenTile(currentMap, pref.r, pref.c);
         ghosts.push({
-          x: startCoords[i].x * tileSize,
-          y: startCoords[i].y * tileSize,
-          dx: startCoords[i].dx,
-          dy: startCoords[i].dy
+          x: tile.c * tileSize,
+          y: tile.r * tileSize,
+          dx: i % 2 === 0 ? 1 : -1,
+          dy: 0
         });
       }
     }
@@ -369,16 +405,13 @@
       if (e.key === 'ArrowRight' || e.key === 'd') setDirection(1, 0);
     });
 
-    // Precise grid-based collision function for any pixel position & movement step
+    // Precise grid-based collision function ensuring walls cannot be breached
     function canMoveTo(x, y, dx, dy, speed) {
-      // Predict next position
       let nextX = x + dx * speed;
       let nextY = y + dy * speed;
 
-      // Check horizontal tunnel wrapping bounds safely
       if (nextX < 0 || nextX >= 19 * tileSize) return true;
 
-      // Check all 4 corners of the 16x16 sprite box against the tile grid to guarantee walls cannot be breached
       let corners = [
         { x: nextX + 2, y: nextY + 2 },
         { x: nextX + tileSize - 2, y: nextY + 2 },
@@ -406,13 +439,11 @@
 
       let speed = player.baseSpeed;
 
-      // Allow switching direction immediately if turning back or moving into an open grid lane
       if (player.nextDx !== 0 || player.nextDy !== 0) {
         if (player.dx === -player.nextDx && player.dy === -player.nextDy) {
           player.dx = player.nextDx;
           player.dy = player.nextDy;
         } else if (canMoveTo(player.x, player.y, player.nextDx, player.nextDy, speed)) {
-          // Snap/align to grid axis when making smooth turns
           if (player.nextDx !== 0 && player.y % tileSize !== 0) {
             player.y = Math.round(player.y / tileSize) * tileSize;
           }
@@ -424,7 +455,6 @@
         }
       }
 
-      // Move player only if path is clear
       if (canMoveTo(player.x, player.y, player.dx, player.dy, speed)) {
         player.x += player.dx * speed;
         player.y += player.dy * speed;
@@ -433,11 +463,9 @@
         player.dy = 0;
       }
 
-      // Screen wrapping horizontal tunnels safely
       if (player.x < 0) player.x = 18 * tileSize;
       if (player.x >= 19 * tileSize) player.x = 0;
 
-      // Eat items on path
       let pCol = Math.floor((player.x + tileSize/2) / tileSize);
       let pRow = Math.floor((player.y + tileSize/2) / tileSize);
       if (pCol >= 0 && pCol < 19 && pRow >= 0 && pRow < 21) {
@@ -463,13 +491,11 @@
       let cfg = levelConfigs[currentLevel - 1];
       let ghostSpeed = frightTimer > 0 ? 0.5 : (0.8 + (currentLevel * 0.08));
 
-      // Move ghosts using rigorous wall collision checks
       ghosts.forEach(g => {
         if (g.x % tileSize === 0 && g.y % tileSize === 0) {
           let directions = [
             {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
           ];
-          // Filter valid non-wall directions (preventing direct instant 180 reverses unless necessary)
           let valid = directions.filter(d => {
             if (d.dx === -g.dx && d.dy === -g.dy && directions.length > 1) return false;
             let ntx = Math.floor(g.x / tileSize) + d.dx;
@@ -478,7 +504,7 @@
           });
 
           if (valid.length === 0) {
-            valid = [{dx: -g.dx, dy: -g.dy}]; // fallback reverse if cornered
+            valid = [{dx: -g.dx, dy: -g.dy}];
           }
 
           let chosen = valid[0];
@@ -504,11 +530,25 @@
           g.x += g.dx * ghostSpeed;
           g.y += g.dy * ghostSpeed;
         } else {
-          g.dx = 0;
-          g.dy = 0;
+          // If stuck against a wall unexpectedly, instantly recalculate a random valid open direction to prevent freeze locks
+          let directions = [
+            {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
+          ];
+          let valid = directions.filter(d => {
+            let ntx = Math.floor(g.x / tileSize) + d.dx;
+            let nty = Math.floor(g.y / tileSize) + d.dy;
+            return ntx >= 0 && ntx < 19 && nty >= 0 && nty < 21 && currentMap[nty][ntx] !== 1;
+          });
+          if (valid.length > 0) {
+            let rChoice = valid[Math.floor(Math.random() * valid.length)];
+            g.dx = rChoice.dx;
+            g.dy = rChoice.dy;
+          } else {
+            g.dx = 0;
+            g.dy = 0;
+          }
         }
 
-        // Check collision with player
         let dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
         if (dist < 10) {
           if (frightTimer > 0) {
@@ -521,7 +561,14 @@
               gameState = 'GAMEOVER';
               triggerGameOverModal("GAME OVER", "The dev otter rugged your bags!", "APE BACK IN 🔄", resetGame);
             } else {
-              resetPositions();
+              let cfg = levelConfigs[currentLevel - 1];
+              let pPos = findOpenTile(currentMap, cfg.playerStart.r, cfg.playerStart.c);
+              player.x = pPos.c * tileSize;
+              player.y = pPos.r * tileSize;
+              player.dx = 0;
+              player.dy = 0;
+              player.nextDx = 0;
+              player.nextDy = 0;
             }
           }
         }
@@ -604,15 +651,6 @@
           initLevel();
         }
       }
-    }
-
-    function resetPositions() {
-      player.x = 9 * tileSize;
-      player.y = 16 * tileSize;
-      player.dx = 0;
-      player.dy = 0;
-      player.nextDx = 0;
-      player.nextDy = 0;
     }
 
     function resetGame() {
