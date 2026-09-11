@@ -52,6 +52,25 @@
       text-shadow: 0 0 6px #ff00ff;
     }
 
+    .header-controls {
+      display: flex;
+      gap: 5px;
+    }
+
+    .control-btn {
+      background: rgba(0, 255, 255, 0.15);
+      border: 2px solid #00ffff;
+      color: #00ffff;
+      padding: 3px 6px;
+      border-radius: 5px;
+      font-size: 0.65rem;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 0 0 6px rgba(0, 255, 255, 0.4);
+      cursor: pointer;
+    }
+    .control-btn:hover { background: #00ffff; color: #000; }
+
     .exit-btn {
       background: rgba(255, 51, 51, 0.15);
       border: 2px solid #ff3333;
@@ -188,7 +207,10 @@
   <div class="arcade-container">
     <div class="header-bar">
       <div class="title-text" id="levelTitle">🦍 APE-man: LVL 1 (VERY EASY)</div>
-      <a href="index.html" class="exit-btn">🚪 EXIT</a>
+      <div class="header-controls">
+        <button class="control-btn" id="musicToggleBtn" onclick="toggleMusic()">🔊 MUSIC: ON</button>
+        <a href="index.html" class="exit-btn">🚪 EXIT</a>
+      </div>
     </div>
 
     <div class="scoreboard">
@@ -232,18 +254,100 @@
     let celebrationTimer = 0;
     let particles = [];
 
-    // 10 Levels with completely distinct player starts and unique map layout assignments
+    // Web Audio API Synthesized Synthwave / Chiptune Background Track
+    let audioCtx = null;
+    let musicPlaying = false;
+    let musicInterval = null;
+    let audioInitialized = false;
+
+    function initAudio() {
+      if (audioInitialized) return;
+      try {
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+        audioInitialized = true;
+      } catch(e) {}
+    }
+
+    function toggleMusic() {
+      initAudio();
+      musicPlaying = !musicPlaying;
+      let btn = document.getElementById('musicToggleBtn');
+      if (musicPlaying) {
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        btn.innerText = "🔊 MUSIC: ON";
+        startSynthwaveTrack();
+      } else {
+        btn.innerText = "🔇 MUSIC: OFF";
+        stopSynthwaveTrack();
+      }
+    }
+
+    function playNote(freq, duration, type = 'square', gainVal = 0.03) {
+      if (!musicPlaying || !audioCtx) return;
+      try {
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function startSynthwaveTrack() {
+      if (musicInterval) clearInterval(musicInterval);
+      const bassNotes = [110, 110, 130.81, 146.83, 110, 110, 164.81, 146.83];
+      const arpNotes = [220, 261.63, 329.63, 392.00, 440, 392.00, 329.63, 261.63];
+      let step = 0;
+
+      musicInterval = setInterval(() => {
+        if (!musicPlaying) return;
+        playNote(bassNotes[step % bassNotes.length], 0.15, 'sawtooth', 0.04);
+        if (step % 2 === 0) {
+          playNote(arpNotes[(step / 2) % arpNotes.length], 0.12, 'square', 0.02);
+        }
+        step++;
+      }, 180);
+    }
+
+    function stopSynthwaveTrack() {
+      if (musicInterval) {
+        clearInterval(musicInterval);
+        musicInterval = null;
+      }
+    }
+
+    window.addEventListener('pointerdown', () => {
+      if (!audioInitialized) {
+        initAudio();
+        musicPlaying = true;
+        document.getElementById('musicToggleBtn').innerText = "🔊 MUSIC: ON";
+        startSynthwaveTrack();
+      }
+    }, { once: true });
+
+    // 10 Levels with gentler otter speeds and much lower tracking intelligence (more random/dumber)
     const levelConfigs = [
-      { name: "LVL 1: VERY EASY", ghostSpeed: 1.1, smartness: 0.4, ghostCount: 2, mapType: 0, playerStart: {r: 16, c: 9} },
-      { name: "LVL 2: EASY", ghostSpeed: 1.15, smartness: 0.5, ghostCount: 2, mapType: 1, playerStart: {r: 3, c: 9} },
-      { name: "LVL 3: CASUAL", ghostSpeed: 1.2, smartness: 0.6, ghostCount: 3, mapType: 2, playerStart: {r: 17, c: 9} },
-      { name: "LVL 4: MEDIUM", ghostSpeed: 1.25, smartness: 0.7, ghostCount: 3, mapType: 0, playerStart: {r: 10, c: 2} },
-      { name: "LVL 5: HARD", ghostSpeed: 1.3, smartness: 0.8, ghostCount: 4, mapType: 1, playerStart: {r: 13, c: 16} },
-      { name: "LVL 6: VERY HARD", ghostSpeed: 1.35, smartness: 0.88, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 2} },
-      { name: "LVL 7: INSANE", ghostSpeed: 1.4, smartness: 0.94, ghostCount: 4, mapType: 0, playerStart: {r: 16, c: 2} },
-      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1.45, smartness: 0.97, ghostCount: 4, mapType: 1, playerStart: {r: 9, c: 16} },
-      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1.5, smartness: 1.0, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 16} },
-      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 1.55, smartness: 1.0, ghostCount: 4, mapType: 0, playerStart: {r: 10, c: 9} }
+      { name: "LVL 1: VERY EASY", ghostSpeed: 0.7, smartness: 0.1, ghostCount: 2, mapType: 0, playerStart: {r: 16, c: 9} },
+      { name: "LVL 2: EASY", ghostSpeed: 0.75, smartness: 0.15, ghostCount: 2, mapType: 1, playerStart: {r: 3, c: 9} },
+      { name: "LVL 3: CASUAL", ghostSpeed: 0.8, smartness: 0.2, ghostCount: 3, mapType: 2, playerStart: {r: 17, c: 9} },
+      { name: "LVL 4: MEDIUM", ghostSpeed: 0.85, smartness: 0.25, ghostCount: 3, mapType: 0, playerStart: {r: 10, c: 2} },
+      { name: "LVL 5: HARD", ghostSpeed: 0.9, smartness: 0.3, ghostCount: 4, mapType: 1, playerStart: {r: 13, c: 16} },
+      { name: "LVL 6: VERY HARD", ghostSpeed: 0.95, smartness: 0.35, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 2} },
+      { name: "LVL 7: INSANE", ghostSpeed: 1.0, smartness: 0.4, ghostCount: 4, mapType: 0, playerStart: {r: 16, c: 2} },
+      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1.05, smartness: 0.45, ghostCount: 4, mapType: 1, playerStart: {r: 9, c: 16} },
+      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1.1, smartness: 0.5, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 16} },
+      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 1.15, smartness: 0.55, ghostCount: 4, mapType: 0, playerStart: {r: 10, c: 9} }
     ];
 
     const baseMaps = [
@@ -335,7 +439,6 @@
 
     let ghosts = [];
 
-    // Helper function to find a valid walkable floor tile (strictly not 1) anywhere near a target location
     function findOpenTile(mapData, prefR, prefC) {
       if (mapData[prefR] && mapData[prefR][prefC] !== 1) {
         return {r: prefR, c: prefC};
@@ -359,7 +462,6 @@
       document.getElementById('levelTitle').innerText = `🦍 ${cfg.name}`;
       currentMap = JSON.parse(JSON.stringify(baseMaps[cfg.mapType]));
       
-      // Position player correctly on layout-specific starting coordinates
       let pPos = findOpenTile(currentMap, cfg.playerStart.r, cfg.playerStart.c);
       player.x = pPos.c * tileSize;
       player.y = pPos.r * tileSize;
@@ -368,7 +470,6 @@
       player.nextDx = 0;
       player.nextDy = 0;
 
-      // Unique spread out valid spawn zones for smarter, active otters per level
       let ghostSpawnPrefabs = [
         [{r: 2, c: 2}, {r: 2, c: 16}, {r: 18, c: 2}, {r: 18, c: 16}],
         [{r: 5, c: 9}, {r: 15, c: 9}, {r: 10, c: 2}, {r: 10, c: 16}],
@@ -386,8 +487,7 @@
           x: tile.c * tileSize,
           y: tile.r * tileSize,
           dx: i % 2 === 0 ? 1 : -1,
-          dy: 0,
-          cachedValidMoves: []
+          dy: 0
         });
       }
     }
@@ -405,7 +505,6 @@
       if (e.key === 'ArrowRight' || e.key === 'd') setDirection(1, 0);
     });
 
-    // Extremely robust grid collision box check
     function canMoveTo(x, y, dx, dy, speed) {
       let nextX = x + dx * speed;
       let nextY = y + dy * speed;
@@ -489,9 +588,8 @@
       document.getElementById('livesDisplay').innerText = lives;
 
       let cfg = levelConfigs[currentLevel - 1];
-      let ghostSpeed = frightTimer > 0 ? 0.7 : cfg.ghostSpeed;
+      let ghostSpeed = frightTimer > 0 ? 0.5 : cfg.ghostSpeed;
 
-      // Smarter, aggressive otter pathing algorithm that actively tracks the player across the maze
       ghosts.forEach(g => {
         if (Math.abs(g.x % tileSize) < 0.6 && Math.abs(g.y % tileSize) < 0.6) {
           g.x = Math.round(g.x / tileSize) * tileSize;
@@ -504,7 +602,6 @@
             {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
           ];
 
-          // Filter paths that are actual open tiles and prevent immediate U-turns unless trapped
           let valid = directions.filter(d => {
             if (g.dx !== 0 || g.dy !== 0) {
               if (d.dx === -g.dx && d.dy === -g.dy) return false;
@@ -514,7 +611,6 @@
             return ntx >= 0 && ntx < 19 && nty >= 0 && nty < 21 && currentMap[nty][ntx] !== 1;
           });
 
-          // Allow U-turns if it's a dead-end corridor
           if (valid.length === 0) {
             valid = directions.filter(d => {
               let ntx = gCol + d.dx;
@@ -539,7 +635,6 @@
                 }
               });
             } else if (frightTimer > 0) {
-              // Frightened mode: run away from player
               let worstDist = -1;
               valid.forEach(d => {
                 let ntx = gCol + d.dx;
@@ -558,12 +653,10 @@
           }
         }
 
-        // Advance otter position with anti-lock fallback check
         if (canMoveTo(g.x, g.y, g.dx, g.dy, ghostSpeed)) {
           g.x += g.dx * ghostSpeed;
           g.y += g.dy * ghostSpeed;
         } else {
-          // If stuck against a wall block, immediately snap to grid and force a recalculation
           g.x = Math.round(g.x / tileSize) * tileSize;
           g.y = Math.round(g.y / tileSize) * tileSize;
           let gCol = Math.floor((g.x + tileSize/2) / tileSize);
@@ -587,12 +680,10 @@
           }
         }
 
-        // Collision detection between player and otter
         let dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
         if (dist < 12) {
           if (frightTimer > 0) {
             score += 200;
-            let cfg = levelConfigs[currentLevel - 1];
             let safeSpawn = findOpenTile(currentMap, 10, 9);
             g.x = safeSpawn.c * tileSize;
             g.y = safeSpawn.r * tileSize;
