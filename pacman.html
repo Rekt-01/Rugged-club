@@ -47,23 +47,23 @@
 
     .title-text {
       color: #ff00ff;
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       font-weight: bold;
       text-shadow: 0 0 6px #ff00ff;
     }
 
     .header-controls {
       display: flex;
-      gap: 5px;
+      gap: 4px;
     }
 
     .control-btn {
       background: rgba(0, 255, 255, 0.15);
       border: 2px solid #00ffff;
       color: #00ffff;
-      padding: 3px 6px;
+      padding: 3px 5px;
       border-radius: 5px;
-      font-size: 0.65rem;
+      font-size: 0.55rem;
       font-weight: bold;
       text-decoration: none;
       box-shadow: 0 0 6px rgba(0, 255, 255, 0.4);
@@ -75,9 +75,9 @@
       background: rgba(255, 51, 51, 0.15);
       border: 2px solid #ff3333;
       color: #ff3333;
-      padding: 3px 6px;
+      padding: 3px 5px;
       border-radius: 5px;
-      font-size: 0.65rem;
+      font-size: 0.55rem;
       font-weight: bold;
       text-decoration: none;
       box-shadow: 0 0 6px rgba(255, 51, 51, 0.4);
@@ -206,9 +206,10 @@
 
   <div class="arcade-container">
     <div class="header-bar">
-      <div class="title-text" id="levelTitle">🦍 APE-man: LVL 1 (VERY EASY)</div>
+      <div class="title-text" id="levelTitle">🦍 APE-man: LVL 1</div>
       <div class="header-controls">
-        <button class="control-btn" id="musicToggleBtn" onclick="toggleMusic()">🔊 MUSIC: ON</button>
+        <button class="control-btn" onclick="openLevelSelect()">🎯 LVL SELECT</button>
+        <button class="control-btn" id="musicToggleBtn" onclick="toggleMusic()">🔊 MUSIC</button>
         <a href="index.html" class="exit-btn">🚪 EXIT</a>
       </div>
     </div>
@@ -236,6 +237,17 @@
       <div class="modal-title" id="modalTitle">GAME OVER</div>
       <div class="modal-desc" id="modalDesc">The dev otter rugged your bags!</div>
       <button class="modal-btn" id="modalActionBtn" onclick="resetGame()">APE BACK IN 🔄</button>
+    </div>
+  </div>
+
+  <!-- LEVEL SELECT MODAL -->
+  <div class="modal-overlay" id="levelSelectModal">
+    <div class="modal-card">
+      <div class="modal-title">SELECT TEST LEVEL</div>
+      <div class="modal-desc">Choose any level to test instantly:</div>
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 15px;" id="levelGridButtons">
+      </div>
+      <button class="modal-btn" onclick="closeLevelSelect()" style="background:#333; color:#fff;">CANCEL</button>
     </div>
   </div>
 
@@ -276,10 +288,10 @@
         if (audioCtx && audioCtx.state === 'suspended') {
           audioCtx.resume();
         }
-        btn.innerText = "🔊 MUSIC: ON";
+        btn.innerText = "🔊 ON";
         startSynthwaveTrack();
       } else {
-        btn.innerText = "🔇 MUSIC: OFF";
+        btn.innerText = "🔇 OFF";
         stopSynthwaveTrack();
       }
     }
@@ -330,23 +342,23 @@
       if (!audioInitialized) {
         initAudio();
         musicPlaying = true;
-        document.getElementById('musicToggleBtn').innerText = "🔊 MUSIC: ON";
+        document.getElementById('musicToggleBtn').innerText = "🔊 ON";
         startSynthwaveTrack();
       }
     }, { once: true });
 
-    // Level configs with a super easy Level 1 setup
+    // Level configs
     const levelConfigs = [
-      { name: "LVL 1: VERY EASY", ghostSpeed: 0.5, smartness: 0.05, ghostCount: 1, mapType: 0, playerStart: {r: 16, c: 9} },
-      { name: "LVL 2: EASY", ghostSpeed: 0.7, smartness: 0.1, ghostCount: 2, mapType: 1, playerStart: {r: 3, c: 9} },
-      { name: "LVL 3: CASUAL", ghostSpeed: 0.8, smartness: 0.2, ghostCount: 3, mapType: 2, playerStart: {r: 17, c: 9} },
-      { name: "LVL 4: MEDIUM", ghostSpeed: 0.85, smartness: 0.25, ghostCount: 3, mapType: 0, playerStart: {r: 10, c: 2} },
-      { name: "LVL 5: HARD", ghostSpeed: 0.9, smartness: 0.3, ghostCount: 4, mapType: 1, playerStart: {r: 13, c: 16} },
-      { name: "LVL 6: VERY HARD", ghostSpeed: 0.95, smartness: 0.35, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 2} },
-      { name: "LVL 7: INSANE", ghostSpeed: 1.0, smartness: 0.4, ghostCount: 4, mapType: 0, playerStart: {r: 16, c: 2} },
-      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1.05, smartness: 0.45, ghostCount: 4, mapType: 1, playerStart: {r: 9, c: 16} },
-      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1.1, smartness: 0.5, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 16} },
-      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 1.15, smartness: 0.55, ghostCount: 4, mapType: 0, playerStart: {r: 10, c: 9} }
+      { name: "LVL 1: VERY EASY", ghostSpeed: 1, smartness: 0.05, ghostCount: 1, mapType: 0, playerStart: {r: 16, c: 9} },
+      { name: "LVL 2: EASY", ghostSpeed: 1, smartness: 0.1, ghostCount: 2, mapType: 1, playerStart: {r: 3, c: 9} },
+      { name: "LVL 3: CASUAL", ghostSpeed: 1, smartness: 0.2, ghostCount: 3, mapType: 2, playerStart: {r: 17, c: 9} },
+      { name: "LVL 4: MEDIUM", ghostSpeed: 1, smartness: 0.25, ghostCount: 3, mapType: 0, playerStart: {r: 10, c: 2} },
+      { name: "LVL 5: HARD", ghostSpeed: 1, smartness: 0.3, ghostCount: 4, mapType: 1, playerStart: {r: 13, c: 16} },
+      { name: "LVL 6: VERY HARD", ghostSpeed: 1, smartness: 0.35, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 2} },
+      { name: "LVL 7: INSANE", ghostSpeed: 1, smartness: 0.4, ghostCount: 4, mapType: 0, playerStart: {r: 16, c: 2} },
+      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1, smartness: 0.45, ghostCount: 4, mapType: 1, playerStart: {r: 9, c: 16} },
+      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1, smartness: 0.5, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 16} },
+      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 1, smartness: 0.55, ghostCount: 4, mapType: 0, playerStart: {r: 10, c: 9} }
     ];
 
     const baseMaps = [
@@ -374,7 +386,7 @@
         [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
       ],
-      // Map Type 1 (Fixed enclosed areas / inaccessible yellow dots)
+      // Map Type 1
       [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,3,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,3,1],
@@ -384,8 +396,8 @@
         [2,2,1,0,0,0,0,1,0,2,0,1,0,0,0,0,1,2,2],
         [1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1],
         [1,0,0,0,1,2,2,2,2,2,2,2,2,2,1,0,0,0,1],
-        [1,0,1,0,1,2,1,1,1,2,1,1,1,2,1,0,1,0,1], // Fixed wall gap to access side dots
-        [1,0,0,0,0,2,1,0,0,2,0,0,1,2,0,0,0,0,1], // Opened path into center ring
+        [1,0,1,0,1,2,1,1,1,2,1,1,1,2,1,0,1,0,1],
+        [1,0,0,0,0,2,1,0,0,2,0,0,1,2,0,0,0,0,1],
         [1,1,1,1,0,2,1,2,1,2,1,2,1,2,0,1,1,1,1],
         [2,2,2,1,0,2,1,2,2,2,2,2,1,2,0,1,2,2,2],
         [1,1,1,1,0,2,1,1,1,1,1,1,1,2,0,1,1,1,1],
@@ -433,7 +445,7 @@
       dy: 0,
       nextDx: 0,
       nextDy: 0,
-      baseSpeed: 1.1
+      baseSpeed: 1
     };
 
     let ghosts = [];
@@ -587,10 +599,11 @@
       document.getElementById('livesDisplay').innerText = lives;
 
       let cfg = levelConfigs[currentLevel - 1];
-      let ghostSpeed = frightTimer > 0 ? 0.5 : cfg.ghostSpeed;
+      let ghostSpeed = frightTimer > 0 ? 1 : cfg.ghostSpeed;
 
       ghosts.forEach(g => {
-        if (Math.abs(g.x % tileSize) < 0.6 && Math.abs(g.y % tileSize) < 0.6) {
+        // Robust grid alignment check using Math.round distance to prevent freezing
+        if (Math.abs(g.x % tileSize) <= ghostSpeed && Math.abs(g.y % tileSize) <= ghostSpeed) {
           g.x = Math.round(g.x / tileSize) * tileSize;
           g.y = Math.round(g.y / tileSize) * tileSize;
 
@@ -795,6 +808,31 @@
       document.getElementById('endGameModal').style.display = 'none';
       pCanvas.style.display = 'none';
       initLevel();
+    }
+
+    function openLevelSelect() {
+      let gridContainer = document.getElementById('levelGridButtons');
+      gridContainer.innerHTML = '';
+      for(let i = 1; i <= 10; i++) {
+        let btn = document.createElement('button');
+        btn.innerText = i;
+        btn.className = 'modal-btn';
+        btn.style.padding = '8px 0';
+        btn.onclick = () => {
+          currentLevel = i;
+          gameState = 'PLAYING';
+          document.getElementById('levelSelectModal').style.display = 'none';
+          document.getElementById('endGameModal').style.display = 'none';
+          pCanvas.style.display = 'none';
+          initLevel();
+        };
+        gridContainer.appendChild(btn);
+      }
+      document.getElementById('levelSelectModal').style.display = 'flex';
+    }
+
+    function closeLevelSelect() {
+      document.getElementById('levelSelectModal').style.display = 'none';
     }
 
     function triggerGameOverModal(title, desc, btnText, callback) {
