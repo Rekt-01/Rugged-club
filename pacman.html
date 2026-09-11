@@ -232,18 +232,18 @@
     let celebrationTimer = 0;
     let particles = [];
 
-    // 10 Level configurations with explicit player start tiles & unique map layout assignments
+    // 10 Levels with completely distinct player starts and unique map layout assignments
     const levelConfigs = [
-      { name: "LVL 1: VERY EASY", ghostSpeed: 1, smartness: 0.1, ghostCount: 2, mapType: 0, playerStart: {r: 16, c: 9} },
-      { name: "LVL 2: EASY", ghostSpeed: 1, smartness: 0.2, ghostCount: 2, mapType: 1, playerStart: {r: 3, c: 9} },
-      { name: "LVL 3: CASUAL", ghostSpeed: 1, smartness: 0.3, ghostCount: 3, mapType: 2, playerStart: {r: 17, c: 9} },
-      { name: "LVL 4: MEDIUM", ghostSpeed: 1, smartness: 0.4, ghostCount: 3, mapType: 0, playerStart: {r: 10, c: 9} },
-      { name: "LVL 5: HARD", ghostSpeed: 1, smartness: 0.5, ghostCount: 4, mapType: 1, playerStart: {r: 13, c: 9} },
-      { name: "LVL 6: VERY HARD", ghostSpeed: 1, smartness: 0.65, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 9} },
-      { name: "LVL 7: INSANE", ghostSpeed: 1, smartness: 0.8, ghostCount: 4, mapType: 0, playerStart: {r: 16, c: 9} },
-      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1, smartness: 0.9, ghostCount: 4, mapType: 1, playerStart: {r: 9, c: 9} },
-      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1, smartness: 0.95, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 9} },
-      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 1, smartness: 1.0, ghostCount: 4, mapType: 0, playerStart: {r: 16, c: 9} }
+      { name: "LVL 1: VERY EASY", ghostSpeed: 1.1, smartness: 0.4, ghostCount: 2, mapType: 0, playerStart: {r: 16, c: 9} },
+      { name: "LVL 2: EASY", ghostSpeed: 1.15, smartness: 0.5, ghostCount: 2, mapType: 1, playerStart: {r: 3, c: 9} },
+      { name: "LVL 3: CASUAL", ghostSpeed: 1.2, smartness: 0.6, ghostCount: 3, mapType: 2, playerStart: {r: 17, c: 9} },
+      { name: "LVL 4: MEDIUM", ghostSpeed: 1.25, smartness: 0.7, ghostCount: 3, mapType: 0, playerStart: {r: 10, c: 2} },
+      { name: "LVL 5: HARD", ghostSpeed: 1.3, smartness: 0.8, ghostCount: 4, mapType: 1, playerStart: {r: 13, c: 16} },
+      { name: "LVL 6: VERY HARD", ghostSpeed: 1.35, smartness: 0.88, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 2} },
+      { name: "LVL 7: INSANE", ghostSpeed: 1.4, smartness: 0.94, ghostCount: 4, mapType: 0, playerStart: {r: 16, c: 2} },
+      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1.45, smartness: 0.97, ghostCount: 4, mapType: 1, playerStart: {r: 9, c: 16} },
+      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1.5, smartness: 1.0, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 16} },
+      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 1.55, smartness: 1.0, ghostCount: 4, mapType: 0, playerStart: {r: 10, c: 9} }
     ];
 
     const baseMaps = [
@@ -330,18 +330,17 @@
       dy: 0,
       nextDx: 0,
       nextDy: 0,
-      baseSpeed: 1.0
+      baseSpeed: 1.1
     };
 
     let ghosts = [];
 
-    // Helper to find valid open floor tile coordinates (where map cell !== 1) near a preferred location
+    // Helper function to find a valid walkable floor tile (strictly not 1) anywhere near a target location
     function findOpenTile(mapData, prefR, prefC) {
       if (mapData[prefR] && mapData[prefR][prefC] !== 1) {
         return {r: prefR, c: prefC};
       }
-      // Spiral search outward for nearest open floor tile
-      for (let dist = 1; dist < 10; dist++) {
+      for (let dist = 1; dist < 12; dist++) {
         for (let dr = -dist; dr <= dist; dr++) {
           for (let dc = -dist; dc <= dist; dc++) {
             let r = prefR + dr;
@@ -352,7 +351,7 @@
           }
         }
       }
-      return {r: 9, c: 9}; // absolute fallback
+      return {r: 10, c: 9};
     }
 
     function initLevel() {
@@ -360,7 +359,7 @@
       document.getElementById('levelTitle').innerText = `🦍 ${cfg.name}`;
       currentMap = JSON.parse(JSON.stringify(baseMaps[cfg.mapType]));
       
-      // Position player strictly on level configuration start tile
+      // Position player correctly on layout-specific starting coordinates
       let pPos = findOpenTile(currentMap, cfg.playerStart.r, cfg.playerStart.c);
       player.x = pPos.c * tileSize;
       player.y = pPos.r * tileSize;
@@ -369,12 +368,12 @@
       player.nextDx = 0;
       player.nextDy = 0;
 
-      // Define diverse valid open starting spawn points inside the maze for ghosts per level configuration
+      // Unique spread out valid spawn zones for smarter, active otters per level
       let ghostSpawnPrefabs = [
-        [{r: 9, c: 9}, {r: 10, c: 9}, {r: 9, c: 8}, {r: 9, c: 10}],
-        [{r: 5, c: 9}, {r: 15, c: 9}, {r: 10, c: 4}, {r: 10, c: 14}],
-        [{r: 7, c: 9}, {r: 13, c: 5}, {r: 13, c: 13}, {r: 3, c: 9}],
-        [{r: 10, c: 2}, {r: 10, c: 16}, {r: 5, c: 5}, {r: 15, c: 13}]
+        [{r: 2, c: 2}, {r: 2, c: 16}, {r: 18, c: 2}, {r: 18, c: 16}],
+        [{r: 5, c: 9}, {r: 15, c: 9}, {r: 10, c: 2}, {r: 10, c: 16}],
+        [{r: 3, c: 9}, {r: 17, c: 9}, {r: 10, c: 5}, {r: 10, c: 13}],
+        [{r: 1, c: 9}, {r: 19, c: 9}, {r: 9, c: 1}, {r: 9, c: 17}]
       ];
 
       let spawnSet = ghostSpawnPrefabs[(currentLevel - 1) % ghostSpawnPrefabs.length];
@@ -387,7 +386,8 @@
           x: tile.c * tileSize,
           y: tile.r * tileSize,
           dx: i % 2 === 0 ? 1 : -1,
-          dy: 0
+          dy: 0,
+          cachedValidMoves: []
         });
       }
     }
@@ -405,7 +405,7 @@
       if (e.key === 'ArrowRight' || e.key === 'd') setDirection(1, 0);
     });
 
-    // Precise grid-based collision function ensuring walls cannot be breached
+    // Extremely robust grid collision box check
     function canMoveTo(x, y, dx, dy, speed) {
       let nextX = x + dx * speed;
       let nextY = y + dy * speed;
@@ -489,54 +489,92 @@
       document.getElementById('livesDisplay').innerText = lives;
 
       let cfg = levelConfigs[currentLevel - 1];
-      let ghostSpeed = frightTimer > 0 ? 0.5 : (0.8 + (currentLevel * 0.08));
+      let ghostSpeed = frightTimer > 0 ? 0.7 : cfg.ghostSpeed;
 
+      // Smarter, aggressive otter pathing algorithm that actively tracks the player across the maze
       ghosts.forEach(g => {
-        if (g.x % tileSize === 0 && g.y % tileSize === 0) {
+        if (Math.abs(g.x % tileSize) < 0.6 && Math.abs(g.y % tileSize) < 0.6) {
+          g.x = Math.round(g.x / tileSize) * tileSize;
+          g.y = Math.round(g.y / tileSize) * tileSize;
+
+          let gCol = Math.floor((g.x + tileSize/2) / tileSize);
+          let gRow = Math.floor((g.y + tileSize/2) / tileSize);
+
           let directions = [
             {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
           ];
+
+          // Filter paths that are actual open tiles and prevent immediate U-turns unless trapped
           let valid = directions.filter(d => {
-            if (d.dx === -g.dx && d.dy === -g.dy && directions.length > 1) return false;
-            let ntx = Math.floor(g.x / tileSize) + d.dx;
-            let nty = Math.floor(g.y / tileSize) + d.dy;
+            if (g.dx !== 0 || g.dy !== 0) {
+              if (d.dx === -g.dx && d.dy === -g.dy) return false;
+            }
+            let ntx = gCol + d.dx;
+            let nty = gRow + d.dy;
             return ntx >= 0 && ntx < 19 && nty >= 0 && nty < 21 && currentMap[nty][ntx] !== 1;
           });
 
+          // Allow U-turns if it's a dead-end corridor
           if (valid.length === 0) {
-            valid = [{dx: -g.dx, dy: -g.dy}];
+            valid = directions.filter(d => {
+              let ntx = gCol + d.dx;
+              let nty = gRow + d.dy;
+              return ntx >= 0 && ntx < 19 && nty >= 0 && nty < 21 && currentMap[nty][ntx] !== 1;
+            });
           }
 
-          let chosen = valid[0];
-          if (Math.random() < cfg.smartness && frightTimer === 0) {
-            let bestDist = Infinity;
-            valid.forEach(d => {
-              let ntx = Math.floor(g.x / tileSize) + d.dx;
-              let nty = Math.floor(g.y / tileSize) + d.dy;
-              let dist = Math.hypot(ntx - pCol, nty - pRow);
-              if (dist < bestDist) {
-                bestDist = dist;
-                chosen = d;
-              }
-            });
-          } else {
-            chosen = valid[Math.floor(Math.random() * valid.length)];
+          if (valid.length > 0) {
+            let chosen = valid[0];
+            let shouldChase = Math.random() < cfg.smartness && frightTimer === 0;
+
+            if (shouldChase) {
+              let bestDist = Infinity;
+              valid.forEach(d => {
+                let ntx = gCol + d.dx;
+                let nty = gRow + d.dy;
+                let dist = Math.hypot(ntx - pCol, nty - pRow);
+                if (dist < bestDist) {
+                  bestDist = dist;
+                  chosen = d;
+                }
+              });
+            } else if (frightTimer > 0) {
+              // Frightened mode: run away from player
+              let worstDist = -1;
+              valid.forEach(d => {
+                let ntx = gCol + d.dx;
+                let nty = gRow + d.dy;
+                let dist = Math.hypot(ntx - pCol, nty - pRow);
+                if (dist > worstDist) {
+                  worstDist = dist;
+                  chosen = d;
+                }
+              });
+            } else {
+              chosen = valid[Math.floor(Math.random() * valid.length)];
+            }
+            g.dx = chosen.dx;
+            g.dy = chosen.dy;
           }
-          g.dx = chosen.dx;
-          g.dy = chosen.dy;
         }
 
+        // Advance otter position with anti-lock fallback check
         if (canMoveTo(g.x, g.y, g.dx, g.dy, ghostSpeed)) {
           g.x += g.dx * ghostSpeed;
           g.y += g.dy * ghostSpeed;
         } else {
-          // If stuck against a wall unexpectedly, instantly recalculate a random valid open direction to prevent freeze locks
+          // If stuck against a wall block, immediately snap to grid and force a recalculation
+          g.x = Math.round(g.x / tileSize) * tileSize;
+          g.y = Math.round(g.y / tileSize) * tileSize;
+          let gCol = Math.floor((g.x + tileSize/2) / tileSize);
+          let gRow = Math.floor((g.y + tileSize/2) / tileSize);
+
           let directions = [
             {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
           ];
           let valid = directions.filter(d => {
-            let ntx = Math.floor(g.x / tileSize) + d.dx;
-            let nty = Math.floor(g.y / tileSize) + d.dy;
+            let ntx = gCol + d.dx;
+            let nty = gRow + d.dy;
             return ntx >= 0 && ntx < 19 && nty >= 0 && nty < 21 && currentMap[nty][ntx] !== 1;
           });
           if (valid.length > 0) {
@@ -549,12 +587,17 @@
           }
         }
 
+        // Collision detection between player and otter
         let dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
-        if (dist < 10) {
+        if (dist < 12) {
           if (frightTimer > 0) {
             score += 200;
-            g.x = 9 * tileSize;
-            g.y = 9 * tileSize;
+            let cfg = levelConfigs[currentLevel - 1];
+            let safeSpawn = findOpenTile(currentMap, 10, 9);
+            g.x = safeSpawn.c * tileSize;
+            g.y = safeSpawn.r * tileSize;
+            g.dx = 1;
+            g.dy = 0;
           } else {
             lives--;
             if (lives <= 0) {
