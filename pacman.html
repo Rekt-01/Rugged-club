@@ -233,16 +233,16 @@
     let particles = [];
 
     const levelConfigs = [
-      { name: "LVL 1: VERY EASY", ghostSpeed: 0.6, smartness: 0.1, ghostCount: 2, mapType: 0 },
-      { name: "LVL 2: EASY", ghostSpeed: 0.8, smartness: 0.2, ghostCount: 2, mapType: 1 },
-      { name: "LVL 3: CASUAL", ghostSpeed: 1.0, smartness: 0.3, ghostCount: 3, mapType: 2 },
-      { name: "LVL 4: MEDIUM", ghostSpeed: 1.1, smartness: 0.4, ghostCount: 3, mapType: 0 },
-      { name: "LVL 5: HARD", ghostSpeed: 1.25, smartness: 0.5, ghostCount: 4, mapType: 1 },
-      { name: "LVL 6: VERY HARD", ghostSpeed: 1.4, smartness: 0.65, ghostCount: 4, mapType: 2 },
-      { name: "LVL 7: INSANE", ghostSpeed: 1.55, smartness: 0.8, ghostCount: 4, mapType: 0 },
-      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1.7, smartness: 0.9, ghostCount: 4, mapType: 1 },
-      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1.9, smartness: 0.95, ghostCount: 4, mapType: 2 },
-      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 2.2, smartness: 1.0, ghostCount: 4, mapType: 0 }
+      { name: "LVL 1: VERY EASY", ghostSpeed: 1, smartness: 0.1, ghostCount: 2, mapType: 0 },
+      { name: "LVL 2: EASY", ghostSpeed: 1, smartness: 0.2, ghostCount: 2, mapType: 1 },
+      { name: "LVL 3: CASUAL", ghostSpeed: 1, smartness: 0.3, ghostCount: 3, mapType: 2 },
+      { name: "LVL 4: MEDIUM", ghostSpeed: 1, smartness: 0.4, ghostCount: 3, mapType: 0 },
+      { name: "LVL 5: HARD", ghostSpeed: 1, smartness: 0.5, ghostCount: 4, mapType: 1 },
+      { name: "LVL 6: VERY HARD", ghostSpeed: 1, smartness: 0.65, ghostCount: 4, mapType: 2 },
+      { name: "LVL 7: INSANE", ghostSpeed: 1, smartness: 0.8, ghostCount: 4, mapType: 0 },
+      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1, smartness: 0.9, ghostCount: 4, mapType: 1 },
+      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1, smartness: 0.95, ghostCount: 4, mapType: 2 },
+      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 1, smartness: 1.0, ghostCount: 4, mapType: 0 }
     ];
 
     const baseMaps = [
@@ -326,7 +326,7 @@
       dy: 0,
       nextDx: 0,
       nextDy: 0,
-      speed: 1.2
+      baseSpeed: 1.0
     };
 
     let ghosts = [];
@@ -369,6 +369,32 @@
       if (e.key === 'ArrowRight' || e.key === 'd') setDirection(1, 0);
     });
 
+    // Precise grid-based collision function for any pixel position & movement step
+    function canMoveTo(x, y, dx, dy, speed) {
+      // Predict next position
+      let nextX = x + dx * speed;
+      let nextY = y + dy * speed;
+
+      // Check horizontal tunnel wrapping bounds safely
+      if (nextX < 0 || nextX >= 19 * tileSize) return true;
+
+      // Check all 4 corners of the 16x16 sprite box against the tile grid to guarantee walls cannot be breached
+      let corners = [
+        { x: nextX + 2, y: nextY + 2 },
+        { x: nextX + tileSize - 2, y: nextY + 2 },
+        { x: nextX + 2, y: nextY + tileSize - 2 },
+        { x: nextX + tileSize - 2, y: nextY + tileSize - 2 }
+      ];
+
+      for (let corner of corners) {
+        let cCol = Math.floor(corner.x / tileSize);
+        let cRow = Math.floor(corner.y / tileSize);
+        if (cCol < 0 || cCol >= 19 || cRow < 0 || cRow >= 21) return false;
+        if (currentMap[cRow][cCol] === 1) return false;
+      }
+      return true;
+    }
+
     function update() {
       if (gameState === 'CELEBRATION') {
         updateCelebrationParticles();
@@ -378,28 +404,40 @@
 
       if (frightTimer > 0) frightTimer--;
 
-      // Player Grid Collision Check (Strictly blocked by walls: 1)
-      if (player.x % tileSize === 0 && player.y % tileSize === 0) {
-        let nextTx = Math.floor(player.x / tileSize) + player.nextDx;
-        let nextTy = Math.floor(player.y / tileSize) + player.nextDy;
-        if (nextTx >= 0 && nextTx < 19 && nextTy >= 0 && nextTy < 21 && currentMap[nextTy][nextTx] !== 1) {
+      let speed = player.baseSpeed;
+
+      // Allow switching direction immediately if turning back or moving into an open grid lane
+      if (player.nextDx !== 0 || player.nextDy !== 0) {
+        if (player.dx === -player.nextDx && player.dy === -player.nextDy) {
+          player.dx = player.nextDx;
+          player.dy = player.nextDy;
+        } else if (canMoveTo(player.x, player.y, player.nextDx, player.nextDy, speed)) {
+          // Snap/align to grid axis when making smooth turns
+          if (player.nextDx !== 0 && player.y % tileSize !== 0) {
+            player.y = Math.round(player.y / tileSize) * tileSize;
+          }
+          if (player.nextDy !== 0 && player.x % tileSize !== 0) {
+            player.x = Math.round(player.x / tileSize) * tileSize;
+          }
           player.dx = player.nextDx;
           player.dy = player.nextDy;
         }
-        let currTx = Math.floor(player.x / tileSize) + player.dx;
-        let currTy = Math.floor(player.y / tileSize) + player.dy;
-        if (currTx < 0 || currTx >= 19 || currTy < 0 || currTy >= 21 || currentMap[currTy][currTx] === 1) {
-          player.dx = 0;
-          player.dy = 0;
-        }
       }
 
-      player.x += player.dx * player.speed;
-      player.y += player.dy * player.speed;
+      // Move player only if path is clear
+      if (canMoveTo(player.x, player.y, player.dx, player.dy, speed)) {
+        player.x += player.dx * speed;
+        player.y += player.dy * speed;
+      } else {
+        player.dx = 0;
+        player.dy = 0;
+      }
 
+      // Screen wrapping horizontal tunnels safely
       if (player.x < 0) player.x = 18 * tileSize;
       if (player.x >= 19 * tileSize) player.x = 0;
 
+      // Eat items on path
       let pCol = Math.floor((player.x + tileSize/2) / tileSize);
       let pRow = Math.floor((player.y + tileSize/2) / tileSize);
       if (pCol >= 0 && pCol < 19 && pRow >= 0 && pRow < 21) {
@@ -423,44 +461,54 @@
       document.getElementById('livesDisplay').innerText = lives;
 
       let cfg = levelConfigs[currentLevel - 1];
+      let ghostSpeed = frightTimer > 0 ? 0.5 : (0.8 + (currentLevel * 0.08));
 
+      // Move ghosts using rigorous wall collision checks
       ghosts.forEach(g => {
-        // Ghost Grid Collision Check (Strictly blocked by walls: 1)
         if (g.x % tileSize === 0 && g.y % tileSize === 0) {
           let directions = [
             {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
           ];
+          // Filter valid non-wall directions (preventing direct instant 180 reverses unless necessary)
           let valid = directions.filter(d => {
+            if (d.dx === -g.dx && d.dy === -g.dy && directions.length > 1) return false;
             let ntx = Math.floor(g.x / tileSize) + d.dx;
             let nty = Math.floor(g.y / tileSize) + d.dy;
             return ntx >= 0 && ntx < 19 && nty >= 0 && nty < 21 && currentMap[nty][ntx] !== 1;
           });
 
-          if (valid.length > 0) {
-            let chosen = valid[0];
-            if (Math.random() < cfg.smartness && frightTimer === 0) {
-              let bestDist = Infinity;
-              valid.forEach(d => {
-                let ntx = Math.floor(g.x / tileSize) + d.dx;
-                let nty = Math.floor(g.y / tileSize) + d.dy;
-                let dist = Math.hypot(ntx - pCol, nty - pRow);
-                if (dist < bestDist) {
-                  bestDist = dist;
-                  chosen = d;
-                }
-              });
-            } else {
-              chosen = valid[Math.floor(Math.random() * valid.length)];
-            }
-            g.dx = chosen.dx;
-            g.dy = chosen.dy;
+          if (valid.length === 0) {
+            valid = [{dx: -g.dx, dy: -g.dy}]; // fallback reverse if cornered
           }
+
+          let chosen = valid[0];
+          if (Math.random() < cfg.smartness && frightTimer === 0) {
+            let bestDist = Infinity;
+            valid.forEach(d => {
+              let ntx = Math.floor(g.x / tileSize) + d.dx;
+              let nty = Math.floor(g.y / tileSize) + d.dy;
+              let dist = Math.hypot(ntx - pCol, nty - pRow);
+              if (dist < bestDist) {
+                bestDist = dist;
+                chosen = d;
+              }
+            });
+          } else {
+            chosen = valid[Math.floor(Math.random() * valid.length)];
+          }
+          g.dx = chosen.dx;
+          g.dy = chosen.dy;
         }
 
-        let gSpeed = frightTimer > 0 ? 0.5 : cfg.ghostSpeed;
-        g.x += g.dx * gSpeed;
-        g.y += g.dy * gSpeed;
+        if (canMoveTo(g.x, g.y, g.dx, g.dy, ghostSpeed)) {
+          g.x += g.dx * ghostSpeed;
+          g.y += g.dy * ghostSpeed;
+        } else {
+          g.dx = 0;
+          g.dy = 0;
+        }
 
+        // Check collision with player
         let dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
         if (dist < 10) {
           if (frightTimer > 0) {
@@ -512,8 +560,7 @@
           vy: (Math.random() - 0.7) * 7,
           emoji: emojis[Math.floor(Math.random() * emojis.length)],
           size: 14 + Math.random() * 10,
-          alpha: 1,
-          rot: Math.random() * Math.PI
+          alpha: 1
         });
       }
     }
