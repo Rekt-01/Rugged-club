@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>pacman.html - APE-man 10-Level Ultimate Edition</title>
+  <title>pacman.html - APE-man Single Level Edition</title>
   <style>
     * {
       box-sizing: border-box;
@@ -206,9 +206,8 @@
 
   <div class="arcade-container">
     <div class="header-bar">
-      <div class="title-text" id="levelTitle">🦍 APE-man: LVL 1</div>
+      <div class="title-text" id="levelTitle">🦍 APE-man: ULTIMATE ARENA</div>
       <div class="header-controls">
-        <button class="control-btn" onclick="openLevelSelect()">🎯 LVL SELECT</button>
         <button class="control-btn" id="musicToggleBtn" onclick="toggleMusic()">🔊 MUSIC</button>
         <a href="index.html" class="exit-btn">🚪 EXIT</a>
       </div>
@@ -240,17 +239,6 @@
     </div>
   </div>
 
-  <!-- LEVEL SELECT MODAL -->
-  <div class="modal-overlay" id="levelSelectModal">
-    <div class="modal-card">
-      <div class="modal-title">SELECT TEST LEVEL</div>
-      <div class="modal-desc">Choose any level to test instantly:</div>
-      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 15px;" id="levelGridButtons">
-      </div>
-      <button class="modal-btn" onclick="closeLevelSelect()" style="background:#333; color:#fff;">CANCEL</button>
-    </div>
-  </div>
-
   <script>
     const canvas = document.getElementById('arcadeCanvas');
     const ctx = canvas.getContext('2d');
@@ -260,7 +248,6 @@
     const tileSize = 16;
     let score = 0;
     let lives = 3;
-    let currentLevel = 1;
     let gameState = 'PLAYING';
     let frightTimer = 0;
     let celebrationTimer = 0;
@@ -347,93 +334,29 @@
       }
     }, { once: true });
 
-    // Level configs
-    const levelConfigs = [
-      { name: "LVL 1: VERY EASY", ghostSpeed: 1, smartness: 0.05, ghostCount: 1, mapType: 0, playerStart: {r: 16, c: 9} },
-      { name: "LVL 2: EASY", ghostSpeed: 1, smartness: 0.1, ghostCount: 2, mapType: 1, playerStart: {r: 3, c: 9} },
-      { name: "LVL 3: CASUAL", ghostSpeed: 1, smartness: 0.2, ghostCount: 3, mapType: 2, playerStart: {r: 17, c: 9} },
-      { name: "LVL 4: MEDIUM", ghostSpeed: 1, smartness: 0.25, ghostCount: 3, mapType: 0, playerStart: {r: 10, c: 2} },
-      { name: "LVL 5: HARD", ghostSpeed: 1, smartness: 0.3, ghostCount: 4, mapType: 1, playerStart: {r: 13, c: 16} },
-      { name: "LVL 6: VERY HARD", ghostSpeed: 1, smartness: 0.35, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 2} },
-      { name: "LVL 7: INSANE", ghostSpeed: 1, smartness: 0.4, ghostCount: 4, mapType: 0, playerStart: {r: 16, c: 2} },
-      { name: "LVL 8: NIGHTMARE", ghostSpeed: 1, smartness: 0.45, ghostCount: 4, mapType: 1, playerStart: {r: 9, c: 16} },
-      { name: "LVL 9: ULTRA HARD", ghostSpeed: 1, smartness: 0.5, ghostCount: 4, mapType: 2, playerStart: {r: 3, c: 16} },
-      { name: "LVL 10: EXTREMELY ULTRA HARD", ghostSpeed: 1, smartness: 0.55, ghostCount: 4, mapType: 0, playerStart: {r: 10, c: 9} }
-    ];
-
-    const baseMaps = [
-      // Map Type 0
-      [
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
-        [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-        [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-        [1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1],
-        [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
-        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
-        [1,1,1,1,0,1,1,1,2,1,2,1,1,1,0,1,1,1,1],
-        [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
-        [1,1,1,1,0,1,2,1,1,2,1,1,2,1,0,1,1,1,1],
-        [2,2,2,2,0,2,2,1,2,2,2,1,2,2,0,2,2,2,2],
-        [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
-        [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
-        [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1],
-        [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
-        [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-        [1,0,0,1,0,0,0,0,0,4,0,0,0,0,0,1,0,0,1],
-        [1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1],
-        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
-        [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-      ],
-      // Map Type 1
-      [
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,3,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,3,1],
-        [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
-        [1,0,0,0,0,1,0,0,0,4,0,0,0,1,0,0,0,0,1],
-        [1,1,1,0,1,1,1,1,0,1,0,1,1,1,1,0,1,1,1],
-        [2,2,1,0,0,0,0,1,0,2,0,1,0,0,0,0,1,2,2],
-        [1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1],
-        [1,0,0,0,1,2,2,2,2,2,2,2,2,2,1,0,0,0,1],
-        [1,0,1,0,1,2,1,1,1,2,1,1,1,2,1,0,1,0,1],
-        [1,0,0,0,0,2,1,0,0,2,0,0,1,2,0,0,0,0,1],
-        [1,1,1,1,0,2,1,2,1,2,1,2,1,2,0,1,1,1,1],
-        [2,2,2,1,0,2,1,2,2,2,2,2,1,2,0,1,2,2,2],
-        [1,1,1,1,0,2,1,1,1,1,1,1,1,2,0,1,1,1,1],
-        [1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1],
-        [1,0,1,1,0,1,1,0,1,1,1,0,1,1,0,1,1,0,1],
-        [1,3,0,1,0,1,1,0,0,2,0,0,1,1,0,1,0,3,1],
-        [1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1],
-        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
-        [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
-        [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-      ],
-      // Map Type 2
-      [
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,3,0,0,0,1,0,0,0,4,0,0,0,1,0,0,0,3,1],
-        [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
-        [1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1],
-        [1,0,1,0,1,1,1,1,0,1,0,1,1,1,1,0,1,0,1],
-        [1,0,0,0,0,0,0,1,0,2,0,1,0,0,0,0,0,0,1],
-        [1,1,1,1,0,1,0,1,1,2,1,1,0,1,0,1,1,1,1],
-        [2,2,2,1,0,1,0,2,2,2,2,2,0,1,0,1,2,2,2],
-        [1,1,1,1,0,1,0,1,1,2,1,1,0,1,0,1,1,1,1],
-        [2,2,2,2,0,0,0,1,2,2,2,1,0,0,0,2,2,2,2],
-        [1,1,1,1,0,1,0,1,2,2,2,1,0,1,0,1,1,1,1],
-        [2,2,2,1,0,1,0,1,1,1,1,1,0,1,0,1,2,2,2],
-        [1,1,1,1,0,1,0,0,0,4,0,0,0,1,0,1,1,1,1],
-        [1,0,0,0,0,1,1,1,0,1,0,1,1,1,0,0,0,0,1],
-        [1,0,1,1,0,0,0,0,0,1,0,0,0,0,0,1,1,0,1],
-        [1,3,0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,3,1],
-        [1,1,0,1,0,0,0,1,0,2,0,1,0,0,0,1,0,1,1],
-        [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
-        [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
-        [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-      ]
+    // Single perfectly balanced map layout
+    const originalMap = [
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
+      [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
+      [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
+      [1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1],
+      [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
+      [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
+      [1,1,1,1,0,1,1,1,2,1,2,1,1,1,0,1,1,1,1],
+      [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
+      [1,1,1,1,0,1,2,1,1,2,1,1,2,1,0,1,1,1,1],
+      [2,2,2,2,0,2,2,1,2,2,2,1,2,2,0,2,2,2,2],
+      [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
+      [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
+      [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1],
+      [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
+      [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
+      [1,0,0,1,0,0,0,0,0,4,0,0,0,0,0,1,0,0,1],
+      [1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1],
+      [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
+      [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     ];
 
     let currentMap = [];
@@ -445,62 +368,26 @@
       dy: 0,
       nextDx: 0,
       nextDy: 0,
-      baseSpeed: 1
+      speed: 1
     };
 
     let ghosts = [];
 
-    function findOpenTile(mapData, prefR, prefC) {
-      if (mapData[prefR] && mapData[prefR][prefC] !== 1) {
-        return {r: prefR, c: prefC};
-      }
-      for (let dist = 1; dist < 12; dist++) {
-        for (let dr = -dist; dr <= dist; dr++) {
-          for (let dc = -dist; dc <= dist; dc++) {
-            let r = prefR + dr;
-            let c = prefC + dc;
-            if (r >= 0 && r < 21 && c >= 0 && c < 19 && mapData[r][c] !== 1) {
-              return {r: r, c: c};
-            }
-          }
-        }
-      }
-      return {r: 10, c: 9};
-    }
-
-    function initLevel() {
-      let cfg = levelConfigs[currentLevel - 1];
-      document.getElementById('levelTitle').innerText = `🦍 ${cfg.name}`;
-      currentMap = JSON.parse(JSON.stringify(baseMaps[cfg.mapType]));
-      
-      let pPos = findOpenTile(currentMap, cfg.playerStart.r, cfg.playerStart.c);
-      player.x = pPos.c * tileSize;
-      player.y = pPos.r * tileSize;
+    function initGame() {
+      currentMap = JSON.parse(JSON.stringify(originalMap));
+      player.x = 9 * tileSize;
+      player.y = 16 * tileSize;
       player.dx = 0;
       player.dy = 0;
       player.nextDx = 0;
       player.nextDy = 0;
 
-      let ghostSpawnPrefabs = [
-        [{r: 2, c: 2}, {r: 2, c: 16}, {r: 18, c: 2}, {r: 18, c: 16}],
-        [{r: 5, c: 9}, {r: 15, c: 9}, {r: 10, c: 2}, {r: 10, c: 16}],
-        [{r: 3, c: 9}, {r: 17, c: 9}, {r: 10, c: 5}, {r: 10, c: 13}],
-        [{r: 1, c: 9}, {r: 19, c: 9}, {r: 9, c: 1}, {r: 9, c: 17}]
+      // 3 smart, reliable, non-freezing ghosts
+      ghosts = [
+        { x: 2 * tileSize, y: 2 * tileSize, dx: 1, dy: 0, speed: 1, color: 'red' },
+        { x: 16 * tileSize, y: 2 * tileSize, dx: -1, dy: 0, speed: 1, color: 'pink' },
+        { x: 9 * tileSize, y: 10 * tileSize, dx: 0, dy: -1, speed: 1, color: 'cyan' }
       ];
-
-      let spawnSet = ghostSpawnPrefabs[(currentLevel - 1) % ghostSpawnPrefabs.length];
-
-      ghosts = [];
-      for(let i = 0; i < cfg.ghostCount; i++) {
-        let pref = spawnSet[i % spawnSet.length];
-        let tile = findOpenTile(currentMap, pref.r, pref.c);
-        ghosts.push({
-          x: tile.c * tileSize,
-          y: tile.r * tileSize,
-          dx: i % 2 === 0 ? 1 : -1,
-          dy: 0
-        });
-      }
     }
 
     function setDirection(x, y) {
@@ -547,13 +434,12 @@
 
       if (frightTimer > 0) frightTimer--;
 
-      let speed = player.baseSpeed;
-
+      // Player direction queueing and movement
       if (player.nextDx !== 0 || player.nextDy !== 0) {
         if (player.dx === -player.nextDx && player.dy === -player.nextDy) {
           player.dx = player.nextDx;
           player.dy = player.nextDy;
-        } else if (canMoveTo(player.x, player.y, player.nextDx, player.nextDy, speed)) {
+        } else if (canMoveTo(player.x, player.y, player.nextDx, player.nextDy, player.speed)) {
           if (player.nextDx !== 0 && player.y % tileSize !== 0) {
             player.y = Math.round(player.y / tileSize) * tileSize;
           }
@@ -565,9 +451,9 @@
         }
       }
 
-      if (canMoveTo(player.x, player.y, player.dx, player.dy, speed)) {
-        player.x += player.dx * speed;
-        player.y += player.dy * speed;
+      if (canMoveTo(player.x, player.y, player.dx, player.dy, player.speed)) {
+        player.x += player.dx * player.speed;
+        player.y += player.dy * player.speed;
       } else {
         player.dx = 0;
         player.dy = 0;
@@ -576,35 +462,33 @@
       if (player.x < 0) player.x = 18 * tileSize;
       if (player.x >= 19 * tileSize) player.x = 0;
 
+      // Item eating check
       let pCol = Math.floor((player.x + tileSize/2) / tileSize);
       let pRow = Math.floor((player.y + tileSize/2) / tileSize);
       if (pCol >= 0 && pCol < 19 && pRow >= 0 && pRow < 21) {
         if (currentMap[pRow][pCol] === 0) {
           currentMap[pRow][pCol] = 2;
           score += 10;
-          checkLevelCompletion();
+          checkWinCondition();
         } else if (currentMap[pRow][pCol] === 4) {
           currentMap[pRow][pCol] = 2;
           score += 100;
-          checkLevelCompletion();
+          checkWinCondition();
         } else if (currentMap[pRow][pCol] === 3) {
           currentMap[pRow][pCol] = 2;
           score += 50;
-          frightTimer = 300;
-          checkLevelCompletion();
+          frightTimer = 350;
+          checkWinCondition();
         }
       }
 
       document.getElementById('scoreDisplay').innerText = score;
       document.getElementById('livesDisplay').innerText = lives;
 
-      let cfg = levelConfigs[currentLevel - 1];
-      let ghostSpeed = frightTimer > 0 ? 1 : cfg.ghostSpeed;
-
+      // Ghost movement update (guaranteed tile snapping to prevent any locking)
       ghosts.forEach(g => {
-        // Bulletproof integer-grid movement and alignment checks
-        g.x += g.dx * ghostSpeed;
-        g.y += g.dy * ghostSpeed;
+        g.x += g.dx * g.speed;
+        g.y += g.dy * g.speed;
 
         if (g.x % tileSize === 0 && g.y % tileSize === 0) {
           let gCol = g.x / tileSize;
@@ -623,6 +507,7 @@
             return ntx >= 0 && ntx < 19 && nty >= 0 && nty < 21 && currentMap[nty][ntx] !== 1;
           });
 
+          // Fallback if dead-ended
           if (valid.length === 0) {
             valid = directions.filter(d => {
               let ntx = gCol + d.dx;
@@ -633,62 +518,57 @@
 
           if (valid.length > 0) {
             let chosen = valid[0];
-            let shouldChase = Math.random() < cfg.smartness && frightTimer === 0;
-
-            if (shouldChase) {
-              let bestDist = Infinity;
+            if (frightTimer > 0) {
+              // Run away from player when frightened
+              let maxDist = -1;
               valid.forEach(d => {
-                let ntx = gCol + d.dx;
-                let nty = gRow + d.dy;
-                let dist = Math.hypot(ntx - pCol, nty - pRow);
-                if (dist < bestDist) {
-                  bestDist = dist;
-                  chosen = d;
-                }
-              });
-            } else if (frightTimer > 0) {
-              let worstDist = -1;
-              valid.forEach(d => {
-                let ntx = gCol + d.dx;
-                let nty = gRow + d.dy;
-                let dist = Math.hypot(ntx - pCol, nty - pRow);
-                if (dist > worstDist) {
-                  worstDist = dist;
+                let dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow);
+                if (dist > maxDist) {
+                  maxDist = dist;
                   chosen = d;
                 }
               });
             } else {
-              chosen = valid[Math.floor(Math.random() * valid.length)];
+              // Smart chase behavior
+              let minDist = Infinity;
+              valid.forEach(d => {
+                let dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow);
+                // Add slight randomness so they don't stack up completely
+                let weightedDist = dist + (Math.random() * 2);
+                if (weightedDist < minDist) {
+                  minDist = weightedDist;
+                  chosen = d;
+                }
+              });
             }
             g.dx = chosen.dx;
             g.dy = chosen.dy;
           }
         }
 
-        if (!canMoveTo(g.x, g.y, g.dx, g.dy, ghostSpeed)) {
+        // Safety fallback if hitting a wall block unexpectedly
+        if (!canMoveTo(g.x, g.y, g.dx, g.dy, g.speed)) {
           g.dx = 0;
           g.dy = 0;
         }
 
+        // Collision with player
         let dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
         if (dist < 12) {
           if (frightTimer > 0) {
             score += 200;
-            let safeSpawn = findOpenTile(currentMap, 10, 9);
-            g.x = safeSpawn.c * tileSize;
-            g.y = safeSpawn.r * tileSize;
+            g.x = 9 * tileSize;
+            g.y = 10 * tileSize;
             g.dx = 1;
             g.dy = 0;
           } else {
             lives--;
             if (lives <= 0) {
               gameState = 'GAMEOVER';
-              triggerGameOverModal("GAME OVER", "The dev otter rugged your bags!", "APE BACK IN 🔄", resetGame);
+              triggerModal("GAME OVER", "The dev otter rugged your bags!", "APE BACK IN 🔄", fullReset);
             } else {
-              let cfg = levelConfigs[currentLevel - 1];
-              let pPos = findOpenTile(currentMap, cfg.playerStart.r, cfg.playerStart.c);
-              player.x = pPos.c * tileSize;
-              player.y = pPos.r * tileSize;
+              player.x = 9 * tileSize;
+              player.y = 16 * tileSize;
               player.dx = 0;
               player.dy = 0;
               player.nextDx = 0;
@@ -699,40 +579,35 @@
       });
     }
 
-    function checkLevelCompletion() {
-      let itemsRemaining = false;
+    function checkWinCondition() {
+      let itemsLeft = false;
       for(let r = 0; r < currentMap.length; r++) {
         for(let c = 0; c < currentMap[r].length; c++) {
           if(currentMap[r][c] === 0 || currentMap[r][c] === 3 || currentMap[r][c] === 4) {
-            itemsRemaining = true;
+            itemsLeft = true;
             break;
           }
         }
-        if(itemsRemaining) break;
+        if(itemsLeft) break;
       }
 
-      if(!itemsRemaining) {
-        triggerCelebration();
-      }
-    }
-
-    function triggerCelebration() {
-      gameState = 'CELEBRATION';
-      celebrationTimer = 180;
-      pCanvas.style.display = 'block';
-      
-      particles = [];
-      const emojis = ['🚀', '🌕', '💎', '💰', '🦍', '🍾', '🔥', '📈'];
-      for(let i = 0; i < 50; i++) {
-        particles.push({
-          x: canvas.width / 2,
-          y: canvas.height / 2,
-          vx: (Math.random() - 0.5) * 6,
-          vy: (Math.random() - 0.7) * 7,
-          emoji: emojis[Math.floor(Math.random() * emojis.length)],
-          size: 14 + Math.random() * 10,
-          alpha: 1
-        });
+      if(!itemsLeft) {
+        gameState = 'CELEBRATION';
+        celebrationTimer = 200;
+        pCanvas.style.display = 'block';
+        particles = [];
+        const emojis = ['🚀', '🌕', '💎', '💰', '🦍', '🍾', '🔥', '📈'];
+        for(let i = 0; i < 60; i++) {
+          particles.push({
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            vx: (Math.random() - 0.5) * 7,
+            vy: (Math.random() - 0.7) * 8,
+            emoji: emojis[Math.floor(Math.random() * emojis.length)],
+            size: 14 + Math.random() * 10,
+            alpha: 1
+          });
+        }
       }
     }
 
@@ -745,7 +620,7 @@
       pCtx.fillStyle = "#00ffff";
       pCtx.shadowColor = "#ff00ff";
       pCtx.shadowBlur = 12;
-      pCtx.fillText(`🎉 LEVEL ${currentLevel} CLEARED! 🎉`, pCanvas.width / 2, pCanvas.height / 2 - 20);
+      pCtx.fillText("🎉 ARENA CLEARED! 🎉", pCanvas.width / 2, pCanvas.height / 2 - 20);
       pCtx.fillStyle = "#ffcc00";
       pCtx.fillText("DIAMOND HANDS WIN 🚀", pCanvas.width / 2, pCanvas.height / 2 + 10);
       pCtx.shadowBlur = 0;
@@ -766,54 +641,21 @@
 
       if (celebrationTimer <= 0) {
         pCanvas.style.display = 'none';
-        currentLevel++;
-        if (currentLevel > 10) {
-          gameState = 'VICTORY';
-          triggerGameOverModal("CHAD MOON LANDING 🌕", `Absolute legend! You survived all 10 levels with ${score} Liquidity!`, "PLAY AGAIN 🔄", resetGame);
-        } else {
-          gameState = 'PLAYING';
-          initLevel();
-        }
+        triggerModal("CHAD MOON LANDING 🌕", `Absolute legend! You cleared the arena with ${score} Liquidity!`, "PLAY AGAIN 🔄", fullReset);
       }
     }
 
-    function resetGame() {
+    function fullReset() {
       score = 0;
       lives = 3;
-      currentLevel = 1;
       gameState = 'PLAYING';
       frightTimer = 0;
       document.getElementById('endGameModal').style.display = 'none';
       pCanvas.style.display = 'none';
-      initLevel();
+      initGame();
     }
 
-    function openLevelSelect() {
-      let gridContainer = document.getElementById('levelGridButtons');
-      gridContainer.innerHTML = '';
-      for(let i = 1; i <= 10; i++) {
-        let btn = document.createElement('button');
-        btn.innerText = i;
-        btn.className = 'modal-btn';
-        btn.style.padding = '8px 0';
-        btn.onclick = () => {
-          currentLevel = i;
-          gameState = 'PLAYING';
-          document.getElementById('levelSelectModal').style.display = 'none';
-          document.getElementById('endGameModal').style.display = 'none';
-          pCanvas.style.display = 'none';
-          initLevel();
-        };
-        gridContainer.appendChild(btn);
-      }
-      document.getElementById('levelSelectModal').style.display = 'flex';
-    }
-
-    function closeLevelSelect() {
-      document.getElementById('levelSelectModal').style.display = 'none';
-    }
-
-    function triggerGameOverModal(title, desc, btnText, callback) {
+    function triggerModal(title, desc, btnText, callback) {
       document.getElementById('modalTitle').innerText = title;
       document.getElementById('modalDesc').innerText = desc;
       let btn = document.getElementById('modalActionBtn');
@@ -829,9 +671,9 @@
       for (let r = 0; r < 21; r++) {
         for (let c = 0; c < 19; c++) {
           if (currentMap[r][c] === 1) {
-            ctx.fillStyle = currentLevel > 7 ? '#3a003a' : '#1a1a3a';
+            ctx.fillStyle = '#1a1a3a';
             ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
-            ctx.strokeStyle = currentLevel > 7 ? '#ff0055' : '#00ffff';
+            ctx.strokeStyle = '#00ffff';
             ctx.lineWidth = 0.5;
             ctx.strokeRect(c * tileSize, r * tileSize, tileSize, tileSize);
           } else if (currentMap[r][c] === 0) {
@@ -869,7 +711,7 @@
       requestAnimationFrame(loop);
     }
 
-    initLevel();
+    initGame();
     loop();
   </script>
 </body>
