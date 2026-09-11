@@ -602,13 +602,13 @@
       let ghostSpeed = frightTimer > 0 ? 1 : cfg.ghostSpeed;
 
       ghosts.forEach(g => {
-        // Robust grid alignment check using Math.round distance to prevent freezing
-        if (Math.abs(g.x % tileSize) <= ghostSpeed && Math.abs(g.y % tileSize) <= ghostSpeed) {
-          g.x = Math.round(g.x / tileSize) * tileSize;
-          g.y = Math.round(g.y / tileSize) * tileSize;
+        // Bulletproof integer-grid movement and alignment checks
+        g.x += g.dx * ghostSpeed;
+        g.y += g.dy * ghostSpeed;
 
-          let gCol = Math.floor((g.x + tileSize/2) / tileSize);
-          let gRow = Math.floor((g.y + tileSize/2) / tileSize);
+        if (g.x % tileSize === 0 && g.y % tileSize === 0) {
+          let gCol = g.x / tileSize;
+          let gRow = g.y / tileSize;
 
           let directions = [
             {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
@@ -665,31 +665,9 @@
           }
         }
 
-        if (canMoveTo(g.x, g.y, g.dx, g.dy, ghostSpeed)) {
-          g.x += g.dx * ghostSpeed;
-          g.y += g.dy * ghostSpeed;
-        } else {
-          g.x = Math.round(g.x / tileSize) * tileSize;
-          g.y = Math.round(g.y / tileSize) * tileSize;
-          let gCol = Math.floor((g.x + tileSize/2) / tileSize);
-          let gRow = Math.floor((g.y + tileSize/2) / tileSize);
-
-          let directions = [
-            {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
-          ];
-          let valid = directions.filter(d => {
-            let ntx = gCol + d.dx;
-            let nty = gRow + d.dy;
-            return ntx >= 0 && ntx < 19 && nty >= 0 && nty < 21 && currentMap[nty][ntx] !== 1;
-          });
-          if (valid.length > 0) {
-            let rChoice = valid[Math.floor(Math.random() * valid.length)];
-            g.dx = rChoice.dx;
-            g.dy = rChoice.dy;
-          } else {
-            g.dx = 0;
-            g.dy = 0;
-          }
+        if (!canMoveTo(g.x, g.y, g.dx, g.dy, ghostSpeed)) {
+          g.dx = 0;
+          g.dy = 0;
         }
 
         let dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
