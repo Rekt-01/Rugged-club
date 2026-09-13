@@ -79,6 +79,50 @@
       border-radius: 4px;
     }
 
+    /* --- PULSING ARROW & TEXT POINTER FOR LORE --- */
+    .lore-pointer {
+      position: absolute;
+      top: 55%;
+      left: 15%;
+      z-index: 6;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none; /* Let clicks pass straight through to the hotspot */
+      animation: bounceArrow 1.2s infinite ease-in-out;
+    }
+
+    .lore-arrow-icon {
+      color: #ff007a;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(255, 0, 122, 0.8);
+    }
+
+    .lore-pointer-text {
+      background: rgba(0, 0, 0, 0.75);
+      color: #00ff66;
+      border: 1px solid #ff007a;
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-family: monospace;
+      font-size: 0.65rem;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 5px rgba(0, 255, 102, 0.6);
+      box-shadow: 0 0 10px rgba(255, 0, 122, 0.4);
+      white-space: nowrap;
+    }
+
+    @keyframes bounceArrow {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(-5px);
+      }
+    }
+
     /* --- TOILET PAPER ROLL MODAL --- */
     .modal {
       display: none;
@@ -198,6 +242,12 @@
       
       <!-- Hidden hotspot over the bathroom stall lock/latch pointing back to the bar -->
       <a href="index.html" class="hotspot stall-lock-hotspot" title="Unlock Stall & Return to Bar"></a>
+
+      <!-- Pulsing arrow indicator pointing straight at the LORE graffiti -->
+      <div class="lore-pointer">
+        <div class="lore-arrow-icon">◀</div>
+        <div class="lore-pointer-text">READ LORE</div>
+      </div>
 
       <!-- Hotspot covering the "LORE" text on the left wall -->
       <button class="hotspot lore-hotspot" onclick="openLoreModal()" title="Inspect Lore"></button>
