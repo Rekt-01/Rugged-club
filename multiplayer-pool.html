@@ -293,12 +293,12 @@
     let roomCode = urlParams.get('room') || "degens_101";
     document.getElementById('roomInput').value = roomCode;
 
-    let localRole = null; // Will be assigned as 'Player 1' or 'Player 2'
+    let localRole = null; 
+    const deviceId = 'dev_' + Math.random().toString(36).substring(2, 9); // Unique session ID for this browser tab
 
     function changeRoom(newRoom) {
       if (!newRoom) return;
       roomCode = newRoom.trim();
-      localStorage.removeItem('pool_role_' + roomCode); // Reset role for new room
       localRole = null;
       const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?room=' + encodeURIComponent(roomCode);
       window.history.pushState({path:newUrl}, '', newUrl);
@@ -331,6 +331,8 @@
     let turnPocketedAny = false;
     let turnPocketedValid = false;
     let scratched = false;
+    let p1Device = null;
+    let p2Device = null;
 
     let cueBall = { x: 90, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
@@ -378,7 +380,7 @@
 
     function executeShot() {
       if (turn !== localRole) {
-        showToast(`🛑 Wait your turn! You are ${localRole}, but it's ${turn}'s shift.`);
+        showToast(`🛑 Wait your turn! You are ${localRole || 'Spectator'}, but it's ${turn}'s shift.`);
         return;
       }
       if (!isAnyBallMoving() && !shotFired) {
@@ -433,7 +435,9 @@
           balls: balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r })),
           turn,
           player1Group,
-          player2Group
+          player2Group,
+          p1Device,
+          p2Device
         };
         await supabaseClient
           .from('pool_games')
@@ -450,7 +454,7 @@
           .select('game_state')
           .eq('room_code', roomCode);
 
-        if (data && data.length > 0 && data[0].game_state && !isAnyBallMoving() && !shotFired) {
+        if (data && data.length > 0 && data[0].game_state) {
           applyRemoteState(data[0].game_state);
         }
       } catch (e) {
@@ -460,41 +464,60 @@
 
     async function initMultiplayer() {
       try {
-        // Check local storage for existing role assignment in this room
-        localRole = localStorage.getItem('pool_role_' + roomCode);
-
         let { data, error } = await supabaseClient
           .from('pool_games')
           .select('*')
           .eq('room_code', roomCode);
         
         if (!data || data.length === 0) {
-          // Room does not exist yet -> First person becomes Player 1
+          // Room completely empty -> Create it and claim Player 1
           localRole = 'Player 1';
-          localStorage.setItem('pool_role_' + roomCode, localRole);
+          p1Device = deviceId;
+          p2Device = null;
 
           generateInitialRack();
           const initState = {
             balls: balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r })),
-            turn, player1Group, player2Group
+            turn, player1Group, player2Group, p1Device, p2Device
           };
           await supabaseClient
             .from('pool_games')
             .insert([{ room_code: roomCode, game_state: initState }]);
         } else {
-          // Room exists
-          if (!localRole) {
-            // Second person joining -> becomes Player 2
+          let state = data[0].game_state || {};
+          p1Device = state.p1Device || null;
+          p2Device = state.p2Device || null;
+
+          // Check if this device already claimed a slot
+          if (p1Device === deviceId) {
+            localRole = 'Player 1';
+          } else if (p2Device === deviceId) {
             localRole = 'Player 2';
-            localStorage.setItem('pool_role_' + roomCode, localRole);
+          } else {
+            // Unclaimed device trying to join
+            if (!p1Device) {
+              p1Device = deviceId;
+              localRole = 'Player 1';
+            } else if (!p2Device) {
+              p2Device = deviceId;
+              localRole = 'Player 2';
+            } else {
+              localRole = 'Spectator'; // Room is full
+              showToast("👀 Room full! Joined as Spectator.");
+            }
+            // Push updated slots to server
+            state.p1Device = p1Device;
+            state.p2Device = p2Device;
+            await supabaseClient
+              .from('pool_games')
+              .upsert({ room_code: roomCode, game_state: state, updated_at: new Date() }, { onConflict: 'room_code' });
           }
-          if (data[0].game_state) {
-            applyRemoteState(data[0].game_state);
-          }
+
+          applyRemoteState(state);
         }
 
         document.getElementById('myRoleDisplay').innerText = localRole.toUpperCase();
-        document.getElementById('myRoleDisplay').style.color = localRole === 'Player 1' ? '#00ffcc' : '#ffe600';
+        document.getElementById('myRoleDisplay').style.color = localRole === 'Player 1' ? '#00ffcc' : (localRole === 'Player 2' ? '#ffe600' : '#ff007a');
         document.getElementById('syncStatus').innerText = 'ONLINE SYNC ACTIVE';
         document.getElementById('syncStatus').style.color = '#00ff66';
       } catch (e) {
@@ -504,7 +527,7 @@
     }
 
     function applyRemoteState(remoteState) {
-      if (remoteState.balls) {
+      if (remoteState.balls && !isAnyBallMoving() && !shotFired) {
         balls = remoteState.balls.map(rb => ({ ...rb }));
         cueBall = balls.find(b => b.isCue) || cueBall;
       }
