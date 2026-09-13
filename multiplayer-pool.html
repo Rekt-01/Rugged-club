@@ -267,7 +267,6 @@
   </div>
 
   <script>
-    // Supabase Configuration
     const SUPABASE_URL = 'https://vcsauoymgxazvfxihyym.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjc2F1b3ltZ3haznZmeGloeXltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTIzNzUsImV4cCI6MjEwNDg4ODM3NX0.x5dQeBH-4YDJKigjG0boizwZrkY7VbbneIN_w-VyBi8';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY.trim());
@@ -278,7 +277,6 @@
     const ctx = canvas.getContext('2d');
     const toast = document.getElementById('eventToast');
 
-    // Slippage Mode State
     let bigPockets = true;
     function toggleSlippageMode() {
       bigPockets = !bigPockets;
@@ -298,9 +296,8 @@
 
     let shotFired = false;
     let turn = 'Player 1';
-    let player1Group = null; // 'solids' or 'stripes'
-    let player2Group = null; // 'solids' or 'stripes'
-    
+    let player1Group = null;
+    let player2Group = null;
     let turnPocketedAny = false;
     let turnPocketedValid = false;
     let scratched = false;
@@ -308,32 +305,37 @@
     let cueBall = { x: 90, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
 
-    let rackX = 240, rackY = 95, spacing = 11.5;
-    let ballNumbers = [1, 2, 9, 3, 8, 10, 4, 11, 12, 5, 6, 13, 14, 15, 7];
+    function generateInitialRack() {
+      balls = [cueBall];
+      let rackX = 240, rackY = 95, spacing = 11.5;
+      let ballNumbers = [1, 2, 9, 3, 8, 10, 4, 11, 12, 5, 6, 13, 14, 15, 7];
 
-    let numIdx = 0;
-    for (let col = 0; col < 5; col++) {
-      for (let row = 0; row <= col; row++) {
-        if (numIdx >= ballNumbers.length) break;
-        let n = ballNumbers[numIdx];
-        let bx = rackX + (col * spacing * 0.866);
-        let by = rackY + (row * spacing) - (col * spacing / 2);
-        
-        let bType = (n === 8) ? 'black' : (n <= 7 ? 'solids' : 'stripes');
-        let bColor = '#ffffff';
-        if (n === 8) bColor = '#111111';
-        else if (n === 1 || n === 9) bColor = '#f1c40f'; 
-        else if (n === 2 || n === 10) bColor = '#2980b9'; 
-        else if (n === 3 || n === 11) bColor = '#e74c3c'; 
-        else if (n === 4 || n === 12) bColor = '#8e44ad'; 
-        else if (n === 5 || n === 13) bColor = '#d35400'; 
-        else if (n === 6 || n === 14) bColor = '#27ae60'; 
-        else if (n === 7 || n === 15) bColor = '#c0392b'; 
+      let numIdx = 0;
+      for (let col = 0; col < 5; col++) {
+        for (let row = 0; row <= col; row++) {
+          if (numIdx >= ballNumbers.length) break;
+          let n = ballNumbers[numIdx];
+          let bx = rackX + (col * spacing * 0.866);
+          let by = rackY + (row * spacing) - (col * spacing / 2);
+          
+          let bType = (n === 8) ? 'black' : (n <= 7 ? 'solids' : 'stripes');
+          let bColor = '#ffffff';
+          if (n === 8) bColor = '#111111';
+          else if (n === 1 || n === 9) bColor = '#f1c40f'; 
+          else if (n === 2 || n === 10) bColor = '#2980b9'; 
+          else if (n === 3 || n === 11) bColor = '#e74c3c'; 
+          else if (n === 4 || n === 12) bColor = '#8e44ad'; 
+          else if (n === 5 || n === 13) bColor = '#d35400'; 
+          else if (n === 6 || n === 14) bColor = '#27ae60'; 
+          else if (n === 7 || n === 15) bColor = '#c0392b'; 
 
-        balls.push({ x: bx, y: by, vx: 0, vy: 0, r: 5.5, color: bColor, isCue: false, type: bType, num: n, isStripe: n > 8 });
-        numIdx++;
+          balls.push({ x: bx, y: by, vx: 0, vy: 0, r: 5.5, color: bColor, isCue: false, type: bType, num: n, isStripe: n > 8 });
+          numIdx++;
+        }
       }
     }
+
+    generateInitialRack();
 
     let aimAngle = 0;
     let power = 6.8;
@@ -382,7 +384,6 @@
         return;
       }
 
-      // Assign groups if open market
       if (player1Group === null) {
         if (turn === 'Player 1') {
           player1Group = b.type;
@@ -404,7 +405,7 @@
     }
 
     async function pushGameStateToSupabase() {
-      const serializedBalls = balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue }));
+      const serializedBalls = balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r }));
       const { error } = await supabase
         .from('pool_games')
         .update({ 
@@ -421,6 +422,48 @@
       if (error) console.error('Sync push error:', error.message);
     }
 
+    async function fetchOrInitRoom() {
+      const { data, error } = await supabase
+        .from('pool_games')
+        .select('*')
+        .eq('room_code', roomCode)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Fetch room error:', error);
+        return;
+      }
+
+      if (!data) {
+        // Create room state if missing
+        const serializedBalls = balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r }));
+        await supabase.from('pool_games').insert([{
+          room_code: roomCode,
+          game_state: { balls: serializedBalls, turn: turn, player1Group: player1Group, player2Group: player2Group }
+        }]);
+      } else if (data.game_state && data.game_state.balls) {
+        applyRemoteState(data.game_state);
+      }
+    }
+
+    function applyRemoteState(remoteState) {
+      if (remoteState.balls) {
+        balls = remoteState.balls.map(rb => ({ ...rb }));
+        cueBall = balls.find(b => b.isCue) || cueBall;
+      }
+      if (remoteState.turn) {
+        turn = remoteState.turn;
+        document.getElementById('turnDisplay').innerText = turn.toUpperCase();
+      }
+      if (remoteState.player1Group !== undefined) {
+        player1Group = remoteState.player1Group;
+        player2Group = remoteState.player2Group;
+        if (player1Group) {
+          document.getElementById('groupDisplay').innerText = `P1: ${player1Group.toUpperCase()} | P2: ${player2Group.toUpperCase()}`;
+        }
+      }
+    }
+
     supabase
       .channel('pool_room_' + roomCode)
       .on('postgres_changes', {
@@ -429,35 +472,15 @@
         table: 'pool_games',
         filter: `room_code=eq.${roomCode}`
       }, payload => {
-        const remoteState = payload.new.game_state;
-        if (remoteState) {
-          if (remoteState.balls) {
-            remoteState.balls.forEach(remoteB => {
-              let localB = balls.find(b => b.num === remoteB.num && b.isCue === remoteB.isCue);
-              if (localB) {
-                localB.x = remoteB.x;
-                localB.y = remoteB.y;
-                localB.vx = remoteB.vx;
-                localB.vy = remoteB.vy;
-              }
-            });
-          }
-          if (remoteState.turn) {
-            turn = remoteState.turn;
-            document.getElementById('turnDisplay').innerText = turn.toUpperCase();
-          }
-          if (remoteState.player1Group) {
-            player1Group = remoteState.player1Group;
-            player2Group = remoteState.player2Group;
-            document.getElementById('groupDisplay').innerText = `P1: ${player1Group.toUpperCase()} | P2: ${player2Group.toUpperCase()}`;
-          }
-          showToast("⚡ Remote sync updated!");
+        if (payload.new && payload.new.game_state) {
+          applyRemoteState(payload.new.game_state);
         }
       })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           document.getElementById('syncStatus').innerText = 'SYNCED ONLINE';
           document.getElementById('syncStatus').style.color = '#00ff66';
+          fetchOrInitRoom();
         }
       });
 
