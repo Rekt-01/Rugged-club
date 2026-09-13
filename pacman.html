@@ -1,239 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>APE-man</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      touch-action: manipulation;
-    }
-
-    body {
-      background-color: #020205;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-      font-family: monospace;
-    }
-
-    .arcade-container {
-      background: #0d0d12;
-      border: 3px solid #ff00ff;
-      border-radius: 14px;
-      padding: 10px;
-      width: 98vw;
-      max-width: 440px;
-      box-shadow: 0 0 35px rgba(255, 0, 255, 0.4);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .header-bar {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-
-    .title-text {
-      color: #ff00ff;
-      font-size: 0.65rem;
-      font-weight: bold;
-      text-shadow: 0 0 6px #ff00ff;
-    }
-
-    .header-controls {
-      display: flex;
-      gap: 4px;
-    }
-
-    .control-btn {
-      background: rgba(0, 255, 255, 0.15);
-      border: 2px solid #00ffff;
-      color: #00ffff;
-      padding: 3px 5px;
-      border-radius: 5px;
-      font-size: 0.55rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .control-btn:hover { background: #00ffff; color: #000; }
-
-    .exit-btn {
-      background: rgba(255, 51, 51, 0.15);
-      border: 2px solid #ff3333;
-      color: #ff3333;
-      padding: 3px 5px;
-      border-radius: 5px;
-      font-size: 0.55rem;
-      font-weight: bold;
-      text-decoration: none;
-    }
-    .exit-btn:hover { background: #ff3333; color: #000; }
-
-    .scoreboard {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      background: #121218;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 5px 10px;
-      margin-bottom: 6px;
-      font-size: 0.65rem;
-      color: #fff;
-    }
-    .score-item span { color: #00ffff; font-weight: bold; }
-
-    .canvas-wrapper {
-      position: relative;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 2px solid #222;
-      background: #000;
-    }
-
-    canvas {
-      display: block;
-      background: #00000a;
-    }
-
-    .dpad {
-      display: grid;
-      grid-template-columns: repeat(3, 50px);
-      grid-template-rows: repeat(2, 44px);
-      gap: 5px;
-      margin-top: 8px;
-      justify-content: center;
-    }
-
-    .dpad-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 2px solid #00ffff;
-      border-radius: 6px;
-      color: #00ffff;
-      font-size: 1rem;
-      font-weight: bold;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-    }
-    .dpad-btn:active {
-      background: rgba(0, 255, 255, 0.3);
-    }
-    .btn-up { grid-column: 2; grid-row: 1; }
-    .btn-left { grid-column: 1; grid-row: 2; }
-    .btn-down { grid-column: 2; grid-row: 2; }
-    .btn-right { grid-column: 3; grid-row: 2; }
-
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 20;
-      justify-content: center;
-      align-items: center;
-      backdrop-filter: blur(5px);
-    }
-    .modal-card {
-      background: #0d0d12;
-      border: 3px solid #00ffff;
-      border-radius: 12px;
-      padding: 18px;
-      width: 90vw;
-      max-width: 380px;
-      text-align: center;
-      box-shadow: 0 0 35px rgba(0, 255, 255, 0.5);
-    }
-    .modal-title {
-      font-size: 0.95rem;
-      font-weight: bold;
-      color: #00ffff;
-      margin-bottom: 10px;
-    }
-    .modal-desc {
-      font-size: 0.7rem;
-      color: #fff;
-      margin-bottom: 15px;
-      line-height: 1.4;
-    }
-    .modal-btn {
-      background: #00ffff;
-      color: #000;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: bold;
-      font-family: monospace;
-      cursor: pointer;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-    }
-    .modal-btn:hover { background: #ff00ff; color: #fff; }
-
-    #particleCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      display: none;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="arcade-container">
-    <div class="header-bar">
-      <div class="title-text">🦍 APE-man</div>
-      <div class="header-controls">
-        <button class="control-btn" id="musicToggleBtn" onclick="toggleMusic()">🔊 MUSIC</button>
-        <a href="index.html" class="exit-btn">🚪 EXIT</a>
-      </div>
-    </div>
-
-    <div class="scoreboard">
-      <div class="score-item">SCORE: <span id="scoreDisplay">0</span></div>
-      <div class="score-item">LIVES: <span id="livesDisplay">3</span></div>
-    </div>
-
-    <div class="canvas-wrapper">
-      <canvas id="arcadeCanvas" width="304" height="336"></canvas>
-      <canvas id="particleCanvas" width="304" height="336"></canvas>
-    </div>
-
-    <div class="dpad">
-      <button class="dpad-btn btn-up" onclick="setDirection(0, -1)">▲</button>
-      <button class="dpad-btn btn-left" onclick="setDirection(-1, 0)">◀</button>
-      <button class="dpad-btn btn-down" onclick="setDirection(0, 1)">▼</button>
-      <button class="dpad-btn btn-right" onclick="setDirection(1, 0)">▶</button>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="endGameModal">
-    <div class="modal-card">
-      <div class="modal-title" id="modalTitle">GAME OVER</div>
-      <div class="modal-desc" id="modalDesc">The otters got you!</div>
-      <button class="modal-btn" id="modalActionBtn" onclick="fullReset()">PLAY AGAIN</button>
-    </div>
-  </div>
-
   <script>
     const canvas = document.getElementById('arcadeCanvas');
     const ctx = canvas.getContext('2d');
@@ -359,11 +123,10 @@
     let ghosts = [];
 
     function resetGhosts() {
-      // All start in the central house
       ghosts = [
-        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 0.7 },
-        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 0.7 },
-        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 0.7 }
+        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 0.8 },
+        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 0.8 },
+        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 0.8 }
       ];
     }
 
@@ -401,14 +164,13 @@
       const nextX = x + dx * speed;
       const nextY = y + dy * speed;
 
-      // Allow horizontal tunnels
       if (nextX < -8 || nextX > 19 * tileSize + 8) return true;
 
       const corners = [
-        { x: nextX + 3, y: nextY + 3 },
-        { x: nextX + tileSize - 3, y: nextY + 3 },
-        { x: nextX + 3, y: nextY + tileSize - 3 },
-        { x: nextX + tileSize - 3, y: nextY + tileSize - 3 }
+        { x: nextX + 2, y: nextY + 2 },
+        { x: nextX + tileSize - 2, y: nextY + 2 },
+        { x: nextX + 2, y: nextY + tileSize - 2 },
+        { x: nextX + tileSize - 2, y: nextY + tileSize - 2 }
       ];
 
       for (let corner of corners) {
@@ -419,7 +181,7 @@
       return true;
     }
 
-    function chooseNewDirection(g, pCol, pRow) {
+    function updateGhostDirection(g, pCol, pRow) {
       const gCol = Math.round(g.x / tileSize);
       const gRow = Math.round(g.y / tileSize);
 
@@ -430,7 +192,7 @@
         {dx: 1, dy: 0}
       ];
 
-      // Prefer not reversing
+      // Find all valid non-wall moves (preventing immediate reverse unless necessary)
       let valid = dirs.filter(d => {
         if (d.dx === -g.dx && d.dy === -g.dy) return false;
         const nc = gCol + d.dx;
@@ -439,7 +201,7 @@
         return !isWall(nc, nr);
       });
 
-      // If nowhere to go, allow reverse
+      // If boxed in, allow reversing
       if (valid.length === 0) {
         valid = dirs.filter(d => {
           const nc = gCol + d.dx;
@@ -449,12 +211,11 @@
         });
       }
 
-      if (valid.length === 0) return; // completely stuck (shouldn't happen)
+      if (valid.length === 0) return;
 
       let chosen = valid[0];
 
       if (frightTimer > 0) {
-        // Run away
         let best = -1;
         valid.forEach(d => {
           const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow);
@@ -464,10 +225,9 @@
           }
         });
       } else {
-        // Chase with a bit of randomness
         let best = Infinity;
         valid.forEach(d => {
-          const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow) + Math.random() * 2.5;
+          const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow) + Math.random() * 1.5;
           if (dist < best) {
             best = dist;
             chosen = d;
@@ -512,7 +272,6 @@
       if (player.x < -tileSize) player.x = 18 * tileSize;
       if (player.x > 18 * tileSize) player.x = -tileSize;
 
-      // Eat
       let pCol = Math.floor((player.x + 8) / tileSize);
       let pRow = Math.floor((player.y + 8) / tileSize);
 
@@ -536,29 +295,28 @@
       document.getElementById('scoreDisplay').innerText = score;
       document.getElementById('livesDisplay').innerText = lives;
 
-      // ===== GHOSTS (stronger logic) =====
+      // ===== GHOSTS =====
       ghosts.forEach(g => {
-        // Are we nicely centered on a tile?
-        const centered = Math.abs(g.x % tileSize) < 1.5 && Math.abs(g.y % tileSize) < 1.5;
+        // Snap/check intersection alignment
+        const atIntersection = Math.abs(g.x % tileSize) <= g.speed && Math.abs(g.y % tileSize) <= g.speed;
 
-        if (centered) {
+        if (atIntersection) {
+          // Snap strictly to grid to prevent drift accumulation
           g.x = Math.round(g.x / tileSize) * tileSize;
           g.y = Math.round(g.y / tileSize) * tileSize;
-          chooseNewDirection(g, pCol, pRow);
+          updateGhostDirection(g, pCol, pRow);
         }
 
-        // Try to move
+        // If the current direction causes a blockage, force a re-evaluation immediately
         if (canMove(g.x, g.y, g.dx, g.dy, g.speed)) {
           g.x += g.dx * g.speed;
           g.y += g.dy * g.speed;
         } else {
-          // Blocked → force new direction immediately
           g.x = Math.round(g.x / tileSize) * tileSize;
           g.y = Math.round(g.y / tileSize) * tileSize;
-          chooseNewDirection(g, pCol, pRow);
+          updateGhostDirection(g, pCol, pRow);
         }
 
-        // Tunnel wrap
         if (g.x < -tileSize) g.x = 18 * tileSize;
         if (g.x > 18 * tileSize) g.x = -tileSize;
 
@@ -724,5 +482,3 @@
     initGame();
     loop();
   </script>
-</body>
-</html>
