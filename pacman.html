@@ -353,16 +353,16 @@
       y: 16 * tileSize,
       dx: 0, dy: 0,
       nextDx: 0, nextDy: 0,
-      speed: 1 // Perfect smooth speed for the ape
+      speed: 1 // Ape speed
     };
 
     let ghosts = [];
 
     function resetGhosts() {
       ghosts = [
-        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 0.7 },
-        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 0.7 },
-        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 0.7 }
+        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 0.8 },
+        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 0.8 },
+        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 0.8 }
       ];
     }
 
@@ -507,7 +507,7 @@
       document.getElementById('scoreDisplay').innerText = score;
       document.getElementById('livesDisplay').innerText = lives;
 
-      // ===== GHOSTS (Otters Movement Fix) =====
+      // ===== GHOSTS (Otters Speed set to 0.8) =====
       ghosts.forEach(g => {
         g.x += g.dx * g.speed;
         g.y += g.dy * g.speed;
@@ -520,12 +520,11 @@
         const gridX = gCol * tileSize;
         const gridY = gRow * tileSize;
 
-        // Check if otter is close enough to center of tile to make a turn choice
+        // Using speed threshold to safely snap and route otters
         if (Math.abs(g.x - gridX) <= g.speed && Math.abs(g.y - gridY) <= g.speed) {
           g.x = gridX;
           g.y = gridY;
           
-          // Check if ahead is blocked, force a direction change if needed
           if (!isTileOpen(gCol + g.dx, gRow + g.dy)) {
             g.dx = 0;
             g.dy = 0;
