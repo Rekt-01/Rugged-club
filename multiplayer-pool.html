@@ -239,7 +239,7 @@
 
     <div class="status-panel">
       <div class="slippage-box">
-        <span>ONLINE STATUS: <strong id="syncStatus" style="color:#ffe600;">ACTIVE (LOCAL READY)</strong></span>
+        <span>ONLINE STATUS: <strong id="syncStatus" style="color:#ffe600;">CONNECTING...</strong></span>
         <button class="toggle-btn" onclick="toggleSlippageMode()">TOGGLE</button>
       </div>
       <div class="status-row">
@@ -266,6 +266,19 @@
   </div>
 
   <script>
+    const SUPABASE_URL = 'https://vcsauoymgxazvfxihyym.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjc2F1b3ltZ3haznZmeGloeXltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTIzNzUsImV4cCI6MjEwNDg4ODM3NX0.x5dQeBH-4YDJKigjG0boizwZrkY7VbbneIN_w-VyBi8';
+    
+    let supabase = null;
+    try {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY.trim());
+      }
+    } catch(e) {
+      console.warn("Supabase init error:", e);
+    }
+
+    const roomCode = "room_degens_101";
     const canvas = document.getElementById('poolCanvas');
     const ctx = canvas.getContext('2d');
     const toast = document.getElementById('eventToast');
@@ -354,6 +367,7 @@
         cueBall.vx = Math.cos(aimAngle) * power;
         cueBall.vy = Math.sin(aimAngle) * power;
         shotFired = true;
+        pushGameStateToSupabase();
       }
     }
 
@@ -393,6 +407,95 @@
         showToast(`${turn} pocketed a valid ${b.type} ball! Extra shot! 🎯`);
       } else {
         showToast(`${turn} pocketed an opponent's ball! 🛑`);
+      }
+    }
+
+    async function pushGameStateToSupabase() {
+      if (!supabase) return;
+      try {
+        const serializedBalls = balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r }));
+        await supabase
+          .from('pool_games')
+          .update({ 
+            game_state: { 
+              balls: serializedBalls, 
+              turn: turn, 
+              player1Group: player1Group, 
+              player2Group: player2Group 
+            }, 
+            updated_at: new Date() 
+          })
+          .eq('room_code', roomCode);
+      } catch(e) {
+        console.error('Push error:', e);
+      }
+    }
+
+    async function initSupabaseSync() {
+      if (!supabase) {
+        document.getElementById('syncStatus').innerText = 'OFFLINE MODE';
+        document.getElementById('syncStatus').style.color = '#ffe600';
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('pool_games')
+          .select('*')
+          .eq('room_code', roomCode)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (!data) {
+          const serializedBalls = balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r }));
+          await supabase.from('pool_games').insert([{
+            room_code: roomCode,
+            game_state: { balls: serializedBalls, turn: turn, player1Group: player1Group, player2Group: player2Group }
+          }]);
+        } else if (data.game_state && data.game_state.balls) {
+          applyRemoteState(data.game_state);
+        }
+
+        document.getElementById('syncStatus').innerText = 'SYNCED ONLINE';
+        document.getElementById('syncStatus').style.color = '#00ff66';
+
+        supabase
+          .channel('pool_room_' + roomCode)
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'pool_games',
+            filter: `room_code=eq.${roomCode}`
+          }, payload => {
+            if (payload.new && payload.new.game_state) {
+              applyRemoteState(payload.new.game_state);
+            }
+          })
+          .subscribe();
+
+      } catch(e) {
+        console.warn('Supabase sync connection fallback:', e);
+        document.getElementById('syncStatus').innerText = 'OFFLINE MODE (LOCAL)';
+        document.getElementById('syncStatus').style.color = '#ffe600';
+      }
+    }
+
+    function applyRemoteState(remoteState) {
+      if (remoteState.balls && isAnyBallMoving() === false) {
+        balls = remoteState.balls.map(rb => ({ ...rb }));
+        cueBall = balls.find(b => b.isCue) || cueBall;
+      }
+      if (remoteState.turn) {
+        turn = remoteState.turn;
+        document.getElementById('turnDisplay').innerText = turn.toUpperCase();
+      }
+      if (remoteState.player1Group !== undefined) {
+        player1Group = remoteState.player1Group;
+        player2Group = remoteState.player2Group;
+        if (player1Group) {
+          document.getElementById('groupDisplay').innerText = `P1: ${player1Group.toUpperCase()} | P2: ${player2Group.toUpperCase()}`;
+        }
       }
     }
 
@@ -461,6 +564,7 @@
         } else {
           showToast(`🔥 ${turn} keeps the turn!`);
         }
+        pushGameStateToSupabase();
       }
 
       drawTable();
@@ -509,8 +613,9 @@
       }
     }
 
-    // Start rendering right away
+    // Start local loop immediately, then init background sync
     updateGame();
+    initSupabaseSync();
   </script>
 </body>
 </html>
