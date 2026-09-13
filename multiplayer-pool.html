@@ -224,7 +224,6 @@
       transform: scale(0.97);
     }
   </style>
-  <!-- Include Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -269,10 +268,15 @@
   <script>
     const SUPABASE_URL = 'https://vcsauoymgxazvfxihyym.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjc2F1b3ltZ3haznZmeGloeXltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTIzNzUsImV4cCI6MjEwNDg4ODM3NX0.x5dQeBH-4YDJKigjG0boizwZrkY7VbbneIN_w-VyBi8';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY.trim());
+    
+    let supabase = null;
+    try {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY.trim());
+    } catch(e) {
+      console.error("Supabase init failed", e);
+    }
 
     const roomCode = "room_degens_101";
-
     const canvas = document.getElementById('poolCanvas');
     const ctx = canvas.getContext('2d');
     const toast = document.getElementById('eventToast');
@@ -405,45 +409,73 @@
     }
 
     async function pushGameStateToSupabase() {
-      const serializedBalls = balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r }));
-      const { error } = await supabase
-        .from('pool_games')
-        .update({ 
-          game_state: { 
-            balls: serializedBalls, 
-            turn: turn, 
-            player1Group: player1Group, 
-            player2Group: player2Group 
-          }, 
-          updated_at: new Date() 
-        })
-        .eq('room_code', roomCode);
-
-      if (error) console.error('Sync push error:', error.message);
+      if (!supabase) return;
+      try {
+        const serializedBalls = balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r }));
+        await supabase
+          .from('pool_games')
+          .update({ 
+            game_state: { 
+              balls: serializedBalls, 
+              turn: turn, 
+              player1Group: player1Group, 
+              player2Group: player2Group 
+            }, 
+            updated_at: new Date() 
+          })
+          .eq('room_code', roomCode);
+      } catch(e) {
+        console.error('Sync push error:', e);
+      }
     }
 
     async function fetchOrInitRoom() {
-      const { data, error } = await supabase
-        .from('pool_games')
-        .select('*')
-        .eq('room_code', roomCode)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Fetch room error:', error);
+      if (!supabase) {
+        fallbackOfflineMode();
         return;
       }
 
-      if (!data) {
-        // Create room state if missing
-        const serializedBalls = balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r }));
-        await supabase.from('pool_games').insert([{
-          room_code: roomCode,
-          game_state: { balls: serializedBalls, turn: turn, player1Group: player1Group, player2Group: player2Group }
-        }]);
-      } else if (data.game_state && data.game_state.balls) {
-        applyRemoteState(data.game_state);
+      try {
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1500));
+        const fetchPromise = supabase.from('pool_games').select('*').eq('room_code', roomCode).maybeSingle();
+        
+        const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
+
+        if (error || !data) {
+          const serializedBalls = balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r }));
+          await supabase.from('pool_games').insert([{
+            room_code: roomCode,
+            game_state: { balls: serializedBalls, turn: turn, player1Group: player1Group, player2Group: player2Group }
+          }]).catch(()=>{});
+        } else if (data.game_state && data.game_state.balls) {
+          applyRemoteState(data.game_state);
+        }
+
+        document.getElementById('syncStatus').innerText = 'SYNCED ONLINE';
+        document.getElementById('syncStatus').style.color = '#00ff66';
+
+        supabase
+          .channel('pool_room_' + roomCode)
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'pool_games',
+            filter: `room_code=eq.${roomCode}`
+          }, payload => {
+            if (payload.new && payload.new.game_state) {
+              applyRemoteState(payload.new.game_state);
+            }
+          })
+          .subscribe();
+
+      } catch(e) {
+        fallbackOfflineMode();
       }
+    }
+
+    function fallbackOfflineMode() {
+      document.getElementById('syncStatus').innerText = 'OFFLINE MODE (LOCAL)';
+      document.getElementById('syncStatus').style.color = '#ffe600';
     }
 
     function applyRemoteState(remoteState) {
@@ -463,26 +495,6 @@
         }
       }
     }
-
-    supabase
-      .channel('pool_room_' + roomCode)
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'pool_games',
-        filter: `room_code=eq.${roomCode}`
-      }, payload => {
-        if (payload.new && payload.new.game_state) {
-          applyRemoteState(payload.new.game_state);
-        }
-      })
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          document.getElementById('syncStatus').innerText = 'SYNCED ONLINE';
-          document.getElementById('syncStatus').style.color = '#00ff66';
-          fetchOrInitRoom();
-        }
-      });
 
     function updateGame() {
       let currentPocketRadius = getPocketRadius();
@@ -598,6 +610,8 @@
       }
     }
 
+    // Initialize connection and start loop
+    fetchOrInitRoom();
     updateGame();
   </script>
 </body>
