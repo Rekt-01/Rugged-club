@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>The Rugged Bar v15.2 - Degen American Pool</title>
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -123,6 +125,20 @@
       color: #fff;
     }
     .score-item span { color: #ffe600; font-weight: bold; }
+
+    .db-scoreboard {
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background: #050b14;
+      border: 1px solid #00ffcc;
+      border-radius: 6px;
+      padding: 4px 6px;
+      margin-bottom: 8px;
+      font-size: 0.65rem;
+      color: #38bdf8;
+    }
+    .db-scoreboard span { color: #fff; font-weight: bold; }
 
     .canvas-wrapper {
       position: relative;
@@ -299,6 +315,11 @@
       <div class="score-item">BAGS: <span id="groupDisplay">OPEN MARKET</span></div>
     </div>
 
+    <div class="db-scoreboard">
+      <div>APE WINS: <span id="playerScoreVal">0</span></div>
+      <div>WHALE RUGS: <span id="whaleScoreVal">0</span></div>
+    </div>
+
     <div class="canvas-wrapper">
       <canvas id="poolCanvas" width="360" height="190"></canvas>
       <div class="event-toast" id="eventToast"></div>
@@ -338,11 +359,23 @@
   </div>
 
   <script>
+    // Initialize Supabase Client with your verified credentials
+    const supabaseUrl = 'https://zxuwequmawgpfprbvtyv.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4dXdlcXVtYXdncGZwcmJ2dHl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDM5NjEsImV4cCI6MjEwNDg3OTk2MX0.vJzwmnQLmht2d0L33-va7o4MryK4MTr2bZBwVDWawgo';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const playerName = "DegenPilot_" + Math.floor(Math.random() * 9000 + 1000);
+
     const canvas = document.getElementById('poolCanvas');
     const ctx = canvas.getContext('2d');
     const toast = document.getElementById('eventToast');
 
     let isEasyMode = false;
+    let playerWins = parseInt(localStorage.getItem('rekt_pool_wins') || 0);
+    let whaleWins = parseInt(localStorage.getItem('rekt_pool_losses') || 0);
+
+    document.getElementById('playerScoreVal').innerText = playerWins;
+    document.getElementById('whaleScoreVal').innerText = whaleWins;
 
     function toggleMode() {
       isEasyMode = !isEasyMode;
@@ -550,9 +583,11 @@
                                      (playerGroup === 'stripes' && remainingStripes > 0) ||
                                      (!playerGroup && (remainingSolids > 0 || remainingStripes > 0));
             if (playerHasBallsLeft) {
+              recordScore(false);
               triggerEndGame(false, "💀 REKT! You pocketed the 8-ball before clearing your portfolio!");
               return;
             } else {
+              recordScore(true);
               triggerEndGame(true, "🚀 TO THE MOON! Portfolio cleared and 8-ball bagged!");
               return;
             }
@@ -587,9 +622,11 @@
                                (!aiGroup && (remainingSolids > 0 || remainingStripes > 0));
           if (pottedBlack) {
             if (aiHasBallsLeft) {
+              recordScore(true);
               triggerEndGame(true, "🎉 WHALE ERROR! The computer rugged itself by sinking the 8-ball early!");
               return;
             } else {
+              recordScore(false);
               triggerEndGame(false, "💀 LIQUIDATED! The whale cleared its bags and bagged the 8-ball.");
               return;
             }
@@ -616,6 +653,29 @@
 
       drawTable();
       requestAnimationFrame(updateGame);
+    }
+
+    async function recordScore(didWin) {
+      if (didWin) {
+        playerWins++;
+        localStorage.setItem('rekt_pool_wins', playerWins);
+        document.getElementById('playerScoreVal').innerText = playerWins;
+      } else {
+        whaleWins++;
+        localStorage.setItem('rekt_pool_losses', whaleWins);
+        document.getElementById('whaleScoreVal').innerText = whaleWins;
+      }
+
+      // Securely update Supabase using RPC function
+      try {
+        const { error } = await _supabase.rpc('record_game_result', {
+          player_name: playerName,
+          did_win: didWin
+        });
+        if (error) console.error('Supabase sync error:', error.message);
+      } catch (err) {
+        console.error('Network sync failure:', err);
+      }
     }
 
     function triggerEndGame(isWin, customDesc) {
