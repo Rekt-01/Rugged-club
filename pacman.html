@@ -353,16 +353,16 @@
       y: 16 * tileSize,
       dx: 0, dy: 0,
       nextDx: 0, nextDy: 0,
-      speed: 1.15
+      speed: 2
     };
 
     let ghosts = [];
 
     function resetGhosts() {
       ghosts = [
-        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 1 },
-        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 1 },
-        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 1 }
+        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 2 },
+        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 2 },
+        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 2 }
       ];
     }
 
@@ -391,33 +391,13 @@
       if (e.key === 'ArrowRight' || e.key === 'd') setDirection(1, 0);
     });
 
-    function isWall(col, row) {
-      if (col < 0 || col >= 19 || row < 0 || row >= 21) return true;
-      return currentMap[row][col] === 1;
+    function isTileOpen(col, row) {
+      if (col < 0 || col >= 19) return true; // Tunnels
+      if (row < 0 || row >= 21) return false;
+      return currentMap[row][col] !== 1;
     }
 
-    function canMove(x, y, dx, dy, speed) {
-      const nextX = x + dx * speed;
-      const nextY = y + dy * speed;
-
-      if (nextX < -8 || nextX > 19 * tileSize + 8) return true;
-
-      const corners = [
-        { x: nextX + 2, y: nextY + 2 },
-        { x: nextX + tileSize - 2, y: nextY + 2 },
-        { x: nextX + 2, y: nextY + tileSize - 2 },
-        { x: nextX + tileSize - 2, y: nextY + tileSize - 2 }
-      ];
-
-      for (let corner of corners) {
-        let cCol = Math.floor(corner.x / tileSize);
-        let cRow = Math.floor(corner.y / tileSize);
-        if (isWall(cCol, cRow)) return false;
-      }
-      return true;
-    }
-
-    function updateGhostDirection(g, pCol, pRow) {
+    function chooseGhostDirection(g, pCol, pRow) {
       const gCol = Math.round(g.x / tileSize);
       const gRow = Math.round(g.y / tileSize);
 
@@ -428,22 +408,15 @@
         {dx: 1, dy: 0}
       ];
 
-      // Get valid moves (avoid immediate reverse unless blocked)
+      // Filter valid paths (avoiding immediate backtracking unless blocked)
       let valid = dirs.filter(d => {
         if (d.dx === -g.dx && d.dy === -g.dy) return false;
-        const nc = gCol + d.dx;
-        const nr = gRow + d.dy;
-        if (nc < 0 || nc >= 19) return true;
-        return !isWall(nc, nr);
+        return isTileOpen(gCol + d.dx, gRow + d.dy);
       });
 
+      // If boxed in, allow backing up
       if (valid.length === 0) {
-        valid = dirs.filter(d => {
-          const nc = gCol + d.dx;
-          const nr = gRow + d.dy;
-          if (nc < 0 || nc >= 19) return true;
-          return !isWall(nc, nr);
-        });
+        valid = dirs.filter(d => isTileOpen(gCol + d.dx, gRow + d.dy));
       }
 
       if (valid.length === 0) return;
@@ -483,44 +456,53 @@
 
       if (frightTimer > 0) frightTimer--;
 
-      // ===== PLAYER =====
+      // ===== PLAYER (Rail System) =====
+      const atIntersection = (player.x % tileSize === 0) && (player.y % tileSize === 0);
+      const pCol = Math.round(player.x / tileSize);
+      const pRow = Math.round(player.y / tileSize);
+
       if (player.nextDx !== 0 || player.nextDy !== 0) {
         if (player.dx === -player.nextDx && player.dy === -player.nextDy) {
           player.dx = player.nextDx;
           player.dy = player.nextDy;
-        } else if (canMove(player.x, player.y, player.nextDx, player.nextDy, player.speed)) {
-          if (player.nextDx !== 0) player.y = Math.round(player.y / tileSize) * tileSize;
-          if (player.nextDy !== 0) player.x = Math.round(player.x / tileSize) * tileSize;
-          player.dx = player.nextDx;
-          player.dy = player.nextDy;
+        } else if (atIntersection) {
+          if (isTileOpen(pCol + player.nextDx, pRow + player.nextDy)) {
+            player.dx = player.nextDx;
+            player.dy = player.nextDy;
+          }
         }
       }
 
-      if (canMove(player.x, player.y, player.dx, player.dy, player.speed)) {
-        player.x += player.dx * player.speed;
-        player.y += player.dy * player.speed;
-      } else {
-        player.dx = 0;
-        player.dy = 0;
+      // Check wall blocking ahead
+      if (atIntersection) {
+        if (!isTileOpen(pCol + player.dx, pRow + player.dy)) {
+          player.dx = 0;
+          player.dy = 0;
+        }
       }
 
-      if (player.x < -tileSize) player.x = 18 * tileSize;
-      if (player.x > 18 * tileSize) player.x = -tileSize;
+      player.x += player.dx * player.speed;
+      player.y += player.dy * player.speed;
 
-      let pCol = Math.floor((player.x + 8) / tileSize);
-      let pRow = Math.floor((player.y + 8) / tileSize);
+      // Tunnels
+      if (player.x < 0) player.x = (19 - 1) * tileSize;
+      else if (player.x >= 19 * tileSize) player.x = 0;
 
-      if (pCol >= 0 && pCol < 19 && pRow >= 0 && pRow < 21) {
-        if (currentMap[pRow][pCol] === 0) {
-          currentMap[pRow][pCol] = 2;
+      // Eat items
+      let eatCol = Math.floor((player.x + 8) / tileSize);
+      let eatRow = Math.floor((player.y + 8) / tileSize);
+
+      if (eatCol >= 0 && eatCol < 19 && eatRow >= 0 && eatRow < 21) {
+        if (currentMap[eatRow][eatCol] === 0) {
+          currentMap[eatRow][eatCol] = 2;
           score += 10;
           checkWinCondition();
-        } else if (currentMap[pRow][pCol] === 4) {
-          currentMap[pRow][pCol] = 2;
+        } else if (currentMap[eatRow][eatCol] === 4) {
+          currentMap[eatRow][eatCol] = 2;
           score += 100;
           checkWinCondition();
-        } else if (currentMap[pRow][pCol] === 3) {
-          currentMap[pRow][pCol] = 2;
+        } else if (currentMap[eatRow][eatCol] === 3) {
+          currentMap[eatRow][eatCol] = 2;
           score += 50;
           frightTimer = 420;
           checkWinCondition();
@@ -530,26 +512,28 @@
       document.getElementById('scoreDisplay').innerText = score;
       document.getElementById('livesDisplay').innerText = lives;
 
-      // ===== GHOSTS (Clean integer-step alignment) =====
+      // ===== GHOSTS (Rail System) =====
       ghosts.forEach(g => {
-        const atIntersection = (g.x % tileSize === 0) && (g.y % tileSize === 0);
+        const gAtIntersection = (g.x % tileSize === 0) && (g.y % tileSize === 0);
+        const gCol = Math.round(g.x / tileSize);
+        const gRow = Math.round(g.y / tileSize);
 
-        if (atIntersection) {
-          updateGhostDirection(g, pCol, pRow);
+        if (gAtIntersection) {
+          chooseGhostDirection(g, pCol, pRow);
         }
 
-        if (canMove(g.x, g.y, g.dx, g.dy, g.speed)) {
-          g.x += g.dx * g.speed;
-          g.y += g.dy * g.speed;
-        } else {
-          // Force snap back to grid and re-evaluate immediately if blocked
-          g.x = Math.round(g.x / tileSize) * tileSize;
-          g.y = Math.round(g.y / tileSize) * tileSize;
-          updateGhostDirection(g, pCol, pRow);
+        // Check if current direction hits a wall
+        if (gAtIntersection && !isTileOpen(gCol + g.dx, gRow + g.dy)) {
+          g.dx = 0;
+          g.dy = 0;
+          chooseGhostDirection(g, pCol, pRow);
         }
 
-        if (g.x < -tileSize) g.x = 18 * tileSize;
-        if (g.x > 18 * tileSize) g.x = -tileSize;
+        g.x += g.dx * g.speed;
+        g.y += g.dy * g.speed;
+
+        if (g.x < 0) g.x = (19 - 1) * tileSize;
+        else if (g.x >= 19 * tileSize) g.x = 0;
 
         // Collision
         const dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
