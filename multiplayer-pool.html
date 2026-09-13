@@ -247,8 +247,8 @@
         <span>SLIPPAGE MODE: <strong id="slippageLabel" style="color:#00ffcc;">PAPER HAND (BIG POCKETS)</strong></span>
       </div>
       <div class="status-row">
-        <span>SHIFT: APE (SOLIDS / STRIPES)</span>
-        <span>BAGS: OPEN MARKET</span>
+        <span>SHIFT: <strong id="turnDisplay" style="color:#ffe600;">PLAYER 1</strong></span>
+        <span>BAGS: <strong id="groupDisplay" style="color:#00ffcc;">OPEN MARKET</strong></span>
       </div>
     </div>
 
@@ -287,7 +287,6 @@
       showToast(bigPockets ? "🟢 Paper Hand Mode: Huge Pockets Activated!" : "💎 Diamond Hand Mode: Pro Pockets Active!");
     }
 
-    // Dynamic Pocket Radius based on mode
     function getPocketRadius() {
       return bigPockets ? 18 : 13;
     }
@@ -298,6 +297,14 @@
     ];
 
     let shotFired = false;
+    let turn = 'Player 1';
+    let player1Group = null; // 'solids' or 'stripes'
+    let player2Group = null; // 'solids' or 'stripes'
+    
+    let turnPocketedAny = false;
+    let turnPocketedValid = false;
+    let scratched = false;
+
     let cueBall = { x: 90, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
 
@@ -345,6 +352,10 @@
 
     async function executeShot() {
       if (!isAnyBallMoving() && !shotFired) {
+        turnPocketedAny = false;
+        turnPocketedValid = false;
+        scratched = false;
+
         cueBall.vx = Math.cos(aimAngle) * power;
         cueBall.vy = Math.sin(aimAngle) * power;
         shotFired = true;
@@ -356,12 +367,53 @@
       return balls.some(b => Math.abs(b.vx) > 0.03 || Math.abs(b.vy) > 0.03);
     }
 
+    function handleBallPocketed(b) {
+      turnPocketedAny = true;
+
+      if (b.num === 8) {
+        let activeGroup = turn === 'Player 1' ? player1Group : player2Group;
+        let remainingGroupBalls = balls.filter(item => !item.isCue && item.num !== 8 && item.type === activeGroup);
+
+        if (remainingGroupBalls.length === 0 && activeGroup !== null) {
+          showToast(`🏆 ${turn} cleared bags and sank the 8-Ball! Victory!`);
+        } else {
+          showToast(`💀 Premature 8-ball sink by ${turn}! Rugged!`);
+        }
+        return;
+      }
+
+      // Assign groups if open market
+      if (player1Group === null) {
+        if (turn === 'Player 1') {
+          player1Group = b.type;
+          player2Group = b.type === 'solids' ? 'stripes' : 'solids';
+        } else {
+          player2Group = b.type;
+          player1Group = b.type === 'solids' ? 'stripes' : 'solids';
+        }
+        document.getElementById('groupDisplay').innerText = `P1: ${player1Group.toUpperCase()} | P2: ${player2Group.toUpperCase()}`;
+      }
+
+      let activeGroup = turn === 'Player 1' ? player1Group : player2Group;
+      if (b.type === activeGroup) {
+        turnPocketedValid = true;
+        showToast(`${turn} pocketed a valid ${b.type} ball! Extra shot! 🎯`);
+      } else {
+        showToast(`${turn} pocketed an opponent's ball! 🛑`);
+      }
+    }
+
     async function pushGameStateToSupabase() {
       const serializedBalls = balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue }));
       const { error } = await supabase
         .from('pool_games')
         .update({ 
-          game_state: { balls: serializedBalls }, 
+          game_state: { 
+            balls: serializedBalls, 
+            turn: turn, 
+            player1Group: player1Group, 
+            player2Group: player2Group 
+          }, 
           updated_at: new Date() 
         })
         .eq('room_code', roomCode);
@@ -378,17 +430,28 @@
         filter: `room_code=eq.${roomCode}`
       }, payload => {
         const remoteState = payload.new.game_state;
-        if (remoteState && remoteState.balls) {
-          remoteState.balls.forEach(remoteB => {
-            let localB = balls.find(b => b.num === remoteB.num && b.isCue === remoteB.isCue);
-            if (localB) {
-              localB.x = remoteB.x;
-              localB.y = remoteB.y;
-              localB.vx = remoteB.vx;
-              localB.vy = remoteB.vy;
-            }
-          });
-          showToast("⚡ Opponent move synced!");
+        if (remoteState) {
+          if (remoteState.balls) {
+            remoteState.balls.forEach(remoteB => {
+              let localB = balls.find(b => b.num === remoteB.num && b.isCue === remoteB.isCue);
+              if (localB) {
+                localB.x = remoteB.x;
+                localB.y = remoteB.y;
+                localB.vx = remoteB.vx;
+                localB.vy = remoteB.vy;
+              }
+            });
+          }
+          if (remoteState.turn) {
+            turn = remoteState.turn;
+            document.getElementById('turnDisplay').innerText = turn.toUpperCase();
+          }
+          if (remoteState.player1Group) {
+            player1Group = remoteState.player1Group;
+            player2Group = remoteState.player2Group;
+            document.getElementById('groupDisplay').innerText = `P1: ${player1Group.toUpperCase()} | P2: ${player2Group.toUpperCase()}`;
+          }
+          showToast("⚡ Remote sync updated!");
         }
       })
       .subscribe((status) => {
@@ -420,8 +483,10 @@
           if (Math.hypot(b.x - p.x, b.y - p.y) < currentPocketRadius + 2) {
             if (b.isCue) {
               b.x = 90; b.y = 95; b.vx = 0; b.vy = 0;
-              showToast("🚨 Scratch!");
+              scratched = true;
+              showToast("🚨 Cue Ball Scratch!");
             } else {
+              handleBallPocketed(b);
               balls.splice(i, 1);
             }
           }
@@ -453,6 +518,15 @@
 
       if (shotFired && !isAnyBallMoving()) {
         shotFired = false;
+        let keepsTurn = turnPocketedValid && !scratched;
+
+        if (!keepsTurn) {
+          turn = turn === 'Player 1' ? 'Player 2' : 'Player 1';
+          document.getElementById('turnDisplay').innerText = turn.toUpperCase();
+        } else {
+          showToast(`🔥 ${turn} keeps the turn!`);
+        }
+        pushGameStateToSupabase();
       }
 
       drawTable();
@@ -462,11 +536,9 @@
     function drawTable() {
       let currentPocketRadius = getPocketRadius();
 
-      // 1. Felt Background
       ctx.fillStyle = '#0f5220';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 2. Pockets
       pockets.forEach(p => {
         ctx.fillStyle = '#000';
         ctx.beginPath();
@@ -474,12 +546,10 @@
         ctx.fill();
       });
 
-      // 3. Cushions / Wood border
       ctx.strokeStyle = '#4a2c11';
       ctx.lineWidth = 14;
       ctx.strokeRect(7, 7, canvas.width - 14, canvas.height - 14);
 
-      // 4. Balls
       balls.forEach(b => {
         ctx.fillStyle = b.color;
         ctx.beginPath();
@@ -493,7 +563,6 @@
         }
       });
 
-      // 5. Aim vector
       if (!isAnyBallMoving() && !shotFired) {
         ctx.strokeStyle = '#00ff66';
         ctx.lineWidth = 2;
