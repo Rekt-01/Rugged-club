@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Degen Pool - Online Multiplayer Match</title>
-  <!-- Load Official Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * {
@@ -13,7 +12,7 @@
       padding: 0;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
-      touch-action: manipulation;
+ dual-action: manipulation;
     }
 
     body {
@@ -85,6 +84,8 @@
       display: flex;
       align-items: center;
       gap: 3px;
+      border: none;
+      font-family: monospace;
     }
 
     .whitepaper-btn {
@@ -186,7 +187,6 @@
       transform: translate(-50%, -50%) scale(1);
     }
 
-    /* Modal for choosing player role */
     .role-modal {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
@@ -196,7 +196,7 @@
       justify-content: center;
       align-items: center;
       z-index: 100;
-      gap: 15px;
+      gap: 12px;
       font-family: monospace;
       padding: 20px;
     }
@@ -213,6 +213,20 @@
       font-size: 0.7rem;
       text-align: center;
       max-width: 300px;
+    }
+
+    .name-input {
+      width: 80%;
+      max-width: 260px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #00ffcc;
+      background: #020205;
+      color: #00ffcc;
+      font-family: monospace;
+      font-size: 0.85rem;
+      text-align: center;
+      outline: none;
     }
 
     .role-btn {
@@ -318,7 +332,10 @@
   <!-- Role Selection Modal -->
   <div class="role-modal" id="roleModal" style="display:none;">
     <h2>CHOOSE YOUR SEAT</h2>
-    <p>Select your player slot for Room: <span id="modalRoomName" style="color:#00ffcc"></span></p>
+    <p>Room: <span id="modalRoomName" style="color:#00ffcc"></span></p>
+    
+    <input type="text" id="playerNameInput" class="name-input" placeholder="Enter your name" maxlength="12" />
+    
     <button class="role-btn btn-p1" id="selectP1Btn" onclick="claimRole('Player 1')">PLAY AS PLAYER 1</button>
     <button class="role-btn btn-p2" id="selectP2Btn" onclick="claimRole('Player 2')">PLAY AS PLAYER 2</button>
     <button class="role-btn btn-spectator" onclick="claimRole('Spectator')">WATCH AS SPECTATOR</button>
@@ -331,7 +348,7 @@
       </div>
       <div class="header-btns">
         <a href="index.html" class="nav-btn whitepaper-btn">📖 HOME</a>
-        <a href="index.html" class="nav-btn exit-btn">🚪 EXIT</a>
+        <button class="nav-btn exit-btn" onclick="leaveRoom()">🚪 EXIT</button>
       </div>
     </div>
 
@@ -347,6 +364,10 @@
       <div class="status-row">
         <span>SHIFT: <strong id="turnDisplay" style="color:#ffe600;">PLAYER 1</strong></span>
         <span>BAGS: <strong id="groupDisplay" style="color:#00ffcc;">OPEN MARKET</strong></span>
+      </div>
+      <div class="status-row" style="margin-top:2px;">
+        <span id="p1NameDisplay" style="color:#00ffcc;">P1: ---</span>
+        <span id="p2NameDisplay" style="color:#ffe600;">P2: ---</span>
       </div>
     </div>
 
@@ -370,15 +391,29 @@
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // === PERSISTENT DEVICE ID (fixes seat locking) ===
+    let deviceId = localStorage.getItem('pool_device_id');
+    if (!deviceId) {
+      deviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
+      localStorage.setItem('pool_device_id', deviceId);
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     let roomCode = urlParams.get('room') || "degens_101";
     document.getElementById('roomInput').value = roomCode;
 
-    let localRole = null; 
+    let localRole = null;
+    let localName = localStorage.getItem('pool_player_name') || '';
     let p1Device = null;
     let p2Device = null;
-    const deviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
+    let p1Name = null;
+    let p2Name = null;
     let realTimeChannel = null;
+
+    // Prefill name input
+    if (localName) {
+      document.getElementById('playerNameInput').value = localName;
+    }
 
     function changeRoom(newRoom) {
       if (!newRoom) return;
@@ -390,6 +425,10 @@
       window.history.pushState({path:newUrl}, '', newUrl);
       showToast(`🔄 Joined Room: ${roomCode}`);
       initMultiplayer();
+    }
+
+    function leaveRoom() {
+      window.location.href = 'index.html';
     }
 
     const canvas = document.getElementById('poolCanvas');
@@ -455,7 +494,7 @@
     function showToast(text) {
       toast.innerText = text;
       toast.classList.add('show');
-      setTimeout(() => { toast.classList.remove('show'); }, 2000);
+      setTimeout(() => { toast.classList.remove('show'); }, 2200);
     }
 
     function adjustAim(amount) {
@@ -464,7 +503,7 @@
 
     function executeShot() {
       if (turn !== localRole) {
-        showToast(`🛑 Wait your turn! You are ${localRole}, but it's ${turn}'s shift.`);
+        showToast(`🛑 Wait your turn! (${localName || localRole})`);
         return;
       }
       if (!isAnyBallMoving() && !shotFired) {
@@ -488,9 +527,9 @@
         let activeGroup = turn === 'Player 1' ? player1Group : player2Group;
         let remainingGroupBalls = balls.filter(item => !item.isCue && item.num !== 8 && item.type === activeGroup);
         if (remainingGroupBalls.length === 0 && activeGroup !== null) {
-          showToast(`🏆 ${turn} cleared bags and sank the 8-Ball! Victory!`);
+          showToast(`🏆 ${(turn === 'Player 1' ? p1Name : p2Name) || turn} wins!`);
         } else {
-          showToast(`💀 Premature 8-ball sink by ${turn}!`);
+          showToast(`💀 Premature 8-ball!`);
         }
         return;
       }
@@ -507,9 +546,9 @@
       let activeGroup = turn === 'Player 1' ? player1Group : player2Group;
       if (b.type === activeGroup) {
         turnPocketedValid = true;
-        showToast(`${turn} pocketed a valid ${b.type} ball! Extra shot! 🎯`);
+        showToast(`${(turn === 'Player 1' ? p1Name : p2Name) || turn} pocketed valid! 🎯`);
       } else {
-        showToast(`${turn} pocketed an opponent's ball! 🛑`);
+        showToast(`Wrong group! 🛑`);
       }
     }
 
@@ -521,7 +560,9 @@
           player1Group,
           player2Group,
           p1Device,
-          p2Device
+          p2Device,
+          p1Name,
+          p2Name
         };
         await supabaseClient
           .from('pool_games')
@@ -545,7 +586,9 @@
           generateInitialRack();
           const initState = {
             balls: balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r })),
-            turn, player1Group, player2Group, p1Device: null, p2Device: null
+            turn, player1Group, player2Group, 
+            p1Device: null, p2Device: null,
+            p1Name: null, p2Name: null
           };
           await supabaseClient
             .from('pool_games')
@@ -556,18 +599,24 @@
           
           p1Device = null;
           p2Device = null;
+          p1Name = null;
+          p2Name = null;
         } else {
           let state = data[0].game_state || {};
           p1Device = state.p1Device || null;
           p2Device = state.p2Device || null;
+          p1Name = state.p1Name || null;
+          p2Name = state.p2Name || null;
           applyRemoteState(state);
         }
 
-        // Check if this device already claimed a role
+        // Already claimed by this device?
         if (p1Device === deviceId) {
           localRole = 'Player 1';
+          localName = p1Name || localName;
         } else if (p2Device === deviceId) {
           localRole = 'Player 2';
+          localName = p2Name || localName;
         } else {
           document.getElementById('modalRoomName').innerText = roomCode;
           document.getElementById('selectP1Btn').disabled = (p1Device !== null && p1Device !== deviceId);
@@ -580,11 +629,21 @@
       } catch (e) {
         document.getElementById('syncStatus').innerText = 'SYNC ERROR (FALLBACK)';
         document.getElementById('syncStatus').style.color = '#ff3333';
+        console.error(e);
       }
     }
 
     async function claimRole(role) {
+      const nameInput = document.getElementById('playerNameInput').value.trim();
+      if (!nameInput && role !== 'Spectator') {
+        showToast('✍️ Enter a name first!');
+        return;
+      }
+
       localRole = role;
+      localName = nameInput || 'Anon';
+      localStorage.setItem('pool_player_name', localName);
+
       document.getElementById('roleModal').style.display = 'none';
 
       let { data } = await supabaseClient
@@ -594,11 +653,19 @@
 
       let state = (data && data.length > 0 && data[0].game_state) ? data[0].game_state : {};
       
-      if (role === 'Player 1') state.p1Device = deviceId;
-      if (role === 'Player 2') state.p2Device = deviceId;
+      if (role === 'Player 1') {
+        state.p1Device = deviceId;
+        state.p1Name = localName;
+      }
+      if (role === 'Player 2') {
+        state.p2Device = deviceId;
+        state.p2Name = localName;
+      }
 
       p1Device = state.p1Device;
       p2Device = state.p2Device;
+      p1Name = state.p1Name;
+      p2Name = state.p2Name;
 
       await supabaseClient
         .from('pool_games')
@@ -608,7 +675,7 @@
         );
 
       activateConnection();
-      showToast(`✅ You joined as ${role}`);
+      showToast(`✅ ${localName} joined as ${role}`);
     }
 
     function activateConnection() {
@@ -616,7 +683,6 @@
       document.getElementById('syncStatus').innerText = 'HYBRID SYNC ACTIVE';
       document.getElementById('syncStatus').style.color = '#00ff66';
 
-      // 1. Keep Realtime WebSockets
       if (realTimeChannel) supabaseClient.removeChannel(realTimeChannel);
 
       realTimeChannel = supabaseClient
@@ -632,7 +698,6 @@
         )
         .subscribe();
 
-      // 2. Add a fallback fast-polling loop (every 1 second) to bypass any network/websocket blockers
       if (window.syncPollInterval) clearInterval(window.syncPollInterval);
       window.syncPollInterval = setInterval(async () => {
         try {
@@ -644,29 +709,44 @@
           if (data && data.length > 0 && data[0].game_state) {
             applyRemoteState(data[0].game_state);
           }
-        } catch (e) {
-          // Ignore background poll errors
-        }
+        } catch (e) {}
       }, 1000);
     }
 
     function updateRoleUI() {
       const roleDisp = document.getElementById('myRoleDisplay');
-      roleDisp.innerText = localRole.toUpperCase();
-      roleDisp.style.color = localRole === 'Player 1' ? '#00ffcc' : (localRole === 'Player 2' ? '#ffe600' : '#ff007a');
+      if (localRole === 'Spectator') {
+        roleDisp.innerText = 'SPECTATOR';
+        roleDisp.style.color = '#ff007a';
+      } else {
+        roleDisp.innerText = (localName || localRole).toUpperCase();
+        roleDisp.style.color = localRole === 'Player 1' ? '#00ffcc' : '#ffe600';
+      }
+
+      document.getElementById('p1NameDisplay').innerText = `P1: ${p1Name || '---'}`;
+      document.getElementById('p2NameDisplay').innerText = `P2: ${p2Name || '---'}`;
     }
 
     function applyRemoteState(remoteState) {
       if (remoteState.p1Device !== undefined) p1Device = remoteState.p1Device;
       if (remoteState.p2Device !== undefined) p2Device = remoteState.p2Device;
+      if (remoteState.p1Name !== undefined) p1Name = remoteState.p1Name;
+      if (remoteState.p2Name !== undefined) p2Name = remoteState.p2Name;
 
-      if (remoteState.balls && !isAnyBallMoving() && !shotFired) {
+      document.getElementById('p1NameDisplay').innerText = `P1: ${p1Name || '---'}`;
+      document.getElementById('p2NameDisplay').innerText = `P2: ${p2Name || '---'}`;
+
+      if (remoteState.balls && Array.isArray(remoteState.balls) && remoteState.balls.length > 0 && !isAnyBallMoving() && !shotFired) {
         balls = remoteState.balls.map(rb => ({ ...rb }));
         cueBall = balls.find(b => b.isCue) || cueBall;
+      } else if (remoteState.balls && remoteState.balls.length === 0) {
+        generateInitialRack(); // safety restore
       }
+
       if (remoteState.turn) {
         turn = remoteState.turn;
-        document.getElementById('turnDisplay').innerText = turn.toUpperCase();
+        const displayName = turn === 'Player 1' ? (p1Name || 'PLAYER 1') : (p2Name || 'PLAYER 2');
+        document.getElementById('turnDisplay').innerText = displayName.toUpperCase();
       }
       if (remoteState.player1Group !== undefined) {
         player1Group = remoteState.player1Group;
@@ -732,9 +812,10 @@
         let keepsTurn = turnPocketedValid && !scratched;
         if (!keepsTurn) {
           turn = turn === 'Player 1' ? 'Player 2' : 'Player 1';
-          document.getElementById('turnDisplay').innerText = turn.toUpperCase();
+          const displayName = turn === 'Player 1' ? (p1Name || 'PLAYER 1') : (p2Name || 'PLAYER 2');
+          document.getElementById('turnDisplay').innerText = displayName.toUpperCase();
         } else {
-          showToast(`🔥 ${turn} keeps the turn!`);
+          showToast(`🔥 ${(turn === 'Player 1' ? p1Name : p2Name) || turn} keeps turn!`);
         }
         pushStateToServer();
       }
