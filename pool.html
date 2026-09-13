@@ -280,7 +280,7 @@
 </head>
 <body>
 
-  <!-- Mode Selection Popup Modal (Active on load) -->
+  <!-- Mode Selection Popup Modal -->
   <div id="mode-modal" class="modal-overlay" style="display: flex;">
     <div class="modal-card" style="margin: auto; max-height: none;">
       <div class="modal-title">🎱 SELECT POOL MODE</div>
@@ -382,12 +382,9 @@
       { x: 16, y: 174 }, { x: 180, y: 178 }, { x: 344, y: 174 }
     ];
 
-    let playerGroup = null; 
-    let aiGroup = null;
     let turn = 'Player';
     let shotFired = false;
     let gameOver = false;
-    let ballInHand = false;
 
     let cueBall = { x: 90, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
@@ -459,9 +456,6 @@
       shotFired = true;
     }
 
-    let pottedThisTurn = [];
-    let firstBallHit = null;
-
     function updateGame() {
       let moving = isAnyBallMoving();
 
@@ -484,10 +478,8 @@
           if (Math.hypot(b.x - p.x, b.y - p.y) < getPocketRadius() + 2) {
             if (b.isCue) {
               b.x = 90; b.y = 95; b.vx = 0; b.vy = 0;
-              pottedThisTurn.push('scratch');
               showToast("🚨 Cue ball pocketed!");
             } else {
-              pottedThisTurn.push({type: b.type, num: b.num});
               balls.splice(i, 1);
             }
           }
@@ -496,15 +488,12 @@
 
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
-          let b1 = balls[i], b2 = balls[j];
+          let b1 = balls[i], b2 =balls[j];
           let dx = b2.x - b1.x, dy = b2.y - b1.y;
           let dist = Math.hypot(dx, dy);
           let minDist = b1.r + b2.r;
 
           if (dist < minDist && dist > 0) {
-            if ((b1.isCue && !b2.isCue) && !firstBallHit) firstBallHit = b2;
-            else if ((b2.isCue && !b1.isCue) && !firstBallHit) firstBallHit = b1;
-
             let nx = dx / dist, ny = dy / dist;
             let overlap = minDist - dist;
             b1.x -= nx * overlap * 0.5; b1.y -= ny * overlap * 0.5;
