@@ -353,7 +353,7 @@
       y: 16 * tileSize,
       dx: 0, dy: 0,
       nextDx: 0, nextDy: 0,
-      speed: 2
+      speed: 1 // Balanced player speed
     };
 
     let ghosts = [];
@@ -507,43 +507,25 @@
       document.getElementById('scoreDisplay').innerText = score;
       document.getElementById('livesDisplay').innerText = lives;
 
-      // ===== GHOSTS (Fractional Rail System) =====
+      // ===== GHOSTS (Fractional Rail System with Distance Snap) =====
       ghosts.forEach(g => {
-        if (g.dx !== 0) g.y = Math.round(g.y / tileSize) * tileSize;
-        if (g.dy !== 0) g.x = Math.round(g.x / tileSize) * tileSize;
-
-        const remX = g.x % tileSize;
-        const remY = g.y % tileSize;
-        const gAtIntersection = (Math.abs(remX) < g.speed || Math.abs(remX - tileSize) < g.speed) &&
-                                (Math.abs(remY) < g.speed || Math.abs(remY - tileSize) < g.speed);
-
-        if (gAtIntersection) {
-          g.x = Math.round(g.x / tileSize) * tileSize;
-          g.y = Math.round(g.y / tileSize) * tileSize;
-          chooseGhostDirection(g, pCol, pRow);
-        }
-
-        const gCol = Math.round(g.x / tileSize);
-        const gRow = Math.round(g.y / tileSize);
-
-        if (g.dx !== 0 && !isTileOpen(gCol + g.dx, gRow) && Math.abs(g.x - gCol * tileSize) < g.speed) {
-          g.dx = 0;
-          g.dy = 0;
-          g.x = gCol * tileSize;
-          chooseGhostDirection(g, pCol, pRow);
-        }
-        if (g.dy !== 0 && !isTileOpen(gCol, gRow + g.dy) && Math.abs(g.y - gRow * tileSize) < g.speed) {
-          g.dx = 0;
-          g.dy = 0;
-          g.y = gRow * tileSize;
-          chooseGhostDirection(g, pCol, pRow);
-        }
-
         g.x += g.dx * g.speed;
         g.y += g.dy * g.speed;
 
         if (g.x < 0) g.x = (19 - 1) * tileSize;
         else if (g.x >= 19 * tileSize) g.x = 0;
+
+        const gCol = Math.round(g.x / tileSize);
+        const gRow = Math.round(g.y / tileSize);
+        const gridX = gCol * tileSize;
+        const gridY = gRow * tileSize;
+
+        // If we reach or pass the grid intersection, snap and pick direction
+        if (Math.hypot(g.x - gridX, g.y - gridY) <= g.speed) {
+          g.x = gridX;
+          g.y = gridY;
+          chooseGhostDirection(g, pCol, pRow);
+        }
 
         const dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
         if (dist < 11) {
