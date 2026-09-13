@@ -248,6 +248,7 @@
     let celebrationTimer = 0;
     let particles = [];
 
+    // Audio
     let audioCtx = null;
     let musicPlaying = false;
     let musicInterval = null;
@@ -358,11 +359,11 @@
     let ghosts = [];
 
     function resetGhosts() {
-      // All ghosts start in the same central house area
+      // All start in the central house
       ghosts = [
-        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 0.72 },
-        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 0.72 },
-        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 0.72 }
+        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 0.7 },
+        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 0.7 },
+        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 0.7 }
       ];
     }
 
@@ -400,7 +401,7 @@
       const nextX = x + dx * speed;
       const nextY = y + dy * speed;
 
-      // Allow horizontal tunnels only
+      // Allow horizontal tunnels
       if (nextX < -8 || nextX > 19 * tileSize + 8) return true;
 
       const corners = [
@@ -416,6 +417,66 @@
         if (isWall(cCol, cRow)) return false;
       }
       return true;
+    }
+
+    function chooseNewDirection(g, pCol, pRow) {
+      const gCol = Math.round(g.x / tileSize);
+      const gRow = Math.round(g.y / tileSize);
+
+      const dirs = [
+        {dx: 0, dy: -1},
+        {dx: 0, dy: 1},
+        {dx: -1, dy: 0},
+        {dx: 1, dy: 0}
+      ];
+
+      // Prefer not reversing
+      let valid = dirs.filter(d => {
+        if (d.dx === -g.dx && d.dy === -g.dy) return false;
+        const nc = gCol + d.dx;
+        const nr = gRow + d.dy;
+        if (nc < 0 || nc >= 19) return true;
+        return !isWall(nc, nr);
+      });
+
+      // If nowhere to go, allow reverse
+      if (valid.length === 0) {
+        valid = dirs.filter(d => {
+          const nc = gCol + d.dx;
+          const nr = gRow + d.dy;
+          if (nc < 0 || nc >= 19) return true;
+          return !isWall(nc, nr);
+        });
+      }
+
+      if (valid.length === 0) return; // completely stuck (shouldn't happen)
+
+      let chosen = valid[0];
+
+      if (frightTimer > 0) {
+        // Run away
+        let best = -1;
+        valid.forEach(d => {
+          const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow);
+          if (dist > best) {
+            best = dist;
+            chosen = d;
+          }
+        });
+      } else {
+        // Chase with a bit of randomness
+        let best = Infinity;
+        valid.forEach(d => {
+          const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow) + Math.random() * 2.5;
+          if (dist < best) {
+            best = dist;
+            chosen = d;
+          }
+        });
+      }
+
+      g.dx = chosen.dx;
+      g.dy = chosen.dy;
     }
 
     function update() {
@@ -448,11 +509,10 @@
         player.dy = 0;
       }
 
-      // Tunnel wrap for player
       if (player.x < -tileSize) player.x = 18 * tileSize;
       if (player.x > 18 * tileSize) player.x = -tileSize;
 
-      // Eat items
+      // Eat
       let pCol = Math.floor((player.x + 8) / tileSize);
       let pRow = Math.floor((player.y + 8) / tileSize);
 
@@ -468,7 +528,7 @@
         } else if (currentMap[pRow][pCol] === 3) {
           currentMap[pRow][pCol] = 2;
           score += 50;
-          frightTimer = 400;
+          frightTimer = 420;
           checkWinCondition();
         }
       }
@@ -476,84 +536,29 @@
       document.getElementById('scoreDisplay').innerText = score;
       document.getElementById('livesDisplay').innerText = lives;
 
-      // ===== GHOSTS =====
+      // ===== GHOSTS (stronger logic) =====
       ghosts.forEach(g => {
-        // Only decide direction when nicely centered
-        const centered = Math.abs(g.x % tileSize) < 1.2 && Math.abs(g.y % tileSize) < 1.2;
+        // Are we nicely centered on a tile?
+        const centered = Math.abs(g.x % tileSize) < 1.5 && Math.abs(g.y % tileSize) < 1.5;
 
         if (centered) {
           g.x = Math.round(g.x / tileSize) * tileSize;
           g.y = Math.round(g.y / tileSize) * tileSize;
-
-          const gCol = g.x / tileSize;
-          const gRow = g.y / tileSize;
-
-          const dirs = [
-            {dx: 0, dy: -1},
-            {dx: 0, dy: 1},
-            {dx: -1, dy: 0},
-            {dx: 1, dy: 0}
-          ];
-
-          let valid = dirs.filter(d => {
-            // Prefer not to reverse
-            if ((g.dx !== 0 || g.dy !== 0) && d.dx === -g.dx && d.dy === -g.dy) return false;
-            const nc = gCol + d.dx;
-            const nr = gRow + d.dy;
-            if (nc < 0 || nc >= 19) return true; // tunnel
-            return !isWall(nc, nr);
-          });
-
-          if (valid.length === 0) {
-            // Allow reverse if stuck
-            valid = dirs.filter(d => {
-              const nc = gCol + d.dx;
-              const nr = gRow + d.dy;
-              if (nc < 0 || nc >= 19) return true;
-              return !isWall(nc, nr);
-            });
-          }
-
-          if (valid.length > 0) {
-            let chosen = valid[0];
-
-            if (frightTimer > 0) {
-              // Run away
-              let best = -1;
-              valid.forEach(d => {
-                const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow);
-                if (dist > best) {
-                  best = dist;
-                  chosen = d;
-                }
-              });
-            } else {
-              // Chase with small randomness
-              let best = Infinity;
-              valid.forEach(d => {
-                const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow) + Math.random() * 2.2;
-                if (dist < best) {
-                  best = dist;
-                  chosen = d;
-                }
-              });
-            }
-            g.dx = chosen.dx;
-            g.dy = chosen.dy;
-          }
+          chooseNewDirection(g, pCol, pRow);
         }
 
-        // Move only if the path is clear
+        // Try to move
         if (canMove(g.x, g.y, g.dx, g.dy, g.speed)) {
           g.x += g.dx * g.speed;
           g.y += g.dy * g.speed;
         } else {
-          // Force re-decision next frame
-          g.dx = 0;
-          g.dy = 0;
+          // Blocked → force new direction immediately
+          g.x = Math.round(g.x / tileSize) * tileSize;
+          g.y = Math.round(g.y / tileSize) * tileSize;
+          chooseNewDirection(g, pCol, pRow);
         }
 
-        // Safe tunnel wrap
+        // Tunnel wrap
         if (g.x < -tileSize) g.x = 18 * tileSize;
         if (g.x > 18 * tileSize) g.x = -tileSize;
 
@@ -562,7 +567,6 @@
         if (dist < 11) {
           if (frightTimer > 0) {
             score += 200;
-            // Send back to house
             g.x = 9 * tileSize;
             g.y = 10 * tileSize;
             g.dx = 0;
