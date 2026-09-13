@@ -360,9 +360,9 @@
 
     function resetGhosts() {
       ghosts = [
-        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 0.8 },
-        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 0.8 },
-        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 0.8 }
+        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 1 },
+        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 1 },
+        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 1 }
       ];
     }
 
@@ -428,6 +428,7 @@
         {dx: 1, dy: 0}
       ];
 
+      // Get valid moves (avoid immediate reverse unless blocked)
       let valid = dirs.filter(d => {
         if (d.dx === -g.dx && d.dy === -g.dy) return false;
         const nc = gCol + d.dx;
@@ -529,13 +530,11 @@
       document.getElementById('scoreDisplay').innerText = score;
       document.getElementById('livesDisplay').innerText = lives;
 
-      // ===== GHOSTS =====
+      // ===== GHOSTS (Clean integer-step alignment) =====
       ghosts.forEach(g => {
-        const atIntersection = Math.abs(g.x % tileSize) <= g.speed && Math.abs(g.y % tileSize) <= g.speed;
+        const atIntersection = (g.x % tileSize === 0) && (g.y % tileSize === 0);
 
         if (atIntersection) {
-          g.x = Math.round(g.x / tileSize) * tileSize;
-          g.y = Math.round(g.y / tileSize) * tileSize;
           updateGhostDirection(g, pCol, pRow);
         }
 
@@ -543,6 +542,7 @@
           g.x += g.dx * g.speed;
           g.y += g.dy * g.speed;
         } else {
+          // Force snap back to grid and re-evaluate immediately if blocked
           g.x = Math.round(g.x / tileSize) * tileSize;
           g.y = Math.round(g.y / tileSize) * tileSize;
           updateGhostDirection(g, pCol, pRow);
