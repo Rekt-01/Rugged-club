@@ -186,6 +186,78 @@
       transform: translate(-50%, -50%) scale(1);
     }
 
+    /* Modal for choosing player role */
+    .role-modal {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(2, 2, 5, 0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      gap: 15px;
+      font-family: monospace;
+      padding: 20px;
+    }
+
+    .role-modal h2 {
+      color: #00ffcc;
+      font-size: 1.1rem;
+      text-shadow: 0 0 10px #00ffcc;
+      text-align: center;
+    }
+
+    .role-modal p {
+      color: #aaa;
+      font-size: 0.7rem;
+      text-align: center;
+      max-width: 300px;
+    }
+
+    .role-btn {
+      width: 80%;
+      max-width: 260px;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: monospace;
+      text-transform: uppercase;
+      transition: transform 0.1s;
+    }
+    .role-btn:active { transform: scale(0.96); }
+
+    .btn-p1 {
+      background: rgba(0, 255, 204, 0.15);
+      border: 2px solid #00ffcc;
+      color: #00ffcc;
+      box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+    }
+
+    .btn-p2 {
+      background: rgba(255, 230, 0, 0.15);
+      border: 2px solid #ffe600;
+      color: #ffe600;
+      box-shadow: 0 0 10px rgba(255, 230, 0, 0.3);
+    }
+
+    .btn-spectator {
+      background: rgba(255, 0, 122, 0.15);
+      border: 2px solid #ff007a;
+      color: #ff007a;
+      box-shadow: 0 0 10px rgba(255, 0, 122, 0.3);
+    }
+
+    .role-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      border-color: #555;
+      color: #555;
+      box-shadow: none;
+    }
+
     .controls-container {
       width: 100%;
       display: flex;
@@ -243,6 +315,15 @@
 </head>
 <body>
 
+  <!-- Role Selection Modal -->
+  <div class="role-modal" id="roleModal" style="display:none;">
+    <h2>CHOOSE YOUR SEAT</h2>
+    <p>Select your player slot for Room: <span id="modalRoomName" style="color:#00ffcc"></span></p>
+    <button class="role-btn btn-p1" id="selectP1Btn" onclick="claimRole('Player 1')">PLAY AS PLAYER 1</button>
+    <button class="role-btn btn-p2" id="selectP2Btn" onclick="claimRole('Player 2')">PLAY AS PLAYER 2</button>
+    <button class="role-btn btn-spectator" onclick="claimRole('Spectator')">WATCH AS SPECTATOR</button>
+  </div>
+
   <div class="pool-container">
     <div class="header-bar">
       <div class="title-text">
@@ -260,7 +341,7 @@
         <button class="toggle-btn" onclick="toggleSlippageMode()">TOGGLE</button>
       </div>
       <div class="status-row">
-        <span>YOUR ROLE: <strong id="myRoleDisplay" style="color:#00ffcc;">CONNECTING...</strong></span>
+        <span>YOUR ROLE: <strong id="myRoleDisplay" style="color:#00ffcc;">SELECTING...</strong></span>
         <span>SLIPPAGE: <strong id="slippageLabel" style="color:#00ffcc;">BIG POCKETS</strong></span>
       </div>
       <div class="status-row">
@@ -294,7 +375,9 @@
     document.getElementById('roomInput').value = roomCode;
 
     let localRole = null; 
-    const deviceId = 'dev_' + Math.random().toString(36).substring(2, 9); // Unique session ID for this browser tab
+    let p1Device = null;
+    let p2Device = null;
+    const deviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
 
     function changeRoom(newRoom) {
       if (!newRoom) return;
@@ -331,8 +414,6 @@
     let turnPocketedAny = false;
     let turnPocketedValid = false;
     let scratched = false;
-    let p1Device = null;
-    let p2Device = null;
 
     let cueBall = { x: 90, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
@@ -380,7 +461,7 @@
 
     function executeShot() {
       if (turn !== localRole) {
-        showToast(`🛑 Wait your turn! You are ${localRole || 'Spectator'}, but it's ${turn}'s shift.`);
+        showToast(`🛑 Wait your turn! You are ${localRole}, but it's ${turn}'s shift.`);
         return;
       }
       if (!isAnyBallMoving() && !shotFired) {
@@ -470,54 +551,40 @@
           .eq('room_code', roomCode);
         
         if (!data || data.length === 0) {
-          // Room completely empty -> Create it and claim Player 1
-          localRole = 'Player 1';
-          p1Device = deviceId;
-          p2Device = null;
-
+          // Room doesn't exist yet, create initial empty row
           generateInitialRack();
           const initState = {
             balls: balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r })),
-            turn, player1Group, player2Group, p1Device, p2Device
+            turn, player1Group, player2Group, p1Device: null, p2Device: null
           };
           await supabaseClient
             .from('pool_games')
             .insert([{ room_code: roomCode, game_state: initState }]);
+          
+          p1Device = null;
+          p2Device = null;
         } else {
           let state = data[0].game_state || {};
           p1Device = state.p1Device || null;
           p2Device = state.p2Device || null;
-
-          // Check if this device already claimed a slot
-          if (p1Device === deviceId) {
-            localRole = 'Player 1';
-          } else if (p2Device === deviceId) {
-            localRole = 'Player 2';
-          } else {
-            // Unclaimed device trying to join
-            if (!p1Device) {
-              p1Device = deviceId;
-              localRole = 'Player 1';
-            } else if (!p2Device) {
-              p2Device = deviceId;
-              localRole = 'Player 2';
-            } else {
-              localRole = 'Spectator'; // Room is full
-              showToast("👀 Room full! Joined as Spectator.");
-            }
-            // Push updated slots to server
-            state.p1Device = p1Device;
-            state.p2Device = p2Device;
-            await supabaseClient
-              .from('pool_games')
-              .upsert({ room_code: roomCode, game_state: state, updated_at: new Date() }, { onConflict: 'room_code' });
-          }
-
           applyRemoteState(state);
         }
 
-        document.getElementById('myRoleDisplay').innerText = localRole.toUpperCase();
-        document.getElementById('myRoleDisplay').style.color = localRole === 'Player 1' ? '#00ffcc' : (localRole === 'Player 2' ? '#ffe600' : '#ff007a');
+        // Check if this device already claimed a role
+        if (p1Device === deviceId) {
+          localRole = 'Player 1';
+        } else if (p2Device === deviceId) {
+          localRole = 'Player 2';
+        } else {
+          // Show Role Selection Modal
+          document.getElementById('modalRoomName').innerText = roomCode;
+          document.getElementById('selectP1Btn').disabled = (p1Device !== null && p1Device !== deviceId);
+          document.getElementById('selectP2Btn').disabled = (p2Device !== null && p2Device !== deviceId);
+          document.getElementById('roleModal').style.display = 'flex';
+          return;
+        }
+
+        updateRoleUI();
         document.getElementById('syncStatus').innerText = 'ONLINE SYNC ACTIVE';
         document.getElementById('syncStatus').style.color = '#00ff66';
       } catch (e) {
@@ -526,7 +593,42 @@
       }
     }
 
+    async function claimRole(role) {
+      localRole = role;
+      document.getElementById('roleModal').style.display = 'none';
+
+      // Fetch latest state to avoid overwrites
+      let { data } = await supabaseClient
+        .from('pool_games')
+        .select('game_state')
+        .eq('room_code', roomCode);
+
+      let state = (data && data.length > 0 && data[0].game_state) ? data[0].game_state : {};
+      
+      if (role === 'Player 1') state.p1Device = deviceId;
+      if (role === 'Player 2') state.p2Device = deviceId;
+
+      p1Device = state.p1Device;
+      p2Device = state.p2Device;
+
+      await supabaseClient
+        .from('pool_games')
+        .upsert({ room_code: roomCode, game_state: state, updated_at: new Date() }, { onConflict: 'room_code' });
+
+      updateRoleUI();
+      showToast(`✅ You joined as ${role}`);
+    }
+
+    function updateRoleUI() {
+      const roleDisp = document.getElementById('myRoleDisplay');
+      roleDisp.innerText = localRole.toUpperCase();
+      roleDisp.style.color = localRole === 'Player 1' ? '#00ffcc' : (localRole === 'Player 2' ? '#ffe600' : '#ff007a');
+    }
+
     function applyRemoteState(remoteState) {
+      if (remoteState.p1Device !== undefined) p1Device = remoteState.p1Device;
+      if (remoteState.p2Device !== undefined) p2Device = remoteState.p2Device;
+
       if (remoteState.balls && !isAnyBallMoving() && !shotFired) {
         balls = remoteState.balls.map(rb => ({ ...rb }));
         cueBall = balls.find(b => b.isCue) || cueBall;
