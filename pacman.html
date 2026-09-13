@@ -353,7 +353,7 @@
       y: 16 * tileSize,
       dx: 0, dy: 0,
       nextDx: 0, nextDy: 0,
-      speed: 1 // Balanced player speed
+      speed: 1 // Perfect smooth speed for the ape
     };
 
     let ghosts = [];
@@ -507,7 +507,7 @@
       document.getElementById('scoreDisplay').innerText = score;
       document.getElementById('livesDisplay').innerText = lives;
 
-      // ===== GHOSTS (Fractional Rail System with Distance Snap) =====
+      // ===== GHOSTS (Otters Movement Fix) =====
       ghosts.forEach(g => {
         g.x += g.dx * g.speed;
         g.y += g.dy * g.speed;
@@ -520,10 +520,17 @@
         const gridX = gCol * tileSize;
         const gridY = gRow * tileSize;
 
-        // If we reach or pass the grid intersection, snap and pick direction
-        if (Math.hypot(g.x - gridX, g.y - gridY) <= g.speed) {
+        // Check if otter is close enough to center of tile to make a turn choice
+        if (Math.abs(g.x - gridX) <= g.speed && Math.abs(g.y - gridY) <= g.speed) {
           g.x = gridX;
           g.y = gridY;
+          
+          // Check if ahead is blocked, force a direction change if needed
+          if (!isTileOpen(gCol + g.dx, gRow + g.dy)) {
+            g.dx = 0;
+            g.dy = 0;
+          }
+          
           chooseGhostDirection(g, pCol, pRow);
         }
 
