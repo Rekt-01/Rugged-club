@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>APE-man Single Level Edition</title>
+  <title>APE-man</title>
   <style>
     * {
       box-sizing: border-box;
@@ -65,8 +65,6 @@
       border-radius: 5px;
       font-size: 0.55rem;
       font-weight: bold;
-      text-decoration: none;
-      box-shadow: 0 0 6px rgba(0, 255, 255, 0.4);
       cursor: pointer;
     }
     .control-btn:hover { background: #00ffff; color: #000; }
@@ -80,8 +78,6 @@
       font-size: 0.55rem;
       font-weight: bold;
       text-decoration: none;
-      box-shadow: 0 0 6px rgba(255, 51, 51, 0.4);
-      cursor: pointer;
     }
     .exit-btn:hover { background: #ff3333; color: #000; }
 
@@ -187,7 +183,6 @@
       cursor: pointer;
       font-size: 0.7rem;
       text-transform: uppercase;
-      box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
     }
     .modal-btn:hover { background: #ff00ff; color: #fff; }
 
@@ -206,7 +201,7 @@
 
   <div class="arcade-container">
     <div class="header-bar">
-      <div class="title-text" id="levelTitle">🦍 APE-man: ULTIMATE ARENA</div>
+      <div class="title-text">🦍 APE-man</div>
       <div class="header-controls">
         <button class="control-btn" id="musicToggleBtn" onclick="toggleMusic()">🔊 MUSIC</button>
         <a href="index.html" class="exit-btn">🚪 EXIT</a>
@@ -214,8 +209,8 @@
     </div>
 
     <div class="scoreboard">
-      <div class="score-item">LIQUIDITY: <span id="scoreDisplay">0</span></div>
-      <div class="score-item">BAGS: <span id="livesDisplay">3</span></div>
+      <div class="score-item">SCORE: <span id="scoreDisplay">0</span></div>
+      <div class="score-item">LIVES: <span id="livesDisplay">3</span></div>
     </div>
 
     <div class="canvas-wrapper">
@@ -234,8 +229,8 @@
   <div class="modal-overlay" id="endGameModal">
     <div class="modal-card">
       <div class="modal-title" id="modalTitle">GAME OVER</div>
-      <div class="modal-desc" id="modalDesc">The dev otter rugged your bags!</div>
-      <button class="modal-btn" id="modalActionBtn" onclick="resetGame()">APE BACK IN 🔄</button>
+      <div class="modal-desc" id="modalDesc">The otters got you!</div>
+      <button class="modal-btn" id="modalActionBtn" onclick="fullReset()">PLAY AGAIN</button>
     </div>
   </div>
 
@@ -272,9 +267,7 @@
       musicPlaying = !musicPlaying;
       let btn = document.getElementById('musicToggleBtn');
       if (musicPlaying) {
-        if (audioCtx && audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         btn.innerText = "🔊 ON";
         startSynthwaveTrack();
       } else {
@@ -290,13 +283,10 @@
         let gain = audioCtx.createGain();
         osc.type = type;
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        
         gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-
         osc.start();
         osc.stop(audioCtx.currentTime + duration);
       } catch(e) {}
@@ -307,13 +297,10 @@
       const bassNotes = [110, 110, 130.81, 146.83, 110, 110, 164.81, 146.83];
       const arpNotes = [220, 261.63, 329.63, 392.00, 440, 392.00, 329.63, 261.63];
       let step = 0;
-
       musicInterval = setInterval(() => {
         if (!musicPlaying) return;
         playNote(bassNotes[step % bassNotes.length], 0.15, 'sawtooth', 0.04);
-        if (step % 2 === 0) {
-          playNote(arpNotes[(step / 2) % arpNotes.length], 0.12, 'square', 0.02);
-        }
+        if (step % 2 === 0) playNote(arpNotes[(step/2) % arpNotes.length], 0.12, 'square', 0.02);
         step++;
       }, 180);
     }
@@ -334,7 +321,7 @@
       }
     }, { once: true });
 
-    // Map layout
+    // Map
     const originalMap = [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
@@ -360,24 +347,22 @@
     ];
 
     let currentMap = [];
-
     let player = {
       x: 9 * tileSize,
       y: 16 * tileSize,
-      dx: 0,
-      dy: 0,
-      nextDx: 0,
-      nextDy: 0,
-      speed: 1.1
+      dx: 0, dy: 0,
+      nextDx: 0, nextDy: 0,
+      speed: 1.15
     };
 
     let ghosts = [];
 
     function resetGhosts() {
+      // All ghosts start in the same central house area
       ghosts = [
-        { x: 2 * tileSize, y: 2 * tileSize, dx: 1, dy: 0, speed: 0.7, color: 'red' },
-        { x: 16 * tileSize, y: 2 * tileSize, dx: -1, dy: 0, speed: 0.7, color: 'pink' },
-        { x: 9 * tileSize, y: 10 * tileSize, dx: 0, dy: -1, speed: 0.7, color: 'cyan' }
+        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 0.72 },
+        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 0.72 },
+        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 0.72 }
       ];
     }
 
@@ -390,6 +375,7 @@
       player.nextDx = 0;
       player.nextDy = 0;
       resetGhosts();
+      frightTimer = 0;
     }
 
     function setDirection(x, y) {
@@ -414,14 +400,14 @@
       const nextX = x + dx * speed;
       const nextY = y + dy * speed;
 
-      // Allow horizontal tunnels
-      if (nextX < -tileSize || nextX > 19 * tileSize) return true;
+      // Allow horizontal tunnels only
+      if (nextX < -8 || nextX > 19 * tileSize + 8) return true;
 
       const corners = [
-        { x: nextX + 2, y: nextY + 2 },
-        { x: nextX + tileSize - 2, y: nextY + 2 },
-        { x: nextX + 2, y: nextY + tileSize - 2 },
-        { x: nextX + tileSize - 2, y: nextY + tileSize - 2 }
+        { x: nextX + 3, y: nextY + 3 },
+        { x: nextX + tileSize - 3, y: nextY + 3 },
+        { x: nextX + 3, y: nextY + tileSize - 3 },
+        { x: nextX + tileSize - 3, y: nextY + tileSize - 3 }
       ];
 
       for (let corner of corners) {
@@ -441,21 +427,14 @@
 
       if (frightTimer > 0) frightTimer--;
 
-      // ===== PLAYER MOVEMENT =====
-      // Try to apply queued direction when aligned
+      // ===== PLAYER =====
       if (player.nextDx !== 0 || player.nextDy !== 0) {
-        // Instant reverse is always allowed
         if (player.dx === -player.nextDx && player.dy === -player.nextDy) {
           player.dx = player.nextDx;
           player.dy = player.nextDy;
         } else if (canMove(player.x, player.y, player.nextDx, player.nextDy, player.speed)) {
-          // Snap to grid when turning
-          if (player.nextDx !== 0) {
-            player.y = Math.round(player.y / tileSize) * tileSize;
-          }
-          if (player.nextDy !== 0) {
-            player.x = Math.round(player.x / tileSize) * tileSize;
-          }
+          if (player.nextDx !== 0) player.y = Math.round(player.y / tileSize) * tileSize;
+          if (player.nextDy !== 0) player.x = Math.round(player.x / tileSize) * tileSize;
           player.dx = player.nextDx;
           player.dy = player.nextDy;
         }
@@ -469,13 +448,13 @@
         player.dy = 0;
       }
 
-      // Tunnel wrapping for player
+      // Tunnel wrap for player
       if (player.x < -tileSize) player.x = 18 * tileSize;
       if (player.x > 18 * tileSize) player.x = -tileSize;
 
-      // ===== EAT ITEMS =====
-      let pCol = Math.floor((player.x + tileSize / 2) / tileSize);
-      let pRow = Math.floor((player.y + tileSize / 2) / tileSize);
+      // Eat items
+      let pCol = Math.floor((player.x + 8) / tileSize);
+      let pRow = Math.floor((player.y + 8) / tileSize);
 
       if (pCol >= 0 && pCol < 19 && pRow >= 0 && pRow < 21) {
         if (currentMap[pRow][pCol] === 0) {
@@ -489,7 +468,7 @@
         } else if (currentMap[pRow][pCol] === 3) {
           currentMap[pRow][pCol] = 2;
           score += 50;
-          frightTimer = 380;
+          frightTimer = 400;
           checkWinCondition();
         }
       }
@@ -499,44 +478,39 @@
 
       // ===== GHOSTS =====
       ghosts.forEach(g => {
-        // Only decide new direction when perfectly centered on a tile
-        const onTile = (Math.abs(g.x % tileSize) < 0.5) && (Math.abs(g.y % tileSize) < 0.5);
+        // Only decide direction when nicely centered
+        const centered = Math.abs(g.x % tileSize) < 1.2 && Math.abs(g.y % tileSize) < 1.2;
 
-        if (onTile) {
-          // Snap cleanly
+        if (centered) {
           g.x = Math.round(g.x / tileSize) * tileSize;
           g.y = Math.round(g.y / tileSize) * tileSize;
 
           const gCol = g.x / tileSize;
           const gRow = g.y / tileSize;
 
-          const directions = [
-            { dx: 0, dy: -1 },
-            { dx: 0, dy: 1 },
-            { dx: -1, dy: 0 },
-            { dx: 1, dy: 0 }
+          const dirs = [
+            {dx: 0, dy: -1},
+            {dx: 0, dy: 1},
+            {dx: -1, dy: 0},
+            {dx: 1, dy: 0}
           ];
 
-          // Filter valid moves (no reverse unless necessary)
-          let valid = directions.filter(d => {
-            // Don't reverse unless no other choice
+          let valid = dirs.filter(d => {
+            // Prefer not to reverse
             if ((g.dx !== 0 || g.dy !== 0) && d.dx === -g.dx && d.dy === -g.dy) return false;
-
-            const nCol = gCol + d.dx;
-            const nRow = gRow + d.dy;
-
-            // Allow tunnel
-            if (nCol < 0 || nCol >= 19) return true;
-            return !isWall(nCol, nRow);
+            const nc = gCol + d.dx;
+            const nr = gRow + d.dy;
+            if (nc < 0 || nc >= 19) return true; // tunnel
+            return !isWall(nc, nr);
           });
 
-          // If no valid (dead end), allow reverse
           if (valid.length === 0) {
-            valid = directions.filter(d => {
-              const nCol = gCol + d.dx;
-              const nRow = gRow + d.dy;
-              if (nCol < 0 || nCol >= 19) return true;
-              return !isWall(nCol, nRow);
+            // Allow reverse if stuck
+            valid = dirs.filter(d => {
+              const nc = gCol + d.dx;
+              const nr = gRow + d.dy;
+              if (nc < 0 || nc >= 19) return true;
+              return !isWall(nc, nr);
             });
           }
 
@@ -545,51 +519,50 @@
 
             if (frightTimer > 0) {
               // Run away
-              let maxDist = -1;
+              let best = -1;
               valid.forEach(d => {
                 const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow);
-                if (dist > maxDist) {
-                  maxDist = dist;
+                if (dist > best) {
+                  best = dist;
                   chosen = d;
                 }
               });
             } else {
-              // Chase with a little randomness so they don't stack
-              let minDist = Infinity;
+              // Chase with small randomness
+              let best = Infinity;
               valid.forEach(d => {
-                const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow) + Math.random() * 1.8;
-                if (dist < minDist) {
-                  minDist = dist;
+                const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow) + Math.random() * 2.2;
+                if (dist < best) {
+                  best = dist;
                   chosen = d;
                 }
               });
             }
-
             g.dx = chosen.dx;
             g.dy = chosen.dy;
           }
         }
 
-        // Move
+        // Move only if the path is clear
         if (canMove(g.x, g.y, g.dx, g.dy, g.speed)) {
           g.x += g.dx * g.speed;
           g.y += g.dy * g.speed;
         } else {
-          // Force a new decision next frame
+          // Force re-decision next frame
           g.dx = 0;
           g.dy = 0;
         }
 
-        // Tunnel wrapping for ghosts
+        // Safe tunnel wrap
         if (g.x < -tileSize) g.x = 18 * tileSize;
         if (g.x > 18 * tileSize) g.x = -tileSize;
 
-        // Collision with player
+        // Collision
         const dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
         if (dist < 11) {
           if (frightTimer > 0) {
             score += 200;
-            // Send ghost back to house
+            // Send back to house
             g.x = 9 * tileSize;
             g.y = 10 * tileSize;
             g.dx = 0;
@@ -598,9 +571,8 @@
             lives--;
             if (lives <= 0) {
               gameState = 'GAMEOVER';
-              triggerModal("GAME OVER", "The dev otter rugged your bags!", "APE BACK IN 🔄", fullReset);
+              triggerModal("GAME OVER", "The otters got you!", "PLAY AGAIN", fullReset);
             } else {
-              // Reset player + ghosts
               player.x = 9 * tileSize;
               player.y = 16 * tileSize;
               player.dx = 0;
@@ -616,31 +588,31 @@
     }
 
     function checkWinCondition() {
-      let itemsLeft = false;
-      for (let r = 0; r < currentMap.length; r++) {
-        for (let c = 0; c < currentMap[r].length; c++) {
+      let left = false;
+      for (let r = 0; r < 21; r++) {
+        for (let c = 0; c < 19; c++) {
           if (currentMap[r][c] === 0 || currentMap[r][c] === 3 || currentMap[r][c] === 4) {
-            itemsLeft = true;
+            left = true;
             break;
           }
         }
-        if (itemsLeft) break;
+        if (left) break;
       }
 
-      if (!itemsLeft) {
+      if (!left) {
         gameState = 'CELEBRATION';
-        celebrationTimer = 200;
+        celebrationTimer = 180;
         pCanvas.style.display = 'block';
         particles = [];
-        const emojis = ['🚀', '🌕', '💎', '💰', '🦍', '🍾', '🔥', '📈'];
-        for (let i = 0; i < 60; i++) {
+        const emojis = ['🚀','🌕','💎','💰','🦍','🔥'];
+        for (let i = 0; i < 50; i++) {
           particles.push({
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            vx: (Math.random() - 0.5) * 7,
-            vy: (Math.random() - 0.7) * 8,
-            emoji: emojis[Math.floor(Math.random() * emojis.length)],
-            size: 14 + Math.random() * 10,
+            x: canvas.width/2,
+            y: canvas.height/2,
+            vx: (Math.random()-0.5)*7,
+            vy: (Math.random()-0.7)*8,
+            emoji: emojis[Math.floor(Math.random()*emojis.length)],
+            size: 14 + Math.random()*10,
             alpha: 1
           });
         }
@@ -654,19 +626,15 @@
       pCtx.font = "bold 16px monospace";
       pCtx.textAlign = "center";
       pCtx.fillStyle = "#00ffff";
-      pCtx.shadowColor = "#ff00ff";
-      pCtx.shadowBlur = 12;
-      pCtx.fillText("🎉 ARENA CLEARED! 🎉", pCanvas.width / 2, pCanvas.height / 2 - 20);
+      pCtx.fillText("🎉 ARENA CLEARED! 🎉", pCanvas.width/2, pCanvas.height/2 - 15);
       pCtx.fillStyle = "#ffcc00";
-      pCtx.fillText("DIAMOND HANDS WIN 🚀", pCanvas.width / 2, pCanvas.height / 2 + 10);
-      pCtx.shadowBlur = 0;
+      pCtx.fillText("YOU WIN!", pCanvas.width/2, pCanvas.height/2 + 15);
 
       particles.forEach(p => {
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.2;
-        p.alpha -= 0.005;
-
+        p.vy += 0.18;
+        p.alpha -= 0.006;
         pCtx.save();
         pCtx.globalAlpha = Math.max(p.alpha, 0);
         pCtx.font = `${p.size}px sans-serif`;
@@ -677,7 +645,7 @@
 
       if (celebrationTimer <= 0) {
         pCanvas.style.display = 'none';
-        triggerModal("CHAD MOON LANDING 🌕", `Absolute legend! You cleared the arena with ${score} Liquidity!`, "PLAY AGAIN 🔄", fullReset);
+        triggerModal("YOU WIN!", `Score: ${score}`, "PLAY AGAIN", fullReset);
       }
     }
 
