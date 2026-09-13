@@ -505,9 +505,9 @@
             <div class="console-panel">
                 <div class="screen-monitor" style="border-color: #0369a1;">
                     <div class="screen-content" style="color: #34d399; text-shadow: 0 0 4px rgba(52,211,153,0.8);">
-                        * TERMINAL READY *<br>
+                        * LIQUIDATION LARRY *<br>
                         CORE TEMP: MELTING<br>
-                        BRAINCELLS: 0
+                        AI: ONLINE 🧠
                     </div>
                 </div>
                 <div class="switch-grid">
@@ -542,22 +542,22 @@
     <div class="cmd-overlay" id="cmdOverlay">
         <div class="cmd-window">
             <div class="cmd-header">
-                <span>REKT-OS v4.20 (DEGEN-BOT ZERO-IQ)</span>
+                <span>REKT-OS v4.20 (GEMINI LIQUIDATION LARRY)</span>
                 <button class="cmd-close" onclick="closeTerminal()">[X]</button>
             </div>
             <div class="cmd-body" id="cmdBody">
                 <div class="prompt-list-help">
-                    ZERO-IQ OFFLINE BOT. Try commands:<br>
+                    LIVE AI DEGEN BOT CONNECTED VIA SUPABASE.<br>
+                    Ask Larry anything or try shortcuts:<br>
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('/wen')">/wen</b> | 
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('/pump')">/pump</b> | 
                     - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('/rekt')">/rekt</b> | 
-                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('/hodl')">/hodl</b> |
-                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('help')">help</b>
+                    - <b style="cursor:pointer; color:#38bdf8;" onclick="runPreset('/hodl')">/hodl</b>
                 </div>
             </div>
             <div class="cmd-input-line">
                 <span>C:\REKT\></span>
-                <input type="text" class="cmd-input" id="cmdInput" placeholder="type a discord command like /wen..." onkeydown="handleCmd(event)">
+                <input type="text" class="cmd-input" id="cmdInput" placeholder="talk to liquidation larry..." onkeydown="handleCmd(event)">
             </div>
         </div>
     </div>
@@ -612,7 +612,6 @@
         let hopiumDeg = 45, hopiumLevel = 420;
         let copiumDeg = -30, copiumLevel = 69;
 
-        // Easter egg tracking variables
         let hopiumClicks = 0;
         let copiumClicks = 0;
         let comboTimeout = null;
@@ -624,7 +623,6 @@
                 document.getElementById('hopium-needle').style.transform = `translate(-50%, 0) rotate(${hopiumDeg}deg)`;
                 document.getElementById('hopium-val').innerText = Math.floor(hopiumLevel) + '%';
 
-                // Easter egg sequence logic
                 hopiumClicks++;
                 checkDegenCombo();
             } else {
@@ -633,21 +631,18 @@
                 document.getElementById('copium-needle').style.transform = `translate(-50%, 0) rotate(${copiumDeg}deg)`;
                 document.getElementById('copium-val').innerText = Math.floor(copiumLevel) + '%';
 
-                // Easter egg sequence logic
                 copiumClicks++;
                 checkDegenCombo();
             }
         }
 
         function checkDegenCombo() {
-            // Reset combo if user waits too long between clicks (e.g., 2.5 seconds)
             clearTimeout(comboTimeout);
             comboTimeout = setTimeout(() => {
                 hopiumClicks = 0;
                 copiumClicks = 0;
             }, 2500);
 
-            // Target: exactly 3 hopium and 2 copium continuously/in sequence
             if (hopiumClicks === 3 && copiumClicks === 2) {
                 showDegenPopup();
                 hopiumClicks = 0;
@@ -682,7 +677,7 @@
             const body = document.getElementById('cmdBody');
             const div = document.createElement('div');
             div.style.color = isUser ? '#38bdf8' : '#22c55e';
-            div.innerHTML = (isUser ? 'C:\\REKT\\> ' : 'BOT: ') + text;
+            div.innerHTML = (isUser ? 'C:\\REKT\\> ' : 'LARRY: ') + text;
             body.appendChild(div);
             body.scrollTop = body.scrollHeight;
         }
@@ -703,46 +698,35 @@
             processDegenBot(cmd);
         }
 
-        // PRE-WRITTEN ZERO-IQ DEGEN REPLIES & DISCORD COMMANDS
-        const degenReplies = [
-            "WEN MOON? Bro we are already past Jupiter, buy the dip LFG! 🚀",
-            "Diamond hands only! 💎🙌 If your portfolio isn't down 90%, are you even trying?",
-            "DEV IS DOXXED... wait no, dev just rugged into a hardware wallet. GG WP.",
-            "Up only! Green candles straight to Valhalla! 🕯️📈",
-            "Just aped another 4 sol into a random dog coin named after Elon's toaster. Wish me luck.",
-            "Touching grass is bearish. Stay locked in the Discord voice chat.",
-            "Liquidation price? Right below current market price, exactly how we like the adrenaline.",
-            "Bro trust me, it's a structural redistribution event before the mega-pump. Pass the hopium tank.",
-            "NGMI if you sell here. Real chads go down with the spaceship. 🚢💥",
-            "Copy trading my cat right now and she's outperforming Wall Street."
-        ];
-
-        function processDegenBot(input) {
-            const lower = input.toLowerCase();
-            let response = "";
-
-            setTimeout(() => {
-                if (lower.includes('/wen') || lower.includes('wen')) {
-                    const wenAnswers = [
-                        "Moon is scheduled for tomorrow at 2:32 PM UTC. Bring snacks.",
-                        "Wen? Now. Always now. Stop asking questions and buy more.",
-                        "The moon was last Tuesday. We are heading for deep space exile now."
-                    ];
-                    response = wenAnswers[Math.floor(Math.random() * wenAnswers.length)];
-                } else if (lower.includes('/pump') || lower.includes('pump')) {
-                    response = "PUMPING INITIATED. Main thrusters screaming! 🚀🔥🔥";
-                } else if (lower.includes('/rekt') || lower.includes('rekt') || lower.includes('liquidat')) {
-                    response = "🚨 WARNING: Position completely wiped out! Margin call answered with tears. F.";
-                } else if (lower.includes('/hodl') || lower.includes('hodl')) {
-                    response = "HODL mode locked with industrial welding equipment. Keys thrown into a black hole.";
-                } else if (lower.includes('help')) {
-                    response = "Available discord commands: /wen, /pump, /rekt, /hodl, or just type random text for pure degen wisdom.";
+        // CONNECTED TO SUPABASE EDGE FUNCTION (LIQUIDATION LARRY VIA GEMINI)
+        async function processDegenBot(input) {
+            appendToTerminal("Consulting the hopium matrix...", false);
+            
+            try {
+                const response = await fetch('https://zxuwequmawgpfprbvtyv.supabase.co/functions/v1/liquidation-larry', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: input })
+                });
+                
+                const data = await response.json();
+                
+                // Remove the "Consulting..." status line
+                const body = document.getElementById('cmdBody');
+                body.removeChild(body.lastChild);
+                
+                if (data.reply) {
+                    appendToTerminal(data.reply);
                 } else {
-                    response = degenReplies[Math.floor(Math.random() * degenReplies.length)];
+                    appendToTerminal("ERR: Larry is ghosting us. Check the function logs.");
                 }
-
-                appendToTerminal(response);
-            }, 300);
+            } catch (error) {
+                const body = document.getElementById('cmdBody');
+                body.removeChild(body.lastChild);
+                appendToTerminal("ERROR: Satellite link dropped. Blame the validator.");
+            }
         }
     </script>
 </body>
