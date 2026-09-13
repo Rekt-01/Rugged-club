@@ -3,38 +3,302 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Multiplayer Pool - Online Match</title>
+  <title>Degen Pool - Online Multiplayer Match</title>
   <style>
-    body { background-color: #020205; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; font-family: monospace; color: #fff; }
-    .pool-container { background: #0d0d12; border: 3px solid #00ff66; border-radius: 12px; padding: 12px; width: 96vw; max-width: 480px; box-shadow: 0 0 30px rgba(0, 255, 102, 0.4); display: flex; flex-direction: column; align-items: center; }
-    canvas { display: block; background: #0f5220; border-radius: 8px; border: 2px solid #222; }
-    .btn-shoot { width: 100%; height: 36px; background: #00ff66; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
-    .exit-btn { display: inline-block; margin-top: 10px; color: #ff3333; text-decoration: none; font-size: 0.7rem; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    body {
+      background-color: #020205;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: monospace;
+      touch-action: manipulation;
+    }
+
+    .pool-container {
+      background: #0d0d12;
+      border: 3px solid #00ff66;
+      border-radius: 12px;
+      padding: 12px;
+      width: 96vw;
+      max-width: 480px;
+      box-shadow: 0 0 30px rgba(0, 255, 102, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .title-text {
+      color: #00ffcc;
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-shadow: 0 0 6px #00ffcc;
+    }
+
+    .exit-btn {
+      padding: 3px 6px;
+      border-radius: 5px;
+      font-size: 0.65rem;
+      font-weight: bold;
+      cursor: pointer;
+      background: rgba(255, 51, 51, 0.15);
+      border: 2px solid #ff3333;
+      color: #ff3333;
+      text-decoration: none;
+      box-shadow: 0 0 6px rgba(255, 51, 51, 0.4);
+    }
+    .exit-btn:hover { background: #ff3333; color: #000; }
+
+    .scoreboard {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      background: #121218;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 5px 10px;
+      margin-bottom: 8px;
+      font-size: 0.65rem;
+      color: #fff;
+    }
+    .score-item span { color: #ffe600; font-weight: bold; }
+
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid #222;
+      background: #000;
+    }
+
+    canvas {
+      display: block;
+      background: #0f5220;
+      touch-action: none;
+    }
+
+    .event-toast {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: rgba(0, 0, 0, 0.95);
+      border: 2px solid #ff007a;
+      border-radius: 8px;
+      padding: 8px 14px;
+      color: #ff007a;
+      font-size: 0.7rem;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(255, 0, 122, 0.8);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 10;
+      width: 85%;
+    }
+    .event-toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .controls-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .aim-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-ctrl {
+      flex: 1;
+      max-width: 120px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid #00ffcc;
+      border-radius: 6px;
+      color: #00ffcc;
+      font-size: 0.75rem;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .btn-ctrl:active {
+      background: rgba(0, 255, 204, 0.3);
+      transform: scale(0.96);
+    }
+
+    .btn-shoot {
+      width: 100%;
+      height: 36px;
+      background: #00ff66;
+      color: #000;
+      font-weight: bold;
+      font-size: 0.75rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      touch-action: manipulation;
+    }
+    .btn-shoot:active {
+      transform: scale(0.97);
+    }
   </style>
   <!-- Include Supabase JS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
   <div class="pool-container">
-    <h2>Room: <span id="room-display" style="color: #00ffcc;"></span></h2>
-    <canvas id="poolCanvas" width="360" height="190"></canvas>
-    <button class="btn-shoot" onclick="syncShot()">⚡ SYNC SHOT</button>
-    <a href="pool.html" class="exit-btn">🚪 Leave Room</a>
+    <div class="header-bar">
+      <div class="title-text">🌐 ONLINE ROOM: <span id="roomDisplay" style="color:#ffe600;">...</span></div>
+      <a href="pool.html" class="exit-btn">🚪 LEAVE ROOM</a>
+    </div>
+
+    <div class="scoreboard">
+      <div class="score-item">STATUS: <span id="syncStatus">CONNECTING...</span></div>
+      <div class="score-item">ROLE: <span id="playerRoleDisplay">PLAYER</span></div>
+    </div>
+
+    <div class="canvas-wrapper">
+      <canvas id="poolCanvas" width="360" height="190"></canvas>
+      <div class="event-toast" id="eventToast"></div>
+    </div>
+
+    <div class="controls-container">
+      <div class="aim-row">
+        <button class="btn-ctrl" onclick="adjustAim(-0.1)">◀ ROTATE</button>
+        <button class="btn-ctrl" onclick="adjustAim(0.1)">ROTATE ▶</button>
+      </div>
+      <button class="btn-shoot" onclick="executeShot()">⚡ SEND SHOT & SYNC</button>
+    </div>
   </div>
 
   <script>
-    // Configured with your Supabase credentials
+    // Supabase Configuration
     const SUPABASE_URL = 'https://vcsauoymgxazvfxihyym.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjc2F1b3ltZ3haznZmeGloeXltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTIzNzUsImV4cCI6MjEwNDg4ODM3NX0.x5dQeBH-4YDJKigjG0boizwZrkY7VbbneIN_w-VyBi8';
-    
-    // Clean key string assignment matching provided token
-    const cleanKey = SUPABASE_ANON_KEY.trim();
-    const supabase = window.supabase.createClient(SUPABASE_URL, cleanKey);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY.trim());
 
-    const roomCode = "room_degens_101"; 
-    document.getElementById('room-display').innerText = roomCode;
+    const roomCode = "room_degens_101";
+    document.getElementById('roomDisplay').innerText = roomCode;
 
-    // Listen for real-time changes from the other player in this room
+    const canvas = document.getElementById('poolCanvas');
+    const ctx = canvas.getContext('2d');
+    const toast = document.getElementById('eventToast');
+
+    const pockets = [
+      { x: 16, y: 16 }, { x: 180, y: 12 }, { x: 344, y: 16 },
+      { x: 16, y: 174 }, { x: 180, y: 178 }, { x: 344, y: 174 }
+    ];
+
+    let shotFired = false;
+    let cueBall = { x: 90, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
+    let balls = [cueBall];
+
+    let rackX = 240, rackY = 95, spacing = 11.5;
+    let ballNumbers = [1, 2, 9, 3, 8, 10, 4, 11, 12, 5, 6, 13, 14, 15, 7];
+
+    let numIdx = 0;
+    for (let col = 0; col < 5; col++) {
+      for (let row = 0; row <= col; row++) {
+        if (numIdx >= ballNumbers.length) break;
+        let n = ballNumbers[numIdx];
+        let bx = rackX + (col * spacing * 0.866);
+        let by = rackY + (row * spacing) - (col * spacing / 2);
+        
+        let bType = (n === 8) ? 'black' : (n <= 7 ? 'solids' : 'stripes');
+        let bColor = '#ffffff';
+        if (n === 8) bColor = '#111111';
+        else if (n === 1 || n === 9) bColor = '#f1c40f'; 
+        else if (n === 2 || n === 10) bColor = '#2980b9'; 
+        else if (n === 3 || n === 11) bColor = '#e74c3c'; 
+        else if (n === 4 || n === 12) bColor = '#8e44ad'; 
+        else if (n === 5 || n === 13) bColor = '#d35400'; 
+        else if (n === 6 || n === 14) bColor = '#27ae60'; 
+        else if (n === 7 || n === 15) bColor = '#c0392b'; 
+
+        balls.push({ x: bx, y: by, vx: 0, vy: 0, r: 5.5, color: bColor, isCue: false, type: bType, num: n, isStripe: n > 8 });
+        numIdx++;
+      }
+    }
+
+    let aimAngle = 0;
+    let power = 6.8;
+
+    function showToast(text) {
+      toast.innerText = text;
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2000);
+    }
+
+    function adjustAim(amount) {
+      if (!isAnyBallMoving() && !shotFired) {
+        aimAngle += amount;
+      }
+    }
+
+    async function executeShot() {
+      if (!isAnyBallMoving() && !shotFired) {
+        cueBall.vx = Math.cos(aimAngle) * power;
+        cueBall.vy = Math.sin(aimAngle) * power;
+        shotFired = true;
+
+        // Broadcast new ball coordinates to Supabase
+        await pushGameStateToSupabase();
+      }
+    }
+
+    function isAnyBallMoving() {
+      return balls.some(b => Math.abs(b.vx) > 0.03 || Math.abs(b.vy) > 0.03);
+    }
+
+    async function pushGameStateToSupabase() {
+      const serializedBalls = balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue }));
+      const { error } = await supabase
+        .from('pool_games')
+        .update({ 
+          game_state: { balls: serializedBalls }, 
+          updated_at: new Date() 
+        })
+        .eq('room_code', roomCode);
+
+      if (error) console.error('Sync push error:', error.message);
+    }
+
+    // Realtime subscription listener for opponent shots
     supabase
       .channel('pool_room_' + roomCode)
       .on('postgres_changes', {
@@ -43,25 +307,127 @@
         table: 'pool_games',
         filter: `room_code=eq.${roomCode}`
       }, payload => {
-        console.log('Opponent synced state:', payload.new.game_state);
-        alert('Received move update from opponent network!');
+        const remoteState = payload.new.game_state;
+        if (remoteState && remoteState.balls) {
+          // Sync remote ball positions
+          remoteState.balls.forEach(remoteB => {
+            let localB = balls.find(b => b.num === remoteB.num && b.isCue === remoteB.isCue);
+            if (localB) {
+              localB.x = remoteB.x;
+              localB.y = remoteB.y;
+              localB.vx = remoteB.vx;
+              localB.vy = remoteB.vy;
+            }
+          });
+          showToast("⚡ Opponent move synced!");
+        }
       })
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          document.getElementById('syncStatus').innerText = 'SYNCED ONLINE';
+          document.getElementById('syncStatus').style.color = '#00ff66';
+        }
+      });
 
-    async function syncShot() {
-      const sampleState = { shotPower: Math.random(), timestamp: Date.now() };
-      const { error } = await supabase
-        .from('pool_games')
-        .update({ game_state: sampleState, updated_at: new Date() })
-        .eq('room_code', roomCode);
+    function updateGame() {
+      for (let i = balls.length - 1; i >= 0; i--) {
+        let b = balls[i];
+        b.x += b.vx;
+        b.y += b.vy;
+        b.vx *= 0.988;
+        b.vy *= 0.988;
 
-      if (error) {
-        console.error('Sync error:', error);
-        alert('Sync failed: ' + error.message);
-      } else {
-        alert('Shot broadcasted successfully to Supabase!');
+        if (Math.abs(b.vx) < 0.02) b.vx = 0;
+        if (Math.abs(b.vy) < 0.02) b.vy = 0;
+
+        if (b.x - b.r < 20) { b.x = 20 + b.r; b.vx *= -1; }
+        if (b.x + b.r > 340) { b.x = 340 - b.r; b.vx *= -1; }
+        if (b.y - b.r < 20) { b.y = 20 + b.r; b.vy *= -1; }
+        if (b.y + b.r > 170) { b.y = 170 - b.r; b.vy *= -1; }
+
+        pockets.forEach(p => {
+          if (Math.hypot(b.x - p.x, b.y - p.y) < 13 + 2) {
+            if (b.isCue) {
+              b.x = 90; b.y = 95; b.vx = 0; b.vy = 0;
+              showToast("🚨 Scratch!");
+            } else {
+              balls.splice(i, 1);
+            }
+          }
+        });
+      }
+
+      for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) {
+          let b1 = balls[i], b2 = balls[j];
+          let dx = b2.x - b1.x, dy = b2.y - b1.y;
+          let dist = Math.hypot(dx, dy);
+          let minDist = b1.r + b2.r;
+
+          if (dist < minDist && dist > 0) {
+            let nx = dx / dist, ny = dy / dist;
+            let overlap = minDist - dist;
+            b1.x -= nx * overlap * 0.5; b1.y -= ny * overlap * 0.5;
+            b2.x += nx * overlap * 0.5; b2.y += ny * overlap * 0.5;
+
+            let kx = b1.vx - b2.vx, ky = b1.vy - b2.vy;
+            let p = 2 * (nx * kx + ny * ky) / 2;
+            if (p > 0) {
+              b1.vx -= p * nx * 0.96; b1.vy -= p * ny * 0.96;
+              b2.vx += p * nx * 0.96; b2.vy += p * ny * 0.96;
+            }
+          }
+        }
+      }
+
+      if (shotFired && !isAnyBallMoving()) {
+        shotFired = false;
+      }
+
+      drawTable();
+      requestAnimationFrame(updateGame);
+    }
+
+    function drawTable() {
+      ctx.fillStyle = '#0f5220';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#4a2c11';
+      ctx.lineWidth = 14;
+      ctx.strokeRect(7, 7, canvas.width - 14, canvas.height - 14);
+
+      pockets.forEach(p => {
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 13, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      balls.forEach(b => {
+        ctx.fillStyle = b.color;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fill();
+        if (b.isStripe) {
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r * 0.55, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      if (!isAnyBallMoving() && !shotFired) {
+        ctx.strokeStyle = '#00ff66';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(cueBall.x, cueBall.y);
+        ctx.lineTo(cueBall.x + Math.cos(aimAngle) * 65, cueBall.y + Math.sin(aimAngle) * 65);
+        ctx.stroke();
+        ctx.setLineDash([]);
       }
     }
+
+    updateGame();
   </script>
 </body>
 </html>
