@@ -79,88 +79,113 @@
       border-radius: 4px;
     }
 
-    /* --- POPUP WINDOW MODAL --- */
+    /* --- TOILET PAPER ROLL MODAL --- */
     .modal {
       display: none;
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.88);
       z-index: 20;
       justify-content: center;
       align-items: center;
-      padding: 20px;
-      backdrop-filter: blur(4px);
+      padding: 15px;
+      backdrop-filter: blur(6px);
     }
 
     .modal-content {
       position: relative;
-      background: #0d0d12;
-      border: 2px solid #ff007a;
-      border-radius: 12px;
-      padding: 30px 20px 20px 20px;
-      width: 90vw;
-      max-width: 380px;
+      /* Realistic Toilet Paper Texture & Color */
+      background: linear-gradient(135deg, #fbfbf8 0%, #f0eee6 50%, #e6e3d8 100%);
+      color: #2b2b2b;
+      /* Torn edge effect using clip-path / irregular borders */
+      border-radius: 4px 4px 12px 12px;
+      padding: 35px 22px 25px 22px;
+      width: 92vw;
+      max-width: 410px;
+      max-height: 85vh;
       text-align: center;
-      box-shadow: 0 0 30px rgba(255, 0, 122, 0.5);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(200, 195, 180, 0.6);
       font-family: monospace;
+      
+      /* Simulating toilet paper roll lines (perforations/ridges) */
+      background-image: 
+        linear-gradient(135deg, #fbfbf8 0%, #f0eee6 50%, #e6e3d8 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(0, 0, 0, 0.02) 18px, rgba(0, 0, 0, 0.02) 19px);
+      
+      /* Torn Top and Bottom Borders */
+      border-top: 6px dashed #dcd8cc;
+      border-bottom: 6px dashed #dcd8cc;
     }
 
     .close-btn {
       position: absolute;
       top: 10px; right: 15px;
-      color: #fff;
+      color: #777;
       font-size: 1.8rem;
       font-weight: bold;
       cursor: pointer;
     }
     .close-btn:hover {
-      color: #ff007a;
+      color: #d90429;
     }
 
     .modal-title {
-      color: #ff007a;
-      font-size: 1.1rem;
+      color: #111;
+      font-size: 1rem;
       font-weight: bold;
-      margin-bottom: 8px;
-      text-shadow: 0 0 8px rgba(255, 0, 122, 0.6);
-      letter-spacing: 1px;
+      margin-bottom: 5px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
     .modal-subtitle {
-      color: #00ff66;
-      font-size: 0.8rem;
-      margin-bottom: 15px;
+      color: #555;
+      font-size: 0.75rem;
+      margin-bottom: 12px;
       font-weight: bold;
-      text-shadow: 0 0 6px rgba(0, 255, 102, 0.4);
     }
 
     .modal-body-text {
-      color: #ccc;
-      font-size: 0.82rem;
-      line-height: 1.4;
-      margin-bottom: 20px;
-      max-height: 45vh;
+      color: #222;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      margin-bottom: 15px;
+      max-height: 38vh;
       overflow-y: auto;
       text-align: left;
+      padding-right: 5px;
+      border-top: 1px dashed #ccc;
+      border-bottom: 1px dashed #ccc;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    /* Custom Scrollbar for Toilet Paper text container */
+    .modal-body-text::-webkit-scrollbar {
+      width: 5px;
+    }
+    .modal-body-text::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 4px;
     }
 
     .lang-btn-container {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-bottom: 15px;
+      gap: 6px;
+      margin-bottom: 12px;
     }
 
     .lang-btn {
-      background: #15151f;
-      color: #00ff66;
-      border: 1px solid #00ff66;
-      border-radius: 8px;
-      padding: 10px;
+      background: rgba(255, 255, 255, 0.7);
+      color: #333;
+      border: 1px solid #c8c2b4;
+      border-radius: 6px;
+      padding: 8px 10px;
       font-family: monospace;
       font-weight: bold;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       cursor: pointer;
       transition: all 0.2s ease;
       text-align: left;
@@ -170,26 +195,31 @@
     }
 
     .lang-btn:hover, .lang-btn.active {
-      background: #00ff66;
-      color: #020205;
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+      background: #2b2b2b;
+      color: #f0eee6;
+      border-color: #2b2b2b;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
     }
 
     .modal-action-btn {
-      background: #ff007a;
-      color: #fff;
+      background: #2b2b2b;
+      color: #fbfbf8;
       border: none;
-      border-radius: 20px;
-      padding: 10px 20px;
+      border-radius: 15px;
+      padding: 9px 18px;
       font-family: monospace;
       font-weight: bold;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       cursor: pointer;
-      box-shadow: 0 0 10px rgba(255, 0, 122, 0.5);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
       width: 100%;
+      transition: background 0.2s ease;
+    }
+    .modal-action-btn:hover {
+      background: #d90429;
     }
     .modal-action-btn:active {
-      transform: scale(0.95);
+      transform: scale(0.97);
     }
   </style>
 </head>
@@ -207,11 +237,11 @@
     </div>
   </div>
 
-  <!-- Lore Popup Window Modal -->
+  <!-- Lore Popup Window Modal (Styled like Toilet Paper) -->
   <div class="modal" id="loreModal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeLoreModal()">&times;</span>
-      <div class="modal-title">📜 RESTROOM LORE ARCHIVE</div>
+      <div class="modal-title">🧻 RESTROOM ROLL ARCHIVE</div>
       <div class="modal-subtitle">CHOOSE YOUR DIALECT, ANON:</div>
       
       <div class="lang-btn-container">
@@ -230,16 +260,16 @@
       </div>
 
       <div class="modal-body-text" id="loreTextContainer">
-        Select a translation above to inject the alpha straight into your brain-rot.
+        Select a translation above to wipe away your ignorance.
       </div>
 
-      <button class="modal-action-btn" onclick="closeLoreModal()">CLOSE CHAT</button>
+      <button class="modal-action-btn" onclick="closeLoreModal()">FLUSH & CLOSE</button>
     </div>
   </div>
 
   <script>
     const loreOptions = {
-      1: `Legend has it that this very stall was built during the legendary bloodbath, when the gas fees were higher than the community's collective IQ and every green candle was just a cruel optical illusion engineered by a founder named Chad who promised utility before vanishing to Dubai with the mint funds.<br><br>They say if you stare long enough into the 404 Degen graffiti while down 99% on your third consecutive "revolutionary AI meme coin," you can still hear the faint, echoing cries of paper hands hitting the emergency sell button. The plumbing here doesn’t actually flush wastewater—it directly pipes your remaining liquidity straight into a wallet labeled <em>"Liquidity Provision (Trust Me Bro)"</em>.<br><br>Local legends claim that the only way to break the curse of the red candle is to hit the latch, walk back out to the bar, and pretend you didn't just mortgage your mother’s garage for a JPEG of a bored primate wearing a pirate hat.`,
+      1: `Remember the last time you aped into a project because the promo trailer looked like a Marvel movie? The sleek 3D renders, the cinematic voiceover, the roadmaps promising metaverse penthouses and passive income while you sleep. You felt that little warm spark in your chest—<em>fuck, maybe this is the one that changes things.</em><br><br>And then, forty-eight hours later, the Twitter account is wiped, the Discord says "Invite Invalid," and the founder has vanished to Dubai with your grocery money, leaving you staring at a pixelated rock worth less than a used tissue.<br><br>That gut punch? We’ve all tasted it. It makes you want to throw your laptop through the drywall, touch some grass, and swear off JPEGs forever.<br><br><strong>The 3:00 AM Google Search Support Group</strong><br>That exact flavor of emotional damage is why we’re sitting here in the trenches today. But instead of rage-quitting or sliding into a deep depression, a couple of smooth-brained anons who don't know the first thing about coding or digital art looked at each other and thought, <em>"How hard can it be to just... not be absolute sociopaths?"</em><br><br>Turns out, it’s really hard. None of us went to art school. None of us have a computer science degree. If you peeked behind our curtain right now, it’s just a bunch of sleep-deprived degenerates frantically Googling "how to fix Solidity revert error" while surviving entirely on caffeine, cheap energy drinks, and pure spite. Our tech stack is held together by copy-pasted StackOverflow answers, duct tape, and sheer denial. We fumbled. We broke things. But because we didn't want to add <em>our</em> incompetence to your financial trauma, we did a free mint. Zero cost, zero financial risk—just an open door to come trip over our shoelaces with us.<br><br><strong>Planting Our Flag in the ApeChain Wasteland</strong><br>While the rest of the timeline is digital-tourist hopping to whatever new layer-zero chain is pumping engagement farming this week, we locked ourselves in the basement on ApeChain and stayed put.<br><br>It’s cozy down here in the trenches. We don't have a multi-million dollar treasury funded by your hard-earned ETH, but we do have a group chat where someone is perpetually roasting our pixelated art—which, if you squint really hard and tilt your head sideways, sort of looks like a human being. It’s hard to feel like a depressed bagholder when you're crying-laughing at the fact that your project's mascot looks less like a masterpiece and more like an accidental glitch on a 1990s graphing calculator.<br><br>Our roadmap? It's not a PDF with corporate buzzwords. It’s basically just a napkin that someone spilled coffee on, and half of it says "Figure out how buttons work."<br><br><strong>The Open Door (And Zero Pressure)</strong><br>* <strong>Come as you are:</strong> If you’re a crypto veteran with battle scars from every cycle, welcome home. If you’re a complete newbie who bought a wallet yesterday and thinks a "gas fee" is a tax on driving—welcome twice. There is zero sell-shaming here. We don’t care if you diamond-hand or paper-hand; we’re just glad you're breathing the same air.<br>* <strong>Throw your ideas in the ring:</strong> Everyone is welcome to pitch whatever chaotic nonsense they want. We want to hear your ideas, your weird lore thoughts, and your master plans. But fair warning: <strong>we’re broke too</strong>, so whatever we build has got to be free. There’s zero pressure here—help out if you feel like it, and if you want to lurk in silence for six months, that’s totally fine too. No quotas, no mandatory participation, no corporate boss vibes.<br>* <strong>The Bouncer's List:</strong> Scammers, grifters, and serial rug-devs need not apply. The iron gate is permanently welded shut for anyone whose entire business model relies on making other people cry for liquidity.<br><br>At the end of the day, we’re probably not going to fix the global financial system, and our art looks like a crime against graphic design. But we’re building this together, pixel by clumsy pixel, and we're actually having fun doing it without trying to pick your pockets.<br><br>Pull up a folding chair. You’re early, and for once, you’re actually safe here.`,
       
       2: `We all crawled in here straight from rinses and smoking NFT rug pulls, blinking into the dim light of a dying laptop screen with a collective migraine and zero APE left for gas. That’s us. We aren’t VC-backed paper-pushers, master artists, or elite smart-contract devs—we're just a bunch of brain-rotted degens winging it, copying spaghetti code from GitHub at 3 AM, and fat-fingering mint functions as we go because we're building this shit out of pure spite from the trenches.<br><br>While everyone else is out chasing whatever shiny new L2 is dropping influencer exit liquidity this week, we stayed. We're locked in and riding with ApeChain because we still actually believe in $APE.<br><br>This NFT clubhouse isn't some soulless corporate mint farm; it’s a survivor camp built by serial bagholders who are sick of getting farmed by anon devs. Run by the underground Copium Cartel with <strong>Liquidation Larry</strong> at the head of the table huffing industrial-grade hopium through a gas mask, we're here to ape in, shitpost, talk charts, and cope about real life when our portfolios look like a literal crime scene. But hear this loud and clear, anon: everyone is welcome here, but we have absolute zero tolerance for hate, racism, bigotry, or toxic gatekeepers. Sell-shaming someone for panic-selling the local bottom gets you instantly blacklisted into the shadow realm—remember, <strong>no crying in the casino, bro</strong>.<br><br>We’re bound to get rekt on a few bugs, but we're building a real empire from the mud. In this ecosystem, we don't do soft stuff—we run on pure, unfiltered <strong>$CHAOS</strong> and absolute degenerate solidarity. LFG.`,
       
