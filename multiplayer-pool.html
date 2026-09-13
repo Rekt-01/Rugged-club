@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Degen Pool - Online Multiplayer Match</title>
+  <title>Pool - Online Multiplayer</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * {
@@ -88,19 +88,17 @@
       font-family: monospace;
     }
 
-    .whitepaper-btn {
+    .home-btn {
       background: rgba(0, 255, 204, 0.1);
       border: 2px solid #00ffcc;
       color: #00ffcc;
-      box-shadow: 0 0 5px rgba(0, 255, 204, 0.3);
     }
-    .whitepaper-btn:hover { background: #00ffcc; color: #000; }
+    .home-btn:hover { background: #00ffcc; color: #000; }
 
     .exit-btn {
       background: rgba(255, 51, 51, 0.15);
       border: 2px solid #ff3333;
       color: #ff3333;
-      box-shadow: 0 0 5px rgba(255, 51, 51, 0.3);
     }
     .exit-btn:hover { background: #ff3333; color: #000; }
 
@@ -122,28 +120,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-
-    .slippage-box {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid #444;
-      border-radius: 4px;
-      padding: 3px 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-    }
-
-    .toggle-btn {
-      background: #ffe600;
-      color: #000;
-      border: none;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 0.55rem;
-      font-weight: bold;
-      cursor: pointer;
     }
 
     .canvas-wrapper {
@@ -239,7 +215,6 @@
       cursor: pointer;
       font-family: monospace;
       text-transform: uppercase;
-      transition: transform 0.1s;
     }
     .role-btn:active { transform: scale(0.96); }
 
@@ -247,29 +222,26 @@
       background: rgba(0, 255, 204, 0.15);
       border: 2px solid #00ffcc;
       color: #00ffcc;
-      box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
     }
 
     .btn-p2 {
       background: rgba(255, 230, 0, 0.15);
       border: 2px solid #ffe600;
       color: #ffe600;
-      box-shadow: 0 0 10px rgba(255, 230, 0, 0.3);
     }
 
     .btn-spectator {
       background: rgba(255, 0, 122, 0.15);
       border: 2px solid #ff007a;
       color: #ff007a;
-      box-shadow: 0 0 10px rgba(255, 0, 122, 0.3);
     }
 
     .controls-container {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 5px;
-      margin-top: 6px;
+      gap: 8px;
+      margin-top: 8px;
     }
 
     .aim-row {
@@ -281,18 +253,17 @@
     .btn-ctrl {
       flex: 1;
       max-width: 120px;
-      height: 30px;
+      height: 32px;
       background: rgba(255, 255, 255, 0.08);
       border: 2px solid #00ffcc;
       border-radius: 6px;
       color: #00ffcc;
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       font-weight: bold;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      touch-action: manipulation;
     }
     .btn-ctrl:active {
       background: rgba(0, 255, 204, 0.3);
@@ -301,40 +272,37 @@
 
     .btn-shoot {
       width: 100%;
-      height: 34px;
+      height: 38px;
       background: #00ff66;
       color: #000;
       font-weight: bold;
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       box-shadow: 0 0 10px rgba(0, 255, 102, 0.6);
       text-transform: uppercase;
-      letter-spacing: 1px;
-      touch-action: manipulation;
     }
     .btn-shoot:active {
       transform: scale(0.97);
     }
 
+    /* Extra space + different colour so it’s harder to hit by mistake */
     .btn-rack {
       width: 100%;
-      height: 32px;
-      background: #ff007a;
-      color: #fff;
+      height: 30px;
+      margin-top: 6px;
+      background: #333;
+      color: #aaa;
       font-weight: bold;
       font-size: 0.7rem;
-      border: none;
+      border: 1px solid #555;
       border-radius: 6px;
       cursor: pointer;
-      box-shadow: 0 0 10px rgba(255, 0, 122, 0.5);
       text-transform: uppercase;
-      letter-spacing: 1px;
-      touch-action: manipulation;
-      margin-top: 4px;
     }
     .btn-rack:active {
+      background: #444;
       transform: scale(0.97);
     }
 
@@ -349,6 +317,7 @@
 </head>
 <body>
 
+  <!-- Role Selection Modal -->
   <div class="role-modal" id="roleModal" style="display:none;">
     <h2>CHOOSE YOUR SEAT</h2>
     <p>Room: <span id="modalRoomName" style="color:#00ffcc"></span></p>
@@ -366,29 +335,28 @@
         🎱 ROOM: <input type="text" id="roomInput" class="room-input" value="degens_101" onchange="changeRoom(this.value)" />
       </div>
       <div class="header-btns">
-        <a href="index.html" class="nav-btn whitepaper-btn">📖 HOME</a>
-        <button class="nav-btn exit-btn" onclick="leaveRoom()">🚪 EXIT</button>
+        <a href="index.html" class="nav-btn home-btn">HOME</a>
+        <button class="nav-btn exit-btn" onclick="leaveRoom()">EXIT</button>
       </div>
     </div>
 
     <div class="status-panel">
-      <div class="slippage-box">
-        <span>ONLINE SYNC: <strong id="syncStatus" style="color:#ffe600;">CONNECTING...</strong></span>
-        <button class="toggle-btn" onclick="toggleSlippageMode()">TOGGLE</button>
+      <div class="status-row">
+        <span>ONLINE: <strong id="syncStatus" style="color:#ffe600;">CONNECTING...</strong></span>
+        <span>POCKETS: <strong id="slippageLabel" style="color:#00ffcc;">NORMAL</strong></span>
       </div>
       <div class="status-row">
-        <span>YOUR ROLE: <strong id="myRoleDisplay" style="color:#00ffcc;">SELECTING...</strong></span>
-        <span>SLIPPAGE: <strong id="slippageLabel" style="color:#00ffcc;">BIG POCKETS</strong></span>
+        <span>YOU: <strong id="myRoleDisplay" style="color:#00ffcc;">SELECTING...</strong></span>
+        <span>TURN: <strong id="turnDisplay" style="color:#ffe600;">PLAYER 1</strong></span>
       </div>
       <div class="status-row">
-        <span>SHIFT: <strong id="turnDisplay" style="color:#ffe600;">PLAYER 1</strong></span>
-        <span>BAGS: <strong id="groupDisplay" style="color:#00ffcc;">OPEN MARKET</strong></span>
-      </div>
-      <div class="status-row" style="margin-top:2px;">
         <span id="p1NameDisplay" style="color:#00ffcc;">P1: ---</span>
         <span id="p2NameDisplay" style="color:#ffe600;">P2: ---</span>
       </div>
-      <div class="timer-display" id="timerDisplay">⏱️ Shot timer: --</div>
+      <div class="status-row">
+        <span>YOUR GROUP: <strong id="groupDisplay" style="color:#00ffcc;">OPEN TABLE</strong></span>
+      </div>
+      <div class="timer-display" id="timerDisplay">Shot timer: --</div>
     </div>
 
     <div class="canvas-wrapper">
@@ -401,12 +369,18 @@
         <button class="btn-ctrl" onclick="adjustAim(-0.1)">◀ ROTATE</button>
         <button class="btn-ctrl" onclick="adjustAim(0.1)">ROTATE ▶</button>
       </div>
-      <button class="btn-shoot" onclick="executeShot()">⚡ SEND THE LIQUIDITY</button>
-      <button class="btn-rack" onclick="rackEm()">🎱 RACK 'EM</button>
+
+      <button class="btn-shoot" onclick="executeShot()">SHOOT</button>
+
+      <!-- Extra space so it’s harder to hit by mistake -->
+      <button class="btn-rack" onclick="rackEm()">RE-RACK</button>
     </div>
   </div>
 
   <script>
+    // ========== SUPABASE + GAME LOGIC ==========
+    // (Same solid multiplayer logic we built earlier, just with clean text)
+
     const SUPABASE_URL = 'https://evlawscutifjpppbffbu.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2bGF3c2N1dGlmanBwcGJmZmJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTczMjcsImV4cCI6MjEwNDg5MzMyN30.kYvtFRDP_vTAWhWkzk7Q8MpepUrXJbWID_uWNXxstgk';
     
@@ -430,7 +404,6 @@
     let p2Name = null;
     let realTimeChannel = null;
 
-    // Shot timer
     let shotTimer = null;
     let shotTimeLeft = 30;
     const SHOT_TIME = 30;
@@ -448,7 +421,7 @@
       if (window.syncPollInterval) clearInterval(window.syncPollInterval);
       const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?room=' + encodeURIComponent(roomCode);
       window.history.pushState({path:newUrl}, '', newUrl);
-      showToast(`🔄 Joined Room: ${roomCode}`);
+      showToast(`Joined room: ${roomCode}`);
       initMultiplayer();
     }
 
@@ -460,11 +433,11 @@
     const ctx = canvas.getContext('2d');
     const toast = document.getElementById('eventToast');
 
-    let bigPockets = true;
+    let bigPockets = false;
     function toggleSlippageMode() {
       bigPockets = !bigPockets;
-      document.getElementById('slippageLabel').innerText = bigPockets ? "BIG POCKETS" : "STANDARD";
-      showToast(bigPockets ? "🟢 Big Pockets Activated!" : "💎 Standard Pockets Active!");
+      document.getElementById('slippageLabel').innerText = bigPockets ? "BIG" : "NORMAL";
+      showToast(bigPockets ? "Big pockets enabled" : "Normal pockets");
     }
 
     function getPocketRadius() { return bigPockets ? 18 : 13; }
@@ -483,13 +456,12 @@
     let scratched = false;
     let gameOver = false;
 
-    // Cue ball starts dead centre
-    let cueBall = { x: 180, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
+    // Proper cue ball start position
+    let cueBall = { x: 95, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
 
     function generateInitialRack() {
-      // Reset cue ball to dead centre
-      cueBall = { x: 180, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
+      cueBall = { x: 95, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
       balls = [cueBall];
 
       let rackX = 240, rackY = 95, spacing = 11.5;
@@ -524,7 +496,7 @@
     function showToast(text) {
       toast.innerText = text;
       toast.classList.add('show');
-      setTimeout(() => { toast.classList.remove('show'); }, 2800);
+      setTimeout(() => { toast.classList.remove('show'); }, 2500);
     }
 
     function adjustAim(amount) {
@@ -534,11 +506,11 @@
 
     function executeShot() {
       if (gameOver) {
-        showToast("Game over! Hit RACK 'EM to play again");
+        showToast("Game over – press RE-RACK to play again");
         return;
       }
       if (turn !== localRole) {
-        showToast(`🛑 Wait your turn! (${localName || localRole})`);
+        showToast("Wait your turn");
         return;
       }
       if (!isAnyBallMoving() && !shotFired) {
@@ -557,7 +529,7 @@
       return balls.some(b => Math.abs(b.vx) > 0.03 || Math.abs(b.vy) > 0.03);
     }
 
-    // ========== SHOT TIMER ==========
+    // ===== SHOT TIMER =====
     function startShotTimer() {
       clearShotTimer();
       if (gameOver || localRole === 'Spectator') return;
@@ -568,10 +540,8 @@
       shotTimer = setInterval(() => {
         shotTimeLeft--;
         updateTimerDisplay();
-
         if (shotTimeLeft <= 0) {
           clearShotTimer();
-          // Kick the current player
           kickCurrentPlayer();
         }
       }, 1000);
@@ -582,23 +552,18 @@
         clearInterval(shotTimer);
         shotTimer = null;
       }
-      document.getElementById('timerDisplay').innerText = '⏱️ Shot timer: --';
+      document.getElementById('timerDisplay').innerText = 'Shot timer: --';
     }
 
     function updateTimerDisplay() {
       const el = document.getElementById('timerDisplay');
-      if (shotTimeLeft <= 10) {
-        el.style.color = '#ff3333';
-      } else {
-        el.style.color = '#ffe600';
-      }
-      el.innerText = `⏱️ Shot timer: ${shotTimeLeft}s`;
+      el.style.color = shotTimeLeft <= 10 ? '#ff3333' : '#ffe600';
+      el.innerText = `Shot timer: ${shotTimeLeft}s`;
     }
 
     async function kickCurrentPlayer() {
-      showToast(`⏰ Time's up! ${turn === 'Player 1' ? (p1Name || 'Player 1') : (p2Name || 'Player 2')} kicked for taking too long`);
+      showToast(`Time's up! ${turn === 'Player 1' ? (p1Name || 'Player 1') : (p2Name || 'Player 2')} was kicked`);
 
-      // Clear the current player's seat
       if (turn === 'Player 1') {
         p1Device = null;
         p1Name = null;
@@ -607,12 +572,9 @@
         p2Name = null;
       }
 
-      // Switch turn
       turn = turn === 'Player 1' ? 'Player 2' : 'Player 1';
-
       await pushStateToServer();
 
-      // If we were the one kicked, go back to seat selection
       if ((turn === 'Player 2' && localRole === 'Player 1') || (turn === 'Player 1' && localRole === 'Player 2')) {
         localRole = null;
         document.getElementById('roleModal').style.display = 'flex';
@@ -622,7 +584,6 @@
 
     function handleBallPocketed(b) {
       if (gameOver) return;
-
       turnPocketedAny = true;
 
       if (b.num === 8) {
@@ -630,14 +591,12 @@
         const opponentName = turn === 'Player 1' ? (p2Name || 'Player 2') : (p1Name || 'Player 1');
         const activeGroup = turn === 'Player 1' ? player1Group : player2Group;
 
-        const remainingGroupBalls = balls.filter(item => 
-          !item.isCue && item.num !== 8 && item.type === activeGroup
-        );
+        const remaining = balls.filter(item => !item.isCue && item.num !== 8 && item.type === activeGroup);
 
-        if (activeGroup !== null && remainingGroupBalls.length === 0 && !scratched) {
-          showToast(`🏆 ${shooterName} sinks the 8!\nVICTORY!`);
+        if (activeGroup !== null && remaining.length === 0 && !scratched) {
+          showToast(`${shooterName} wins!`);
         } else {
-          showToast(`💀 ${shooterName} fouled on the 8!\n🏆 ${opponentName} WINS!`);
+          showToast(`${shooterName} pocketed the 8 early!\n${opponentName} wins!`);
         }
 
         gameOver = true;
@@ -656,29 +615,26 @@
           player1Group = b.type === 'solids' ? 'stripes' : 'solids';
         }
         document.getElementById('groupDisplay').innerText = 
-          `P1: ${player1Group.toUpperCase()} | P2: ${player2Group.toUpperCase()}`;
+          (localRole === 'Player 1' ? player1Group : player2Group).toUpperCase();
       }
 
       const activeGroup = turn === 'Player 1' ? player1Group : player2Group;
-
       if (b.type === activeGroup) {
         turnPocketedValid = true;
-        showToast(`${(turn === 'Player 1' ? p1Name : p2Name) || turn} pocketed valid! 🎯`);
+        showToast("Valid ball – keep shooting");
       } else {
-        showToast(`Wrong group! 🛑`);
+        showToast("Opponent's ball");
       }
     }
 
-    // ========== RACK 'EM ==========
+    // ===== RE-RACK =====
     async function rackEm() {
       if (isAnyBallMoving()) {
-        showToast("Wait for balls to stop first!");
+        showToast("Wait for the balls to stop");
         return;
       }
 
       clearShotTimer();
-
-      // Full reset
       generateInitialRack();
       turn = 'Player 1';
       player1Group = null;
@@ -686,85 +642,61 @@
       shotFired = false;
       scratched = false;
       gameOver = false;
-      turnPocketedAny = false;
-      turnPocketedValid = false;
 
-      // KICK BOTH PLAYERS OUT
+      // Kick both players
       p1Device = null;
       p2Device = null;
       p1Name = null;
       p2Name = null;
 
-      document.getElementById('groupDisplay').innerText = 'OPEN MARKET';
+      document.getElementById('groupDisplay').innerText = 'OPEN TABLE';
       document.getElementById('turnDisplay').innerText = 'PLAYER 1';
       document.getElementById('p1NameDisplay').innerText = 'P1: ---';
       document.getElementById('p2NameDisplay').innerText = 'P2: ---';
 
       await pushStateToServer();
 
-      // Force local player back to seat selection
       localRole = null;
       document.getElementById('myRoleDisplay').innerText = 'SELECTING...';
       document.getElementById('roleModal').style.display = 'flex';
 
-      // Update button texts
       document.getElementById('selectP1Btn').innerText = 'PLAY AS PLAYER 1';
       document.getElementById('selectP2Btn').innerText = 'PLAY AS PLAYER 2';
 
-      showToast("🎱 RACKED & STACKED!\nBoth seats are free again");
+      showToast("Table re-racked – seats are free");
     }
 
     async function pushStateToServer() {
       try {
         const payloadState = {
           balls: balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r })),
-          turn,
-          player1Group,
-          player2Group,
-          p1Device,
-          p2Device,
-          p1Name,
-          p2Name,
-          gameOver
+          turn, player1Group, player2Group,
+          p1Device, p2Device, p1Name, p2Name, gameOver
         };
         await supabaseClient
           .from('pool_games')
-          .upsert(
-            { room_code: roomCode, game_state: payloadState, updated_at: new Date() },
-            { onConflict: 'room_code' }
-          );
+          .upsert({ room_code: roomCode, game_state: payloadState, updated_at: new Date() }, { onConflict: 'room_code' });
       } catch (e) {
-        console.error("Supabase Push error:", e);
+        console.error(e);
       }
     }
 
     async function initMultiplayer() {
       try {
-        let { data, error } = await supabaseClient
-          .from('pool_games')
-          .select('*')
-          .eq('room_code', roomCode);
+        let { data } = await supabaseClient.from('pool_games').select('*').eq('room_code', roomCode);
         
         if (!data || data.length === 0) {
           generateInitialRack();
-          const initState = {
-            balls: balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r })),
-            turn, player1Group, player2Group, 
-            p1Device: null, p2Device: null,
-            p1Name: null, p2Name: null,
-            gameOver: false
-          };
-          await supabaseClient
-            .from('pool_games')
-            .upsert(
-              { room_code: roomCode, game_state: initState, updated_at: new Date() },
-              { onConflict: 'room_code' }
-            );
-          
-          p1Device = null;
-          p2Device = null;
-          p1Name = null;
-          p2Name = null;
+          await supabaseClient.from('pool_games').upsert({
+            room_code: roomCode,
+            game_state: {
+              balls: balls.map(b => ({...b})),
+              turn, player1Group, player2Group,
+              p1Device: null, p2Device: null, p1Name: null, p2Name: null, gameOver: false
+            },
+            updated_at: new Date()
+          }, { onConflict: 'room_code' });
+          p1Device = p2Device = p1Name = p2Name = null;
         } else {
           let state = data[0].game_state || {};
           p1Device = state.p1Device || null;
@@ -788,45 +720,33 @@
         }
 
         document.getElementById('modalRoomName').innerText = roomCode;
-        
-        const p1Btn = document.getElementById('selectP1Btn');
-        const p2Btn = document.getElementById('selectP2Btn');
-        
-        p1Btn.disabled = false;
-        p2Btn.disabled = false;
-        
-        p1Btn.innerText = p1Device ? 'TAKE PLAYER 1 SEAT' : 'PLAY AS PLAYER 1';
-        p2Btn.innerText = p2Device ? 'TAKE PLAYER 2 SEAT' : 'PLAY AS PLAYER 2';
-        
+        document.getElementById('selectP1Btn').disabled = false;
+        document.getElementById('selectP2Btn').disabled = false;
+        document.getElementById('selectP1Btn').innerText = p1Device ? 'TAKE PLAYER 1 SEAT' : 'PLAY AS PLAYER 1';
+        document.getElementById('selectP2Btn').innerText = p2Device ? 'TAKE PLAYER 2 SEAT' : 'PLAY AS PLAYER 2';
         document.getElementById('roleModal').style.display = 'flex';
 
       } catch (e) {
-        document.getElementById('syncStatus').innerText = 'SYNC ERROR (FALLBACK)';
+        document.getElementById('syncStatus').innerText = 'SYNC ERROR';
         document.getElementById('syncStatus').style.color = '#ff3333';
-        console.error(e);
       }
     }
 
     async function claimRole(role) {
       const nameInput = document.getElementById('playerNameInput').value.trim();
       if (!nameInput && role !== 'Spectator') {
-        showToast('✍️ Enter a name first!');
+        showToast('Please enter a name');
         return;
       }
 
       localRole = role;
-      localName = nameInput || 'Anon';
+      localName = nameInput || 'Player';
       localStorage.setItem('pool_player_name', localName);
-
       document.getElementById('roleModal').style.display = 'none';
 
-      let { data } = await supabaseClient
-        .from('pool_games')
-        .select('game_state')
-        .eq('room_code', roomCode);
+      let { data } = await supabaseClient.from('pool_games').select('game_state').eq('room_code', roomCode);
+      let state = (data && data[0] && data[0].game_state) ? data[0].game_state : {};
 
-      let state = (data && data.length > 0 && data[0].game_state) ? data[0].game_state : {};
-      
       if (role === 'Player 1') {
         state.p1Device = deviceId;
         state.p1Name = localName;
@@ -841,60 +761,48 @@
       p1Name = state.p1Name;
       p2Name = state.p2Name;
 
-      await supabaseClient
-        .from('pool_games')
-        .upsert(
-          { room_code: roomCode, game_state: state, updated_at: new Date() },
-          { onConflict: 'room_code' }
-        );
+      await supabaseClient.from('pool_games').upsert({
+        room_code: roomCode,
+        game_state: state,
+        updated_at: new Date()
+      }, { onConflict: 'room_code' });
 
       activateConnection();
-      showToast(`✅ ${localName} joined as ${role}`);
+      showToast(`${localName} joined as ${role}`);
 
-      // Start timer if it's our turn
-      if (turn === localRole) {
-        startShotTimer();
-      }
+      if (turn === localRole) startShotTimer();
     }
 
     function activateConnection() {
       updateRoleUI();
-      document.getElementById('syncStatus').innerText = 'HYBRID SYNC ACTIVE';
+      document.getElementById('syncStatus').innerText = 'CONNECTED';
       document.getElementById('syncStatus').style.color = '#00ff66';
 
       if (realTimeChannel) supabaseClient.removeChannel(realTimeChannel);
 
       realTimeChannel = supabaseClient
         .channel(`room_${roomCode}`)
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'pool_games', filter: `room_code=eq.${roomCode}` },
-          (payload) => {
-            if (payload.new && payload.new.game_state) {
-              applyRemoteState(payload.new.game_state);
-            }
+        .on('postgres_changes', {
+          event: '*', schema: 'public', table: 'pool_games',
+          filter: `room_code=eq.${roomCode}`
+        }, (payload) => {
+          if (payload.new && payload.new.game_state) {
+            applyRemoteState(payload.new.game_state);
           }
-        )
+        })
         .subscribe();
 
       if (window.syncPollInterval) clearInterval(window.syncPollInterval);
       window.syncPollInterval = setInterval(async () => {
         try {
-          let { data } = await supabaseClient
-            .from('pool_games')
-            .select('game_state')
-            .eq('room_code', roomCode);
-
-          if (data && data.length > 0 && data[0].game_state) {
+          let { data } = await supabaseClient.from('pool_games').select('game_state').eq('room_code', roomCode);
+          if (data && data[0] && data[0].game_state) {
             applyRemoteState(data[0].game_state);
           }
-        } catch (e) {}
+        } catch(e) {}
       }, 1000);
 
-      // Start timer if it's our turn
-      if (turn === localRole && !gameOver) {
-        startShotTimer();
-      }
+      if (turn === localRole && !gameOver) startShotTimer();
     }
 
     function updateRoleUI() {
@@ -906,7 +814,6 @@
         roleDisp.innerText = (localName || localRole).toUpperCase();
         roleDisp.style.color = localRole === 'Player 1' ? '#00ffcc' : '#ffe600';
       }
-
       document.getElementById('p1NameDisplay').innerText = `P1: ${p1Name || '---'}`;
       document.getElementById('p2NameDisplay').innerText = `P2: ${p2Name || '---'}`;
     }
@@ -923,7 +830,7 @@
       document.getElementById('p1NameDisplay').innerText = `P1: ${p1Name || '---'}`;
       document.getElementById('p2NameDisplay').innerText = `P2: ${p2Name || '---'}`;
 
-      // If seats were cleared (RACK 'EM), force local player back to modal
+      // If seats were cleared, send local player back to modal
       if (localRole === 'Player 1' && p1Device !== deviceId) {
         localRole = null;
         clearShotTimer();
@@ -938,29 +845,27 @@
       }
 
       if (remoteState.balls && Array.isArray(remoteState.balls) && remoteState.balls.length > 0 && !isAnyBallMoving() && !shotFired) {
-        balls = remoteState.balls.map(rb => ({ ...rb }));
+        balls = remoteState.balls.map(rb => ({...rb}));
         cueBall = balls.find(b => b.isCue) || cueBall;
-      } else if (remoteState.balls && remoteState.balls.length === 0) {
-        generateInitialRack();
       }
 
       if (remoteState.turn) {
         turn = remoteState.turn;
-        const displayName = turn === 'Player 1' ? (p1Name || 'PLAYER 1') : (p2Name || 'PLAYER 2');
-        document.getElementById('turnDisplay').innerText = displayName.toUpperCase();
+        document.getElementById('turnDisplay').innerText = turn === 'Player 1' ? (p1Name || 'PLAYER 1') : (p2Name || 'PLAYER 2');
 
-        // Restart timer when turn changes to us
         if (turn !== oldTurn && turn === localRole && !gameOver) {
           startShotTimer();
         }
       }
+
       if (remoteState.player1Group !== undefined) {
         player1Group = remoteState.player1Group;
         player2Group = remoteState.player2Group;
         if (player1Group) {
-          document.getElementById('groupDisplay').innerText = `P1: ${player1Group.toUpperCase()} | P2: ${player2Group.toUpperCase()}`;
+          const myGroup = localRole === 'Player 1' ? player1Group : player2Group;
+          document.getElementById('groupDisplay').innerText = myGroup ? myGroup.toUpperCase() : 'OPEN TABLE';
         } else {
-          document.getElementById('groupDisplay').innerText = 'OPEN MARKET';
+          document.getElementById('groupDisplay').innerText = 'OPEN TABLE';
         }
       }
     }
@@ -981,6 +886,7 @@
         b.vy *= 0.988;
         if (Math.abs(b.vx) < 0.02) b.vx = 0;
         if (Math.abs(b.vy) < 0.02) b.vy = 0;
+
         if (b.x - b.r < 20) { b.x = 20 + b.r; b.vx *= -1; }
         if (b.x + b.r > 340) { b.x = 340 - b.r; b.vx *= -1; }
         if (b.y - b.r < 20) { b.y = 20 + b.r; b.vy *= -1; }
@@ -989,9 +895,9 @@
         pockets.forEach(p => {
           if (Math.hypot(b.x - p.x, b.y - p.y) < currentPocketRadius + 2) {
             if (b.isCue) {
-              b.x = 180; b.y = 95; b.vx = 0; b.vy = 0; // reset to centre
+              b.x = 95; b.y = 95; b.vx = 0; b.vy = 0;
               scratched = true;
-              showToast("🚨 Cue Ball Scratch!");
+              showToast("Cue ball scratched!");
             } else {
               handleBallPocketed(b);
               balls.splice(i, 1);
@@ -1000,6 +906,7 @@
         });
       }
 
+      // Collisions
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
           let b1 = balls[i], b2 = balls[j];
@@ -1026,19 +933,14 @@
         let keepsTurn = turnPocketedValid && !scratched;
         if (!keepsTurn) {
           turn = turn === 'Player 1' ? 'Player 2' : 'Player 1';
-          const displayName = turn === 'Player 1' ? (p1Name || 'PLAYER 1') : (p2Name || 'PLAYER 2');
-          document.getElementById('turnDisplay').innerText = displayName.toUpperCase();
+          document.getElementById('turnDisplay').innerText = turn === 'Player 1' ? (p1Name || 'PLAYER 1') : (p2Name || 'PLAYER 2');
         } else {
-          showToast(`🔥 ${(turn === 'Player 1' ? p1Name : p2Name) || turn} keeps turn!`);
+          showToast("Keep shooting!");
         }
         pushStateToServer();
 
-        // Restart timer for the next player
-        if (turn === localRole && !gameOver) {
-          startShotTimer();
-        } else {
-          clearShotTimer();
-        }
+        if (turn === localRole && !gameOver) startShotTimer();
+        else clearShotTimer();
       }
 
       drawTable();
