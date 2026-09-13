@@ -280,6 +280,20 @@
 </head>
 <body>
 
+  <!-- Mode Selection Popup Modal (Active on load) -->
+  <div id="mode-modal" class="modal-overlay" style="display: flex;">
+    <div class="modal-card" style="margin: auto; max-height: none;">
+      <div class="modal-title">🎱 SELECT POOL MODE</div>
+      <div class="modal-desc" style="text-align: center; max-height: none; overflow: visible;">
+        <p>Choose your match style to dive into the trading floor.</p>
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+        <button class="modal-btn" onclick="selectMode(1)" style="margin-top:0;">1 Player (Solo)</button>
+        <button class="modal-btn" onclick="selectMode(2)" style="background: #00ff66; margin-top:0;">2 Players (Online)</button>
+      </div>
+    </div>
+  </div>
+
   <div class="pool-container">
     <div class="header-bar">
       <div class="title-text">🎱 DEGEN POOL: AMERICAN RUG EDITION</div>
@@ -318,11 +332,11 @@
     <div class="modal-card">
       <div class="modal-title">📜 DEGEN WHITEPAPER (RULES)</div>
       <div class="modal-desc">
-        <p><strong>1. The Liquidity Rack:</strong> 15 token bags (Solids 1–7, Stripes 9–15, and the 8-Ball Mega Whale dead center) locked on the ledger.</p>
-        <p><strong>2. Claiming Your Bag:</strong> The market starts open. Whichever token group you legally sink first becomes your permanent bag (Solids or Stripes).</p>
-        <p><strong>3. Diamond Hands Streak:</strong> If you legally pocket your own token bag, you keep your shift for another trade. Miss or hit dirty, and the AI whale takes over.</p>
-        <p><strong>4. Getting Rugged (Foul):</strong> Sinking the white cue ball or hitting the wrong token group first results in a brutal liquidity drain, giving your opponent "Ball-in-Hand" anywhere on the charts.</p>
-        <p><strong>5. The 8-Ball Exit:</strong> The black 8-ball is your final exit liquidity. Clear all 7 of your assigned bags first, then sink the 8-ball to moon. Pocketing it early triggers instant liquidation and game over.</p>
+        <p><strong>1. The Liquidity Rack:</strong> 15 token bags locked on the ledger.</p>
+        <p><strong>2. Claiming Your Bag:</strong> Whichever token group you legally sink first becomes your permanent bag.</p>
+        <p><strong>3. Diamond Hands Streak:</strong> Pocket your own token bag to keep your shift.</p>
+        <p><strong>4. Getting Rugged (Foul):</strong> Sinking the cue ball gives your opponent ball-in-hand.</p>
+        <p><strong>5. The 8-Ball Exit:</strong> Clear your assigned bags first, then sink the 8-ball to win.</p>
       </div>
       <button class="modal-btn" onclick="closeRulesModal()">LFG, LET'S TRADE 🚀</button>
     </div>
@@ -338,6 +352,14 @@
   </div>
 
   <script>
+    function selectMode(players) {
+      if (players === 2) {
+        window.location.href = 'multiplayer-pool.html';
+      } else {
+        document.getElementById('mode-modal').style.display = 'none';
+      }
+    }
+
     const canvas = document.getElementById('poolCanvas');
     const ctx = canvas.getContext('2d');
     const toast = document.getElementById('eventToast');
@@ -348,7 +370,7 @@
       isEasyMode = !isEasyMode;
       document.getElementById('modeLabel').innerText = isEasyMode ? 'PAPER HAND (BIG POCKETS)' : 'NORMAL';
       document.getElementById('modeLabel').style.color = isEasyMode ? '#00ff66' : '#00ffcc';
-      showToast(isEasyMode ? "🟢 PAPER HAND MODE: Pockets widened for easy bags!" : "🔴 NORMAL MODE: Standard degen slippage.");
+      showToast(isEasyMode ? "🟢 PAPER HAND MODE enabled!" : "🔴 NORMAL MODE enabled.");
     }
 
     function openRulesModal() { document.getElementById('rulesModal').style.display = 'flex'; }
@@ -371,13 +393,7 @@
     let balls = [cueBall];
 
     let rackX = 240, rackY = 95, spacing = 11.5;
-    let ballNumbers = [
-      1,                     
-      2, 9,                  
-      3, 8, 10,              
-      4, 11, 12, 5,          
-      6, 13, 14, 15, 7       
-    ];
+    let ballNumbers = [1, 2, 9, 3, 8, 10, 4, 11, 12, 5, 6, 13, 14, 15, 7];
 
     let numIdx = 0;
     for (let col = 0; col < 5; col++) {
@@ -423,7 +439,6 @@
         cueBall.vx = Math.cos(aimAngle) * power;
         cueBall.vy = Math.sin(aimAngle) * power;
         shotFired = true;
-        ballInHand = false;
       }
     }
 
@@ -436,19 +451,12 @@
       let availableBalls = balls.filter(b => !b.isCue);
       if (availableBalls.length === 0) return;
 
-      let validTargets = availableBalls;
-      if (aiGroup) {
-        let groupFiltered = availableBalls.filter(b => b.type === aiGroup || b.type === 'black');
-        if (groupFiltered.length > 0) validTargets = groupFiltered;
-      }
-
-      let target = validTargets[Math.floor(Math.random() * validTargets.length)];
+      let target = availableBalls[Math.floor(Math.random() * availableBalls.length)];
       let angleToTarget = Math.atan2(target.y - cueBall.y, target.x - cueBall.x) + (Math.random() - 0.5) * 0.2;
       
       cueBall.vx = Math.cos(angleToTarget) * 6.0;
       cueBall.vy = Math.sin(angleToTarget) * 6.0;
       shotFired = true;
-      ballInHand = false;
     }
 
     let pottedThisTurn = [];
@@ -473,13 +481,11 @@
         if (b.y + b.r > 170) { b.y = 170 - b.r; b.vy *= -1; }
 
         pockets.forEach(p => {
-          let currentPocketRadius = getPocketRadius();
-          if (Math.hypot(b.x - p.x, b.y - p.y) < currentPocketRadius + 2) {
+          if (Math.hypot(b.x - p.x, b.y - p.y) < getPocketRadius() + 2) {
             if (b.isCue) {
               b.x = 90; b.y = 95; b.vx = 0; b.vy = 0;
-              ballInHand = true;
               pottedThisTurn.push('scratch');
-              showToast("🚨 RUGGED! Cue ball pocketed (-1 liquidity).");
+              showToast("🚨 Cue ball pocketed!");
             } else {
               pottedThisTurn.push({type: b.type, num: b.num});
               balls.splice(i, 1);
@@ -496,11 +502,8 @@
           let minDist = b1.r + b2.r;
 
           if (dist < minDist && dist > 0) {
-            if ((b1.isCue && !b2.isCue) && !firstBallHit) {
-              firstBallHit = b2;
-            } else if ((b2.isCue && !b1.isCue) && !firstBallHit) {
-              firstBallHit = b1;
-            }
+            if ((b1.isCue && !b2.isCue) && !firstBallHit) firstBallHit = b2;
+            else if ((b2.isCue && !b1.isCue) && !firstBallHit) firstBallHit = b1;
 
             let nx = dx / dist, ny = dy / dist;
             let overlap = minDist - dist;
@@ -519,129 +522,26 @@
 
       if (shotFired && !moving) {
         shotFired = false;
-        let continueTurn = false;
-        let hasScratch = pottedThisTurn.some(item => item === 'scratch');
-        let objectPots = pottedThisTurn.filter(item => item !== 'scratch');
-        let pottedBlack = objectPots.some(item => item.type === 'black');
-
-        let remainingSolids = balls.filter(b => b.type === 'solids').length;
-        let remainingStripes = balls.filter(b => b.type === 'stripes').length;
-
-        if (turn === 'Player') {
-          let foulOccurred = false;
-
-          if (hasScratch) {
-            foulOccurred = true;
-          } else if (!firstBallHit) {
-            foulOccurred = true;
-            showToast("⚠️ Foul: Empty block, hit nothing!");
-          } else if (playerGroup && firstBallHit.type !== playerGroup && firstBallHit.type !== 'black') {
-            foulOccurred = true;
-            showToast("⚠️ Foul: Hit opponent bag first!");
-          } else if (!playerGroup && firstBallHit.type === 'black') {
-            foulOccurred = true;
-            showToast("⚠️ Foul: Hit the Mega Whale 8-ball while market was open!");
-          }
-
-          if (foulOccurred) {
-            continueTurn = false;
-          } else if (pottedBlack) {
-            let playerHasBallsLeft = (playerGroup === 'solids' && remainingSolids > 0) || 
-                                     (playerGroup === 'stripes' && remainingStripes > 0) ||
-                                     (!playerGroup && (remainingSolids > 0 || remainingStripes > 0));
-            if (playerHasBallsLeft) {
-              triggerEndGame(false, "💀 REKT! You pocketed the 8-ball before clearing your portfolio!");
-              return;
-            } else {
-              triggerEndGame(true, "🚀 TO THE MOON! Portfolio cleared and 8-ball bagged!");
-              return;
-            }
-          } else {
-            if (objectPots.length > 0) {
-              if (!playerGroup) {
-                let firstPot = objectPots.find(i => i.type !== 'black');
-                if (firstPot) {
-                  playerGroup = firstPot.type;
-                  aiGroup = playerGroup === 'solids' ? 'stripes' : 'solids';
-                  document.getElementById('groupDisplay').innerText = playerGroup.toUpperCase() + ' (YOURS)';
-                  showToast(`🎯 BAG LOCKED: You are trading ${playerGroup.toUpperCase()}!`);
-                }
-              }
-
-              let scoredOwnGroup = objectPots.some(i => i.type === playerGroup);
-              let scoredOpponentGroup = objectPots.some(i => i.type === aiGroup);
-
-              if (scoredOwnGroup && !scoredOpponentGroup) {
-                continueTurn = true;
-                showToast("🔥 DIAMOND HANDS! Clean bag secured, extra shift!");
-              } else {
-                showToast("⚠️ Mixed bags potted. Shift handed to the whale.");
-              }
-            } else {
-              showToast("📉 PAPER HANDS! Missed completely.");
-            }
-          }
-        } else {
-          let aiHasBallsLeft = (aiGroup === 'solids' && remainingSolids > 0) || 
-                               (aiGroup === 'stripes' && remainingStripes > 0) ||
-                               (!aiGroup && (remainingSolids > 0 || remainingStripes > 0));
-          if (pottedBlack) {
-            if (aiHasBallsLeft) {
-              triggerEndGame(true, "🎉 WHALE ERROR! The computer rugged itself by sinking the 8-ball early!");
-              return;
-            } else {
-              triggerEndGame(false, "💀 LIQUIDATED! The whale cleared its bags and bagged the 8-ball.");
-              return;
-            }
-          }
-          let aiValidPots = objectPots.filter(i => i.type === aiGroup);
-          if (aiValidPots.length > 0 && !hasScratch) {
-            continueTurn = true;
-          }
-        }
-
-        pottedThisTurn = [];
-        firstBallHit = null;
-
-        if (!continueTurn) {
-          turn = turn === 'Player' ? 'Computer (Whale)' : 'Player';
-          document.getElementById('turnDisplay').innerText = turn === 'Player' ? 'APE (SOLIDS/STRIPES)' : 'WHALE BOT';
-          if (turn === 'Computer (Whale)') {
-            setTimeout(aiTurn, 1000);
-          }
-        } else if (turn === 'Computer (Whale)') {
-          setTimeout(aiTurn, 1000);
-        }
+        turn = turn === 'Player' ? 'Computer (Whale)' : 'Player';
+        document.getElementById('turnDisplay').innerText = turn === 'Player' ? 'APE' : 'WHALE BOT';
+        if (turn === 'Computer (Whale)') setTimeout(aiTurn, 1000);
       }
 
       drawTable();
       requestAnimationFrame(updateGame);
     }
 
-    function triggerEndGame(isWin, customDesc) {
-      gameOver = true;
-      const modal = document.getElementById('endGameModal');
-      const title = document.getElementById('modalTitle');
-      const desc = document.getElementById('modalDesc');
-
-      modal.style.display = 'flex';
-      title.innerText = isWin ? "🚀 BAGS MOONING!" : "💀 TOTALLY RUGGED!";
-      desc.innerText = customDesc;
-    }
-
     function drawTable() {
       ctx.fillStyle = '#0f5220';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       ctx.strokeStyle = '#4a2c11';
       ctx.lineWidth = 14;
       ctx.strokeRect(7, 7, canvas.width - 14, canvas.height - 14);
 
-      let currentPocketRadius = getPocketRadius();
       pockets.forEach(p => {
         ctx.fillStyle = '#000';
         ctx.beginPath();
-        ctx.arc(p.x, p.y, currentPocketRadius, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, getPocketRadius(), 0, Math.PI * 2);
         ctx.fill();
       });
 
@@ -650,17 +550,12 @@
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
         ctx.fill();
-
         if (b.isStripe) {
           ctx.fillStyle = '#ffffff';
           ctx.beginPath();
           ctx.arc(b.x, b.y, b.r * 0.55, 0, Math.PI * 2);
           ctx.fill();
         }
-
-        ctx.strokeStyle = '#111';
-        ctx.lineWidth = 0.75;
-        ctx.stroke();
       });
 
       if (!isAnyBallMoving() && turn === 'Player' && !shotFired && !gameOver) {
