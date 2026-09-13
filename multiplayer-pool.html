@@ -12,7 +12,7 @@
       padding: 0;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
- dual-action: manipulation;
+      touch-action: manipulation;
     }
 
     body {
@@ -264,14 +264,6 @@
       box-shadow: 0 0 10px rgba(255, 0, 122, 0.3);
     }
 
-    .role-btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-      border-color: #555;
-      color: #555;
-      box-shadow: none;
-    }
-
     .controls-container {
       width: 100%;
       display: flex;
@@ -323,6 +315,26 @@
       touch-action: manipulation;
     }
     .btn-shoot:active {
+      transform: scale(0.97);
+    }
+
+    .btn-rack {
+      width: 100%;
+      height: 32px;
+      background: #ff007a;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.7rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 0, 122, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      touch-action: manipulation;
+      margin-top: 4px;
+    }
+    .btn-rack:active {
       transform: scale(0.97);
     }
   </style>
@@ -382,6 +394,7 @@
         <button class="btn-ctrl" onclick="adjustAim(0.1)">ROTATE ▶</button>
       </div>
       <button class="btn-shoot" onclick="executeShot()">⚡ SEND THE LIQUIDITY</button>
+      <button class="btn-rack" onclick="rackEm()">🎱 RACK 'EM</button>
     </div>
   </div>
 
@@ -391,7 +404,7 @@
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // === PERSISTENT DEVICE ID (fixes seat locking) ===
+    // Persistent device ID
     let deviceId = localStorage.getItem('pool_device_id');
     if (!deviceId) {
       deviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
@@ -410,7 +423,6 @@
     let p2Name = null;
     let realTimeChannel = null;
 
-    // Prefill name input
     if (localName) {
       document.getElementById('playerNameInput').value = localName;
     }
@@ -456,6 +468,7 @@
     let turnPocketedAny = false;
     let turnPocketedValid = false;
     let scratched = false;
+    let gameOver = false;
 
     let cueBall = { x: 90, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
@@ -494,14 +507,19 @@
     function showToast(text) {
       toast.innerText = text;
       toast.classList.add('show');
-      setTimeout(() => { toast.classList.remove('show'); }, 2200);
+      setTimeout(() => { toast.classList.remove('show'); }, 2500);
     }
 
     function adjustAim(amount) {
-      if (!isAnyBallMoving() && !shotFired) aimAngle += amount;
+      if (gameOver || isAnyBallMoving() || shotFired) return;
+      aimAngle += amount;
     }
 
     function executeShot() {
+      if (gameOver) {
+        showToast("Game over! Hit RACK 'EM to play again");
+        return;
+      }
       if (turn !== localRole) {
         showToast(`🛑 Wait your turn! (${localName || localRole})`);
         return;
@@ -522,17 +540,33 @@
     }
 
     function handleBallPocketed(b) {
+      if (gameOver) return;
+
       turnPocketedAny = true;
+
+      // === 8-BALL ===
       if (b.num === 8) {
-        let activeGroup = turn === 'Player 1' ? player1Group : player2Group;
-        let remainingGroupBalls = balls.filter(item => !item.isCue && item.num !== 8 && item.type === activeGroup);
-        if (remainingGroupBalls.length === 0 && activeGroup !== null) {
-          showToast(`🏆 ${(turn === 'Player 1' ? p1Name : p2Name) || turn} wins!`);
+        const shooterName = turn === 'Player 1' ? (p1Name || 'Player 1') : (p2Name || 'Player 2');
+        const opponentName = turn === 'Player 1' ? (p2Name || 'Player 2') : (p1Name || 'Player 1');
+        const activeGroup = turn === 'Player 1' ? player1Group : player2Group;
+
+        const remainingGroupBalls = balls.filter(item => 
+          !item.isCue && item.num !== 8 && item.type === activeGroup
+        );
+
+        if (activeGroup !== null && remainingGroupBalls.length === 0 && !scratched) {
+          showToast(`🏆 ${shooterName} sinks the 8!\nVICTORY!`);
         } else {
-          showToast(`💀 Premature 8-ball!`);
+          showToast(`💀 ${shooterName} fouled on the 8!\n🏆 ${opponentName} WINS!`);
         }
+
+        gameOver = true;
+        shotFired = false;
+        balls.forEach(ball => { ball.vx = 0; ball.vy = 0; });
         return;
       }
+
+      // === NORMAL BALLS ===
       if (player1Group === null) {
         if (turn === 'Player 1') {
           player1Group = b.type;
@@ -541,15 +575,42 @@
           player2Group = b.type;
           player1Group = b.type === 'solids' ? 'stripes' : 'solids';
         }
-        document.getElementById('groupDisplay').innerText = `P1: ${player1Group.toUpperCase()} | P2: ${player2Group.toUpperCase()}`;
+        document.getElementById('groupDisplay').innerText = 
+          `P1: ${player1Group.toUpperCase()} | P2: ${player2Group.toUpperCase()}`;
       }
-      let activeGroup = turn === 'Player 1' ? player1Group : player2Group;
+
+      const activeGroup = turn === 'Player 1' ? player1Group : player2Group;
+
       if (b.type === activeGroup) {
         turnPocketedValid = true;
         showToast(`${(turn === 'Player 1' ? p1Name : p2Name) || turn} pocketed valid! 🎯`);
       } else {
         showToast(`Wrong group! 🛑`);
       }
+    }
+
+    // === RACK 'EM BUTTON ===
+    function rackEm() {
+      if (isAnyBallMoving()) {
+        showToast("Wait for balls to stop first!");
+        return;
+      }
+
+      generateInitialRack();
+      turn = 'Player 1';
+      player1Group = null;
+      player2Group = null;
+      shotFired = false;
+      scratched = false;
+      gameOver = false;
+      turnPocketedAny = false;
+      turnPocketedValid = false;
+
+      document.getElementById('groupDisplay').innerText = 'OPEN MARKET';
+      document.getElementById('turnDisplay').innerText = (p1Name || 'PLAYER 1').toUpperCase();
+
+      pushStateToServer();
+      showToast("🎱 RACKED & STACKED!\nFresh game ready");
     }
 
     async function pushStateToServer() {
@@ -562,7 +623,8 @@
           p1Device,
           p2Device,
           p1Name,
-          p2Name
+          p2Name,
+          gameOver
         };
         await supabaseClient
           .from('pool_games')
@@ -588,7 +650,8 @@
             balls: balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r })),
             turn, player1Group, player2Group, 
             p1Device: null, p2Device: null,
-            p1Name: null, p2Name: null
+            p1Name: null, p2Name: null,
+            gameOver: false
           };
           await supabaseClient
             .from('pool_games')
@@ -607,25 +670,35 @@
           p2Device = state.p2Device || null;
           p1Name = state.p1Name || null;
           p2Name = state.p2Name || null;
+          gameOver = state.gameOver || false;
           applyRemoteState(state);
         }
 
-        // Already claimed by this device?
         if (p1Device === deviceId) {
           localRole = 'Player 1';
           localName = p1Name || localName;
+          activateConnection();
+          return;
         } else if (p2Device === deviceId) {
           localRole = 'Player 2';
           localName = p2Name || localName;
-        } else {
-          document.getElementById('modalRoomName').innerText = roomCode;
-          document.getElementById('selectP1Btn').disabled = (p1Device !== null && p1Device !== deviceId);
-          document.getElementById('selectP2Btn').disabled = (p2Device !== null && p2Device !== deviceId);
-          document.getElementById('roleModal').style.display = 'flex';
+          activateConnection();
           return;
         }
 
-        activateConnection();
+        document.getElementById('modalRoomName').innerText = roomCode;
+        
+        const p1Btn = document.getElementById('selectP1Btn');
+        const p2Btn = document.getElementById('selectP2Btn');
+        
+        p1Btn.disabled = false;
+        p2Btn.disabled = false;
+        
+        p1Btn.innerText = p1Device ? 'TAKE PLAYER 1 SEAT' : 'PLAY AS PLAYER 1';
+        p2Btn.innerText = p2Device ? 'TAKE PLAYER 2 SEAT' : 'PLAY AS PLAYER 2';
+        
+        document.getElementById('roleModal').style.display = 'flex';
+
       } catch (e) {
         document.getElementById('syncStatus').innerText = 'SYNC ERROR (FALLBACK)';
         document.getElementById('syncStatus').style.color = '#ff3333';
@@ -732,6 +805,7 @@
       if (remoteState.p2Device !== undefined) p2Device = remoteState.p2Device;
       if (remoteState.p1Name !== undefined) p1Name = remoteState.p1Name;
       if (remoteState.p2Name !== undefined) p2Name = remoteState.p2Name;
+      if (remoteState.gameOver !== undefined) gameOver = remoteState.gameOver;
 
       document.getElementById('p1NameDisplay').innerText = `P1: ${p1Name || '---'}`;
       document.getElementById('p2NameDisplay').innerText = `P2: ${p2Name || '---'}`;
@@ -740,7 +814,7 @@
         balls = remoteState.balls.map(rb => ({ ...rb }));
         cueBall = balls.find(b => b.isCue) || cueBall;
       } else if (remoteState.balls && remoteState.balls.length === 0) {
-        generateInitialRack(); // safety restore
+        generateInitialRack();
       }
 
       if (remoteState.turn) {
@@ -753,11 +827,19 @@
         player2Group = remoteState.player2Group;
         if (player1Group) {
           document.getElementById('groupDisplay').innerText = `P1: ${player1Group.toUpperCase()} | P2: ${player2Group.toUpperCase()}`;
+        } else {
+          document.getElementById('groupDisplay').innerText = 'OPEN MARKET';
         }
       }
     }
 
     function updateGame() {
+      if (gameOver) {
+        drawTable();
+        requestAnimationFrame(updateGame);
+        return;
+      }
+
       let currentPocketRadius = getPocketRadius();
       for (let i = balls.length - 1; i >= 0; i--) {
         let b = balls[i];
@@ -853,7 +935,7 @@
         }
       });
 
-      if (!isAnyBallMoving() && !shotFired) {
+      if (!isAnyBallMoving() && !shotFired && !gameOver) {
         ctx.strokeStyle = '#00ff66';
         ctx.lineWidth = 2;
         ctx.setLineDash([4, 4]);
