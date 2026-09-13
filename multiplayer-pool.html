@@ -260,7 +260,8 @@
         <button class="toggle-btn" onclick="toggleSlippageMode()">TOGGLE</button>
       </div>
       <div class="status-row">
-        <span>SLIPPAGE MODE: <strong id="slippageLabel" style="color:#00ffcc;">PAPER HAND (BIG POCKETS)</strong></span>
+        <span>YOUR ROLE: <strong id="myRoleDisplay" style="color:#00ffcc;">CONNECTING...</strong></span>
+        <span>SLIPPAGE: <strong id="slippageLabel" style="color:#00ffcc;">BIG POCKETS</strong></span>
       </div>
       <div class="status-row">
         <span>SHIFT: <strong id="turnDisplay" style="color:#ffe600;">PLAYER 1</strong></span>
@@ -292,9 +293,13 @@
     let roomCode = urlParams.get('room') || "degens_101";
     document.getElementById('roomInput').value = roomCode;
 
+    let localRole = null; // Will be assigned as 'Player 1' or 'Player 2'
+
     function changeRoom(newRoom) {
       if (!newRoom) return;
       roomCode = newRoom.trim();
+      localStorage.removeItem('pool_role_' + roomCode); // Reset role for new room
+      localRole = null;
       const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?room=' + encodeURIComponent(roomCode);
       window.history.pushState({path:newUrl}, '', newUrl);
       showToast(`🔄 Joined Room: ${roomCode}`);
@@ -308,9 +313,8 @@
     let bigPockets = true;
     function toggleSlippageMode() {
       bigPockets = !bigPockets;
-      document.getElementById('slippageLabel').innerText = bigPockets ? "PAPER HAND (BIG POCKETS)" : "DIAMOND HAND (STANDARD)";
-      document.getElementById('slippageLabel').style.color = bigPockets ? "#00ffcc" : "#ff007a";
-      showToast(bigPockets ? "🟢 Paper Hand Mode: Huge Pockets Activated!" : "💎 Diamond Hand Mode: Pro Pockets Active!");
+      document.getElementById('slippageLabel').innerText = bigPockets ? "BIG POCKETS" : "STANDARD";
+      showToast(bigPockets ? "🟢 Big Pockets Activated!" : "💎 Standard Pockets Active!");
     }
 
     function getPocketRadius() { return bigPockets ? 18 : 13; }
@@ -373,6 +377,10 @@
     }
 
     function executeShot() {
+      if (turn !== localRole) {
+        showToast(`🛑 Wait your turn! You are ${localRole}, but it's ${turn}'s shift.`);
+        return;
+      }
       if (!isAnyBallMoving() && !shotFired) {
         turnPocketedAny = false;
         turnPocketedValid = false;
@@ -396,7 +404,7 @@
         if (remainingGroupBalls.length === 0 && activeGroup !== null) {
           showToast(`🏆 ${turn} cleared bags and sank the 8-Ball! Victory!`);
         } else {
-          showToast(`💀 Premature 8-ball sink by ${turn}! Rugged!`);
+          showToast(`💀 Premature 8-ball sink by ${turn}!`);
         }
         return;
       }
@@ -452,12 +460,19 @@
 
     async function initMultiplayer() {
       try {
+        // Check local storage for existing role assignment in this room
+        localRole = localStorage.getItem('pool_role_' + roomCode);
+
         let { data, error } = await supabaseClient
           .from('pool_games')
           .select('*')
           .eq('room_code', roomCode);
         
         if (!data || data.length === 0) {
+          // Room does not exist yet -> First person becomes Player 1
+          localRole = 'Player 1';
+          localStorage.setItem('pool_role_' + roomCode, localRole);
+
           generateInitialRack();
           const initState = {
             balls: balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r })),
@@ -466,10 +481,20 @@
           await supabaseClient
             .from('pool_games')
             .insert([{ room_code: roomCode, game_state: initState }]);
-        } else if (data[0].game_state) {
-          applyRemoteState(data[0].game_state);
+        } else {
+          // Room exists
+          if (!localRole) {
+            // Second person joining -> becomes Player 2
+            localRole = 'Player 2';
+            localStorage.setItem('pool_role_' + roomCode, localRole);
+          }
+          if (data[0].game_state) {
+            applyRemoteState(data[0].game_state);
+          }
         }
 
+        document.getElementById('myRoleDisplay').innerText = localRole.toUpperCase();
+        document.getElementById('myRoleDisplay').style.color = localRole === 'Player 1' ? '#00ffcc' : '#ffe600';
         document.getElementById('syncStatus').innerText = 'ONLINE SYNC ACTIVE';
         document.getElementById('syncStatus').style.color = '#00ff66';
       } catch (e) {
