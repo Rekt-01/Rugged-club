@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Degen Pool - Online Multiplayer Match</title>
+  <!-- Load Official Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -51,6 +53,21 @@
       font-size: 0.65rem;
       font-weight: bold;
       text-shadow: 0 0 6px #00ffcc;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .room-input {
+      background: #020205;
+      border: 1px solid #00ffcc;
+      color: #00ffcc;
+      font-family: monospace;
+      font-size: 0.6rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+      width: 90px;
+      outline: none;
     }
 
     .header-btns {
@@ -228,7 +245,9 @@
 
   <div class="pool-container">
     <div class="header-bar">
-      <div class="title-text">🎱 ROOM: room_degens_101</div>
+      <div class="title-text">
+        🎱 ROOM: <input type="text" id="roomInput" class="room-input" value="degens_101" onchange="changeRoom(this.value)" />
+      </div>
       <div class="header-btns">
         <a href="index.html" class="nav-btn whitepaper-btn">📖 HOME</a>
         <a href="index.html" class="nav-btn exit-btn">🚪 EXIT</a>
@@ -266,7 +285,21 @@
   <script>
     const SUPABASE_URL = 'https://evlawscutifjpppbffbu.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2bGF3c2N1dGlmanBwcGJmZmJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTczMjcsImV4cCI6MjEwNDg5MzMyN30.kYvtFRDP_vTAWhWkzk7Q8MpepUrXJbWID_uWNXxstgk';
-    const roomCode = "room_degens_101";
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let roomCode = urlParams.get('room') || "degens_101";
+    document.getElementById('roomInput').value = roomCode;
+
+    function changeRoom(newRoom) {
+      if (!newRoom) return;
+      roomCode = newRoom.trim();
+      const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?room=' + encodeURIComponent(roomCode);
+      window.history.pushState({path:newUrl}, '', newUrl);
+      showToast(`🔄 Joined Room: ${roomCode}`);
+      initMultiplayer();
+    }
 
     const canvas = document.getElementById('poolCanvas');
     const ctx = canvas.getContext('2d');
@@ -394,70 +427,51 @@
           player1Group,
           player2Group
         };
-        await fetch(`${SUPABASE_URL}/rest/v1/pool_games?room_code=eq.${roomCode}`, {
-          method: 'PATCH',
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({ game_state: payloadState, updated_at: new Date() })
-        });
+        await supabaseClient
+          .from('pool_games')
+          .upsert({ room_code: roomCode, game_state: payloadState, updated_at: new Date() }, { onConflict: 'room_code' });
       } catch (e) {
-        console.error("REST Push error:", e);
+        console.error("Supabase Push error:", e);
       }
     }
 
     async function pollServerState() {
       try {
-        let response = await fetch(`${SUPABASE_URL}/rest/v1/pool_games?room_code=eq.${roomCode}&select=game_state`, {
-          method: 'GET',
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-          }
-        });
-        let data = await response.json();
+        let { data, error } = await supabaseClient
+          .from('pool_games')
+          .select('game_state')
+          .eq('room_code', roomCode);
+
         if (data && data.length > 0 && data[0].game_state && !isAnyBallMoving() && !shotFired) {
           applyRemoteState(data[0].game_state);
         }
       } catch (e) {
-        // Silent catch to keep frame rate smooth
+        // Silent catch
       }
     }
 
     async function initMultiplayer() {
       try {
-        let response = await fetch(`${SUPABASE_URL}/rest/v1/pool_games?room_code=eq.${roomCode}&select=*`, {
-          headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-          }
-        });
-        let data = await response.json();
+        let { data, error } = await supabaseClient
+          .from('pool_games')
+          .select('*')
+          .eq('room_code', roomCode);
         
         if (!data || data.length === 0) {
+          generateInitialRack();
           const initState = {
             balls: balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r })),
             turn, player1Group, player2Group
           };
-          await fetch(`${SUPABASE_URL}/rest/v1/pool_games`, {
-            method: 'POST',
-            headers: {
-              'apikey': SUPABASE_ANON_KEY,
-              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ room_code: roomCode, game_state: initState })
-          });
+          await supabaseClient
+            .from('pool_games')
+            .insert([{ room_code: roomCode, game_state: initState }]);
         } else if (data[0].game_state) {
           applyRemoteState(data[0].game_state);
         }
 
         document.getElementById('syncStatus').innerText = 'ONLINE SYNC ACTIVE';
         document.getElementById('syncStatus').style.color = '#00ff66';
-        setInterval(pollServerState, 1500);
       } catch (e) {
         document.getElementById('syncStatus').innerText = 'SYNC ERROR (FALLBACK)';
         document.getElementById('syncStatus').style.color = '#ff3333';
@@ -591,6 +605,7 @@
 
     updateGame();
     initMultiplayer();
+    setInterval(pollServerState, 1500);
   </script>
 </body>
 </html>
