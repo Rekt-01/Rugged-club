@@ -720,12 +720,12 @@
                 if (data.reply) {
                     appendToTerminal(data.reply);
                 } else {
-                    appendToTerminal("ERR: Larry is ghosting us. Check the function logs.");
+                    appendToTerminal("ERR: Larry sent empty data.");
                 }
             } catch (error) {
                 const body = document.getElementById('cmdBody');
                 body.removeChild(body.lastChild);
-                appendToTerminal("ERROR: Satellite link dropped. Blame the validator.");
+                appendToTerminal("ERROR: Satellite link dropped.");
             }
         }
     </script>
