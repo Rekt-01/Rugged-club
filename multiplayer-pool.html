@@ -378,11 +378,13 @@
     let p1Device = null;
     let p2Device = null;
     const deviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
+    let pollInterval = null;
 
     function changeRoom(newRoom) {
       if (!newRoom) return;
       roomCode = newRoom.trim();
       localRole = null;
+      if (pollInterval) clearInterval(pollInterval);
       const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?room=' + encodeURIComponent(roomCode);
       window.history.pushState({path:newUrl}, '', newUrl);
       showToast(`🔄 Joined Room: ${roomCode}`);
@@ -551,7 +553,6 @@
           .eq('room_code', roomCode);
         
         if (!data || data.length === 0) {
-          // Room doesn't exist yet, create initial empty row
           generateInitialRack();
           const initState = {
             balls: balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r })),
@@ -576,7 +577,6 @@
         } else if (p2Device === deviceId) {
           localRole = 'Player 2';
         } else {
-          // Show Role Selection Modal
           document.getElementById('modalRoomName').innerText = roomCode;
           document.getElementById('selectP1Btn').disabled = (p1Device !== null && p1Device !== deviceId);
           document.getElementById('selectP2Btn').disabled = (p2Device !== null && p2Device !== deviceId);
@@ -584,9 +584,7 @@
           return;
         }
 
-        updateRoleUI();
-        document.getElementById('syncStatus').innerText = 'ONLINE SYNC ACTIVE';
-        document.getElementById('syncStatus').style.color = '#00ff66';
+        activateConnection();
       } catch (e) {
         document.getElementById('syncStatus').innerText = 'SYNC ERROR (FALLBACK)';
         document.getElementById('syncStatus').style.color = '#ff3333';
@@ -597,7 +595,6 @@
       localRole = role;
       document.getElementById('roleModal').style.display = 'none';
 
-      // Fetch latest state to avoid overwrites
       let { data } = await supabaseClient
         .from('pool_games')
         .select('game_state')
@@ -615,8 +612,16 @@
         .from('pool_games')
         .upsert({ room_code: roomCode, game_state: state, updated_at: new Date() }, { onConflict: 'room_code' });
 
-      updateRoleUI();
+      activateConnection();
       showToast(`✅ You joined as ${role}`);
+    }
+
+    function activateConnection() {
+      updateRoleUI();
+      document.getElementById('syncStatus').innerText = 'ONLINE SYNC ACTIVE';
+      document.getElementById('syncStatus').style.color = '#00ff66';
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(pollServerState, 1500);
     }
 
     function updateRoleUI() {
@@ -755,7 +760,6 @@
 
     updateGame();
     initMultiplayer();
-    setInterval(pollServerState, 1500);
   </script>
 </body>
 </html>
