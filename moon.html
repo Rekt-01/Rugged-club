@@ -362,7 +362,6 @@
             padding-bottom: 4px;
         }
 
-        /* Degen Easter Egg Popup Styles */
         .degen-popup-overlay {
             display: none;
             position: fixed;
@@ -526,7 +525,6 @@
         </div>
     </div>
 
-    <!-- Hidden Degen Easter Egg Popup -->
     <div class="degen-popup-overlay" id="degenPopup">
         <div class="degen-popup-box">
             <div class="degen-popup-title">⚠️ SYSTEM OVERLOAD ⚠️</div>
@@ -698,24 +696,37 @@
             processDegenBot(cmd);
         }
 
-        // CONNECTED TO SUPABASE EDGE FUNCTION (LIQUIDATION LARRY VIA GEMINI)
         async function processDegenBot(input) {
-            appendToTerminal("Consulting the hopium matrix...", false);
+            const loadingMessages = [
+                "Larry is raiding the liquor cabinet...",
+                "Consulting the hopium matrix...",
+                "Bribing an MEV bot for answers...",
+                "Staring blankly into a neon mug..."
+            ];
+            let msgIdx = 0;
+            
+            const body = document.getElementById('cmdBody');
+            const div = document.createElement('div');
+            div.style.color = '#22c55e';
+            div.innerText = "LARRY: " + loadingMessages[0];
+            body.appendChild(div);
+            body.scrollTop = body.scrollHeight;
+
+            const interval = setInterval(() => {
+                msgIdx = (msgIdx + 1) % loadingMessages.length;
+                div.innerText = "LARRY: " + loadingMessages[msgIdx];
+            }, 800);
             
             try {
                 const response = await fetch('https://zxuwequmawgpfprbvtyv.supabase.co/functions/v1/liquidation-larry', {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: input })
                 });
                 
                 const data = await response.json();
-                
-                // Remove the "Consulting..." status line
-                const body = document.getElementById('cmdBody');
-                body.removeChild(body.lastChild);
+                clearInterval(interval);
+                body.removeChild(div);
                 
                 if (data.reply) {
                     appendToTerminal(data.reply);
@@ -723,8 +734,8 @@
                     appendToTerminal("ERR: Larry sent empty data.");
                 }
             } catch (error) {
-                const body = document.getElementById('cmdBody');
-                body.removeChild(body.lastChild);
+                clearInterval(interval);
+                body.removeChild(div);
                 appendToTerminal("ERROR: Satellite link dropped.");
             }
         }
