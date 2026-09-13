@@ -385,6 +385,7 @@
       roomCode = newRoom.trim();
       localRole = null;
       if (realTimeChannel) supabaseClient.removeChannel(realTimeChannel);
+      if (window.syncPollInterval) clearInterval(window.syncPollInterval);
       const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?room=' + encodeURIComponent(roomCode);
       window.history.pushState({path:newUrl}, '', newUrl);
       showToast(`🔄 Joined Room: ${roomCode}`);
@@ -612,12 +613,12 @@
 
     function activateConnection() {
       updateRoleUI();
-      document.getElementById('syncStatus').innerText = 'LIVE SYNC ACTIVE';
+      document.getElementById('syncStatus').innerText = 'HYBRID SYNC ACTIVE';
       document.getElementById('syncStatus').style.color = '#00ff66';
 
+      // 1. Keep Realtime WebSockets
       if (realTimeChannel) supabaseClient.removeChannel(realTimeChannel);
 
-      // Setup Realtime Subscription to listen for row updates on this room code
       realTimeChannel = supabaseClient
         .channel(`room_${roomCode}`)
         .on(
@@ -625,12 +626,28 @@
           { event: '*', schema: 'public', table: 'pool_games', filter: `room_code=eq.${roomCode}` },
           (payload) => {
             if (payload.new && payload.new.game_state) {
-              // Only apply if the update came from the other device
               applyRemoteState(payload.new.game_state);
             }
           }
         )
         .subscribe();
+
+      // 2. Add a fallback fast-polling loop (every 1 second) to bypass any network/websocket blockers
+      if (window.syncPollInterval) clearInterval(window.syncPollInterval);
+      window.syncPollInterval = setInterval(async () => {
+        try {
+          let { data } = await supabaseClient
+            .from('pool_games')
+            .select('game_state')
+            .eq('room_code', roomCode);
+
+          if (data && data.length > 0 && data[0].game_state) {
+            applyRemoteState(data[0].game_state);
+          }
+        } catch (e) {
+          // Ignore background poll errors
+        }
+      }, 1000);
     }
 
     function updateRoleUI() {
@@ -643,7 +660,6 @@
       if (remoteState.p1Device !== undefined) p1Device = remoteState.p1Device;
       if (remoteState.p2Device !== undefined) p2Device = remoteState.p2Device;
 
-      // Only update local simulation layout if we are not actively shooting
       if (remoteState.balls && !isAnyBallMoving() && !shotFired) {
         balls = remoteState.balls.map(rb => ({ ...rb }));
         cueBall = balls.find(b => b.isCue) || cueBall;
