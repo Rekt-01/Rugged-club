@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Multiplayer Pool - Online Match</title>
+  <style>
+    body { background-color: #020205; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; font-family: monospace; color: #fff; }
+    .pool-container { background: #0d0d12; border: 3px solid #00ff66; border-radius: 12px; padding: 12px; width: 96vw; max-width: 480px; box-shadow: 0 0 30px rgba(0, 255, 102, 0.4); display: flex; flex-direction: column; align-items: center; }
+    canvas { display: block; background: #0f5220; border-radius: 8px; border: 2px solid #222; }
+    .btn-shoot { width: 100%; height: 36px; background: #00ff66; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+    .exit-btn { display: inline-block; margin-top: 10px; color: #ff3333; text-decoration: none; font-size: 0.7rem; }
+  </style>
+  <!-- Include Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="pool-container">
+    <h2>Room: <span id="room-display" style="color: #00ffcc;"></span></h2>
+    <canvas id="poolCanvas" width="360" height="190"></canvas>
+    <button class="btn-shoot" onclick="syncShot()">⚡ SYNC SHOT</button>
+    <a href="pool.html" class="exit-btn">🚪 Leave Room</a>
+  </div>
+
+  <script>
+    // TODO: Replace with your actual Supabase URL and Anon Key
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const roomCode = "room_degens_101"; 
+    document.getElementById('room-display').innerText = roomCode;
+
+    // Listen for real-time changes from the other player in this room
+    supabase
+      .channel('pool_room_' + roomCode)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'pool_games',
+        filter: `room_code=eq.${roomCode}`
+      }, payload => {
+        console.log('Opponent synced state:', payload.new.game_state);
+        alert('Received move update from opponent network!');
+      })
+      .subscribe();
+
+    async function syncShot() {
+      const sampleState = { shotPower: Math.random(), timestamp: Date.now() };
+      const { error } = await supabase
+        .from('pool_games')
+        .update({ game_state: sampleState, updated_at: new Date() })
+        .eq('room_code', roomCode);
+
+      if (error) {
+        console.error('Sync error:', error);
+        alert('Sync failed. Make sure your pool_games table and columns match.');
+      } else {
+        alert('Shot broadcasted successfully to Supabase!');
+      }
+    }
+  </script>
+</body>
+</html>
