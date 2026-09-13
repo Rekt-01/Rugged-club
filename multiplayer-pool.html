@@ -88,12 +88,12 @@
       font-family: monospace;
     }
 
-    .home-btn {
-      background: rgba(0, 255, 204, 0.1);
-      border: 2px solid #00ffcc;
-      color: #00ffcc;
+    .pocket-btn {
+      background: rgba(255, 230, 0, 0.15);
+      border: 2px solid #ffe600;
+      color: #ffe600;
     }
-    .home-btn:hover { background: #00ffcc; color: #000; }
+    .pocket-btn:hover { background: #ffe600; color: #000; }
 
     .exit-btn {
       background: rgba(255, 51, 51, 0.15);
@@ -287,7 +287,6 @@
       transform: scale(0.97);
     }
 
-    /* Extra space + different colour so it’s harder to hit by mistake */
     .btn-rack {
       width: 100%;
       height: 30px;
@@ -335,7 +334,7 @@
         🎱 ROOM: <input type="text" id="roomInput" class="room-input" value="degens_101" onchange="changeRoom(this.value)" />
       </div>
       <div class="header-btns">
-        <a href="index.html" class="nav-btn home-btn">HOME</a>
+        <button class="nav-btn pocket-btn" id="pocketBtn" onclick="togglePockets()">POCKETS: BIG</button>
         <button class="nav-btn exit-btn" onclick="leaveRoom()">EXIT</button>
       </div>
     </div>
@@ -343,7 +342,7 @@
     <div class="status-panel">
       <div class="status-row">
         <span>ONLINE: <strong id="syncStatus" style="color:#ffe600;">CONNECTING...</strong></span>
-        <span>POCKETS: <strong id="slippageLabel" style="color:#00ffcc;">NORMAL</strong></span>
+        <span>POCKETS: <strong id="pocketLabel" style="color:#00ffcc;">BIG</strong></span>
       </div>
       <div class="status-row">
         <span>YOU: <strong id="myRoleDisplay" style="color:#00ffcc;">SELECTING...</strong></span>
@@ -371,16 +370,11 @@
       </div>
 
       <button class="btn-shoot" onclick="executeShot()">SHOOT</button>
-
-      <!-- Extra space so it’s harder to hit by mistake -->
       <button class="btn-rack" onclick="rackEm()">RE-RACK</button>
     </div>
   </div>
 
   <script>
-    // ========== SUPABASE + GAME LOGIC ==========
-    // (Same solid multiplayer logic we built earlier, just with clean text)
-
     const SUPABASE_URL = 'https://evlawscutifjpppbffbu.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2bGF3c2N1dGlmanBwcGJmZmJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTczMjcsImV4cCI6MjEwNDg5MzMyN30.kYvtFRDP_vTAWhWkzk7Q8MpepUrXJbWID_uWNXxstgk';
     
@@ -408,6 +402,9 @@
     let shotTimeLeft = 30;
     const SHOT_TIME = 30;
 
+    // Global pocket size (synced)
+    let bigPockets = true;   // start with bigger pockets
+
     if (localName) {
       document.getElementById('playerNameInput').value = localName;
     }
@@ -429,18 +426,26 @@
       window.location.href = 'index.html';
     }
 
+    // ===== GLOBAL POCKET TOGGLE =====
+    async function togglePockets() {
+      bigPockets = !bigPockets;
+      updatePocketUI();
+      showToast(bigPockets ? "Big pockets enabled for everyone" : "Normal pockets enabled for everyone");
+      await pushStateToServer();   // this makes it global
+    }
+
+    function updatePocketUI() {
+      document.getElementById('pocketLabel').innerText = bigPockets ? "BIG" : "NORMAL";
+      document.getElementById('pocketBtn').innerText = bigPockets ? "POCKETS: BIG" : "POCKETS: NORMAL";
+    }
+
+    function getPocketRadius() {
+      return bigPockets ? 19 : 13;
+    }
+
     const canvas = document.getElementById('poolCanvas');
     const ctx = canvas.getContext('2d');
     const toast = document.getElementById('eventToast');
-
-    let bigPockets = false;
-    function toggleSlippageMode() {
-      bigPockets = !bigPockets;
-      document.getElementById('slippageLabel').innerText = bigPockets ? "BIG" : "NORMAL";
-      showToast(bigPockets ? "Big pockets enabled" : "Normal pockets");
-    }
-
-    function getPocketRadius() { return bigPockets ? 18 : 13; }
 
     const pockets = [
       { x: 16, y: 16 }, { x: 180, y: 12 }, { x: 344, y: 16 },
@@ -456,7 +461,6 @@
     let scratched = false;
     let gameOver = false;
 
-    // Proper cue ball start position
     let cueBall = { x: 95, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
 
@@ -506,7 +510,7 @@
 
     function executeShot() {
       if (gameOver) {
-        showToast("Game over – press RE-RACK to play again");
+        showToast("Game over – press RE-RACK");
         return;
       }
       if (turn !== localRole) {
@@ -529,14 +533,12 @@
       return balls.some(b => Math.abs(b.vx) > 0.03 || Math.abs(b.vy) > 0.03);
     }
 
-    // ===== SHOT TIMER =====
+    // ===== TIMER =====
     function startShotTimer() {
       clearShotTimer();
       if (gameOver || localRole === 'Spectator') return;
-
       shotTimeLeft = SHOT_TIME;
       updateTimerDisplay();
-
       shotTimer = setInterval(() => {
         shotTimeLeft--;
         updateTimerDisplay();
@@ -563,7 +565,6 @@
 
     async function kickCurrentPlayer() {
       showToast(`Time's up! ${turn === 'Player 1' ? (p1Name || 'Player 1') : (p2Name || 'Player 2')} was kicked`);
-
       if (turn === 'Player 1') {
         p1Device = null;
         p1Name = null;
@@ -571,10 +572,8 @@
         p2Device = null;
         p2Name = null;
       }
-
       turn = turn === 'Player 1' ? 'Player 2' : 'Player 1';
       await pushStateToServer();
-
       if ((turn === 'Player 2' && localRole === 'Player 1') || (turn === 'Player 1' && localRole === 'Player 2')) {
         localRole = null;
         document.getElementById('roleModal').style.display = 'flex';
@@ -590,7 +589,6 @@
         const shooterName = turn === 'Player 1' ? (p1Name || 'Player 1') : (p2Name || 'Player 2');
         const opponentName = turn === 'Player 1' ? (p2Name || 'Player 2') : (p1Name || 'Player 1');
         const activeGroup = turn === 'Player 1' ? player1Group : player2Group;
-
         const remaining = balls.filter(item => !item.isCue && item.num !== 8 && item.type === activeGroup);
 
         if (activeGroup !== null && remaining.length === 0 && !scratched) {
@@ -598,7 +596,6 @@
         } else {
           showToast(`${shooterName} pocketed the 8 early!\n${opponentName} wins!`);
         }
-
         gameOver = true;
         shotFired = false;
         clearShotTimer();
@@ -614,8 +611,8 @@
           player2Group = b.type;
           player1Group = b.type === 'solids' ? 'stripes' : 'solids';
         }
-        document.getElementById('groupDisplay').innerText = 
-          (localRole === 'Player 1' ? player1Group : player2Group).toUpperCase();
+        const myGroup = localRole === 'Player 1' ? player1Group : player2Group;
+        document.getElementById('groupDisplay').innerText = myGroup ? myGroup.toUpperCase() : 'OPEN TABLE';
       }
 
       const activeGroup = turn === 'Player 1' ? player1Group : player2Group;
@@ -633,7 +630,6 @@
         showToast("Wait for the balls to stop");
         return;
       }
-
       clearShotTimer();
       generateInitialRack();
       turn = 'Player 1';
@@ -643,7 +639,6 @@
       scratched = false;
       gameOver = false;
 
-      // Kick both players
       p1Device = null;
       p2Device = null;
       p1Name = null;
@@ -659,7 +654,6 @@
       localRole = null;
       document.getElementById('myRoleDisplay').innerText = 'SELECTING...';
       document.getElementById('roleModal').style.display = 'flex';
-
       document.getElementById('selectP1Btn').innerText = 'PLAY AS PLAYER 1';
       document.getElementById('selectP2Btn').innerText = 'PLAY AS PLAYER 2';
 
@@ -671,7 +665,9 @@
         const payloadState = {
           balls: balls.map(b => ({ x: b.x, y: b.y, vx: b.vx, vy: b.vy, num: b.num, isCue: b.isCue, color: b.color, type: b.type, isStripe: b.isStripe, r: b.r })),
           turn, player1Group, player2Group,
-          p1Device, p2Device, p1Name, p2Name, gameOver
+          p1Device, p2Device, p1Name, p2Name,
+          gameOver,
+          bigPockets          // ← this is what makes the pocket size global
         };
         await supabaseClient
           .from('pool_games')
@@ -692,11 +688,14 @@
             game_state: {
               balls: balls.map(b => ({...b})),
               turn, player1Group, player2Group,
-              p1Device: null, p2Device: null, p1Name: null, p2Name: null, gameOver: false
+              p1Device: null, p2Device: null, p1Name: null, p2Name: null,
+              gameOver: false,
+              bigPockets: true
             },
             updated_at: new Date()
           }, { onConflict: 'room_code' });
           p1Device = p2Device = p1Name = p2Name = null;
+          bigPockets = true;
         } else {
           let state = data[0].game_state || {};
           p1Device = state.p1Device || null;
@@ -704,8 +703,11 @@
           p1Name = state.p1Name || null;
           p2Name = state.p2Name || null;
           gameOver = state.gameOver || false;
+          bigPockets = state.bigPockets !== undefined ? state.bigPockets : true;
           applyRemoteState(state);
         }
+
+        updatePocketUI();
 
         if (p1Device === deviceId) {
           localRole = 'Player 1';
@@ -769,7 +771,6 @@
 
       activateConnection();
       showToast(`${localName} joined as ${role}`);
-
       if (turn === localRole) startShotTimer();
     }
 
@@ -827,10 +828,15 @@
       if (remoteState.p2Name !== undefined) p2Name = remoteState.p2Name;
       if (remoteState.gameOver !== undefined) gameOver = remoteState.gameOver;
 
+      // Global pocket size
+      if (remoteState.bigPockets !== undefined) {
+        bigPockets = remoteState.bigPockets;
+        updatePocketUI();
+      }
+
       document.getElementById('p1NameDisplay').innerText = `P1: ${p1Name || '---'}`;
       document.getElementById('p2NameDisplay').innerText = `P2: ${p2Name || '---'}`;
 
-      // If seats were cleared, send local player back to modal
       if (localRole === 'Player 1' && p1Device !== deviceId) {
         localRole = null;
         clearShotTimer();
@@ -852,7 +858,6 @@
       if (remoteState.turn) {
         turn = remoteState.turn;
         document.getElementById('turnDisplay').innerText = turn === 'Player 1' ? (p1Name || 'PLAYER 1') : (p2Name || 'PLAYER 2');
-
         if (turn !== oldTurn && turn === localRole && !gameOver) {
           startShotTimer();
         }
@@ -906,7 +911,7 @@
         });
       }
 
-      // Collisions
+      // collisions
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
           let b1 = balls[i], b2 = balls[j];
@@ -938,7 +943,6 @@
           showToast("Keep shooting!");
         }
         pushStateToServer();
-
         if (turn === localRole && !gameOver) startShotTimer();
         else clearShotTimer();
       }
