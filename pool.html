@@ -309,7 +309,7 @@
     </div>
 
     <div class="scoreboard">
-      <div class="score-item">SHIFT: <span id="turnDisplay">APE (SOLIDS / STRIPES)</span></div>
+      <div class="score-item">SHIFT: <span id="turnDisplay">APE</span></div>
       <div class="score-item">BAGS: <span id="groupDisplay">OPEN MARKET</span></div>
     </div>
 
@@ -334,8 +334,8 @@
       <div class="modal-desc">
         <p><strong>1. The Liquidity Rack:</strong> 15 token bags locked on the ledger.</p>
         <p><strong>2. Claiming Your Bag:</strong> Whichever token group you legally sink first becomes your permanent bag.</p>
-        <p><strong>3. Diamond Hands Streak:</strong> Pocket your own token bag to keep your shift.</p>
-        <p><strong>4. Getting Rugged (Foul):</strong> Sinking the cue ball gives your opponent ball-in-hand.</p>
+        <p><strong>3. Diamond Hands Streak:</strong> Pocket a valid ball of your group to keep your turn/get another shot.</p>
+        <p><strong>4. Getting Rugged (Foul):</strong> Sinking the cue ball or opponent's balls/wrong ball gives your turn away.</p>
         <p><strong>5. The 8-Ball Exit:</strong> Clear your assigned bags first, then sink the 8-ball to win.</p>
       </div>
       <button class="modal-btn" onclick="closeRulesModal()">LFG, LET'S TRADE 🚀</button>
@@ -384,7 +384,13 @@
 
     let turn = 'Player';
     let shotFired = false;
-    let gameOver = false;
+    let gameOver = gard = false;
+
+    let playerGroup = null; // 'solids' or 'stripes'
+    let aiGroup = null;
+    let turnPocketedAny = false;
+    let turnPocketedValid = false;
+    let scratched = false;
 
     let cueBall = { x: 90, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
@@ -426,13 +432,16 @@
     }
 
     function adjustAim(amount) {
-      if (turn === 'Player' && !isAnyBallMoving() && !shotFired) {
+      if (turn === 'Player' && !isAnyBallMoving() && !shotFired && !gameOver) {
         aimAngle += amount;
       }
     }
 
     function executeShot() {
       if (turn === 'Player' && !isAnyBallMoving() && !shotFired && !gameOver) {
+        turnPocketedAny = false;
+        turnPocketedValid = false;
+        scratched = false;
         cueBall.vx = Math.cos(aimAngle) * power;
         cueBall.vy = Math.sin(aimAngle) * power;
         shotFired = true;
@@ -445,15 +454,68 @@
 
     function aiTurn() {
       if (gameOver) return;
-      let availableBalls = balls.filter(b => !b.isCue);
+      turnPocketedAny = false;
+      turnPocketedValid = false;
+      scratched = false;
+
+      let availableBalls = balls.filter(b => !b.isCue && b.num !== 8);
+      if (aiGroup) {
+        let groupBalls = availableBalls.filter(b => b.type === aiGroup);
+        if (groupBalls.length > 0) availableBalls = groupBalls;
+      }
+      if (availableBalls.length === 0) availableBalls = balls.filter(b => b.num === 8);
       if (availableBalls.length === 0) return;
 
       let target = availableBalls[Math.floor(Math.random() * availableBalls.length)];
-      let angleToTarget = Math.atan2(target.y - cueBall.y, target.x - cueBall.x) + (Math.random() - 0.5) * 0.2;
+      let angleToTarget = Math.atan2(target.y - cueBall.y, target.x - cueBall.x) + (Math.random() - 0.5) * 0.15;
       
       cueBall.vx = Math.cos(angleToTarget) * 6.0;
       cueBall.vy = Math.sin(angleToTarget) * 6.0;
       shotFired = true;
+    }
+
+    function handleBallPocketed(b, activeTurn) {
+      turnPocketedAny = true;
+
+      if (b.num === 8) {
+        // Check if player/AI cleared all their group balls
+        let currentGroup = activeTurn === 'Player' ? playerGroup : aiGroup;
+        let remainingGroupBalls = balls.filter(item => !item.isCue && item.num !== 8 && item.type === currentGroup);
+        
+        if (remainingGroupBalls.length === 0 && currentGroup !== null) {
+          endGame(activeTurn === 'Player' ? true : false, "You cleared your bags and sank the 8-ball! To the moon! 🚀");
+        } else {
+          endGame(activeTurn === 'Player' ? false : true, "Premature 8-ball sink! You got rugged! 💀");
+        }
+        return;
+      }
+
+      // Assign groups if open market
+      if (playerGroup === null) {
+        if (activeTurn === 'Player') {
+          playerGroup = b.type;
+          aiGroup = b.type === 'solids' ? 'stripes' : 'solids';
+        } else {
+          aiGroup = b.type;
+          playerGroup = b.type === 'solids' ? 'stripes' : 'solids';
+        }
+        document.getElementById('groupDisplay').innerText = playerGroup.toUpperCase();
+      }
+
+      let activeGroup = activeTurn === 'Player' ? playerGroup : aiGroup;
+      if (b.type === activeGroup) {
+        turnPocketedValid = true;
+        showToast(`${activeTurn === 'Player' ? 'You' : 'Bot'} sank a valid ${b.type} bag! Extra shot! 🎯`);
+      } else {
+        showToast(`${activeTurn === 'Player' ? 'You' : 'Bot'} sank an opponent's bag! 🛑`);
+      }
+    }
+
+    function endGame(isWin, message) {
+      gameOver = true;
+      document.getElementById('modalTitle').innerText = isWin ? '🚀 TO THE MOON (VICTORY)' : '💀 GET RUGGED (DEFEAT)';
+      document.getElementById('modalDesc').innerText = message;
+      document.getElementById('endGameModal').style.display = 'flex';
     }
 
     function updateGame() {
@@ -478,8 +540,10 @@
           if (Math.hypot(b.x - p.x, b.y - p.y) < getPocketRadius() + 2) {
             if (b.isCue) {
               b.x = 90; b.y = 95; b.vx = 0; b.vy = 0;
+              scratched = true;
               showToast("🚨 Cue ball pocketed!");
             } else {
+              handleBallPocketed(b, turn);
               balls.splice(i, 1);
             }
           }
@@ -488,7 +552,7 @@
 
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
-          let b1 = balls[i], b2 =balls[j];
+          let b1 = balls[i], b2 = balls[j];
           let dx = b2.x - b1.x, dy = b2.y - b1.y;
           let dist = Math.hypot(dx, dy);
           let minDist = b1.r + b2.r;
@@ -509,11 +573,22 @@
         }
       }
 
-      if (shotFired && !moving) {
+      if (shotFired && !moving && !gameOver) {
         shotFired = false;
-        turn = turn === 'Player' ? 'Computer (Whale)' : 'Player';
-        document.getElementById('turnDisplay').innerText = turn === 'Player' ? 'APE' : 'WHALE BOT';
-        if (turn === 'Computer (Whale)') setTimeout(aiTurn, 1000);
+
+        // Turn logic: If valid ball pocketed and no scratch, player/bot gets another shot! Otherwise, switch turn.
+        let keepsTurn = turnPocketedValid && !scratched;
+
+        if (!keepsTurn) {
+          turn = turn === 'Player' ? 'Computer (Whale)' : 'Player';
+          document.getElementById('turnDisplay').innerText = turn === 'Player' ? 'APE' : 'WHALE BOT';
+        } else {
+          showToast(`🔥 Diamond hands! ${turn === 'Player' ? 'You' : 'Bot'} get another shot!`);
+        }
+
+        if (turn === 'Computer (Whale)' && !gameOver) {
+          setTimeout(aiTurn, 1000);
+        }
       }
 
       drawTable();
