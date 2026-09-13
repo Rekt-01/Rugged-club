@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>pacman.html - APE-man Single Level Edition</title>
+  <title>APE-man Single Level Edition</title>
   <style>
     * {
       box-sizing: border-box;
@@ -334,7 +334,7 @@
       }
     }, { once: true });
 
-    // Single perfectly balanced map layout
+    // Map layout
     const originalMap = [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
@@ -368,10 +368,18 @@
       dy: 0,
       nextDx: 0,
       nextDy: 0,
-      speed: 1
+      speed: 1.1
     };
 
     let ghosts = [];
+
+    function resetGhosts() {
+      ghosts = [
+        { x: 2 * tileSize, y: 2 * tileSize, dx: 1, dy: 0, speed: 0.7, color: 'red' },
+        { x: 16 * tileSize, y: 2 * tileSize, dx: -1, dy: 0, speed: 0.7, color: 'pink' },
+        { x: 9 * tileSize, y: 10 * tileSize, dx: 0, dy: -1, speed: 0.7, color: 'cyan' }
+      ];
+    }
 
     function initGame() {
       currentMap = JSON.parse(JSON.stringify(originalMap));
@@ -381,13 +389,7 @@
       player.dy = 0;
       player.nextDx = 0;
       player.nextDy = 0;
-
-      // 3 smart, reliable, non-freezing ghosts
-      ghosts = [
-        { x: 2 * tileSize, y: 2 * tileSize, dx: 1, dy: 0, speed: 1, color: 'red' },
-        { x: 16 * tileSize, y: 2 * tileSize, dx: -1, dy: 0, speed: 1, color: 'pink' },
-        { x: 9 * tileSize, y: 10 * tileSize, dx: 0, dy: -1, speed: 1, color: 'cyan' }
-      ];
+      resetGhosts();
     }
 
     function setDirection(x, y) {
@@ -403,13 +405,19 @@
       if (e.key === 'ArrowRight' || e.key === 'd') setDirection(1, 0);
     });
 
-    function canMoveTo(x, y, dx, dy, speed) {
-      let nextX = x + dx * speed;
-      let nextY = y + dy * speed;
+    function isWall(col, row) {
+      if (col < 0 || col >= 19 || row < 0 || row >= 21) return true;
+      return currentMap[row][col] === 1;
+    }
 
-      if (nextX < 0 || nextX >= 19 * tileSize) return true;
+    function canMove(x, y, dx, dy, speed) {
+      const nextX = x + dx * speed;
+      const nextY = y + dy * speed;
 
-      let corners = [
+      // Allow horizontal tunnels
+      if (nextX < -tileSize || nextX > 19 * tileSize) return true;
+
+      const corners = [
         { x: nextX + 2, y: nextY + 2 },
         { x: nextX + tileSize - 2, y: nextY + 2 },
         { x: nextX + 2, y: nextY + tileSize - 2 },
@@ -419,8 +427,7 @@
       for (let corner of corners) {
         let cCol = Math.floor(corner.x / tileSize);
         let cRow = Math.floor(corner.y / tileSize);
-        if (cCol < 0 || cCol >= 19 || cRow < 0 || cRow >= 21) return false;
-        if (currentMap[cRow][cCol] === 1) return false;
+        if (isWall(cCol, cRow)) return false;
       }
       return true;
     }
@@ -434,16 +441,19 @@
 
       if (frightTimer > 0) frightTimer--;
 
-      // Player direction queueing and movement
+      // ===== PLAYER MOVEMENT =====
+      // Try to apply queued direction when aligned
       if (player.nextDx !== 0 || player.nextDy !== 0) {
+        // Instant reverse is always allowed
         if (player.dx === -player.nextDx && player.dy === -player.nextDy) {
           player.dx = player.nextDx;
           player.dy = player.nextDy;
-        } else if (canMoveTo(player.x, player.y, player.nextDx, player.nextDy, player.speed)) {
-          if (player.nextDx !== 0 && player.y % tileSize !== 0) {
+        } else if (canMove(player.x, player.y, player.nextDx, player.nextDy, player.speed)) {
+          // Snap to grid when turning
+          if (player.nextDx !== 0) {
             player.y = Math.round(player.y / tileSize) * tileSize;
           }
-          if (player.nextDy !== 0 && player.x % tileSize !== 0) {
+          if (player.nextDy !== 0) {
             player.x = Math.round(player.x / tileSize) * tileSize;
           }
           player.dx = player.nextDx;
@@ -451,7 +461,7 @@
         }
       }
 
-      if (canMoveTo(player.x, player.y, player.dx, player.dy, player.speed)) {
+      if (canMove(player.x, player.y, player.dx, player.dy, player.speed)) {
         player.x += player.dx * player.speed;
         player.y += player.dy * player.speed;
       } else {
@@ -459,12 +469,14 @@
         player.dy = 0;
       }
 
-      if (player.x < 0) player.x = 18 * tileSize;
-      if (player.x >= 19 * tileSize) player.x = 0;
+      // Tunnel wrapping for player
+      if (player.x < -tileSize) player.x = 18 * tileSize;
+      if (player.x > 18 * tileSize) player.x = -tileSize;
 
-      // Item eating check
-      let pCol = Math.floor((player.x + tileSize/2) / tileSize);
-      let pRow = Math.floor((player.y + tileSize/2) / tileSize);
+      // ===== EAT ITEMS =====
+      let pCol = Math.floor((player.x + tileSize / 2) / tileSize);
+      let pRow = Math.floor((player.y + tileSize / 2) / tileSize);
+
       if (pCol >= 0 && pCol < 19 && pRow >= 0 && pRow < 21) {
         if (currentMap[pRow][pCol] === 0) {
           currentMap[pRow][pCol] = 2;
@@ -477,7 +489,7 @@
         } else if (currentMap[pRow][pCol] === 3) {
           currentMap[pRow][pCol] = 2;
           score += 50;
-          frightTimer = 350;
+          frightTimer = 380;
           checkWinCondition();
         }
       }
@@ -485,94 +497,118 @@
       document.getElementById('scoreDisplay').innerText = score;
       document.getElementById('livesDisplay').innerText = lives;
 
-      // Ghost movement update (guaranteed tile snapping to prevent any locking)
+      // ===== GHOSTS =====
       ghosts.forEach(g => {
-        g.x += g.dx * g.speed;
-        g.y += g.dy * g.speed;
+        // Only decide new direction when perfectly centered on a tile
+        const onTile = (Math.abs(g.x % tileSize) < 0.5) && (Math.abs(g.y % tileSize) < 0.5);
 
-        if (g.x % tileSize === 0 && g.y % tileSize === 0) {
-          let gCol = g.x / tileSize;
-          let gRow = g.y / tileSize;
+        if (onTile) {
+          // Snap cleanly
+          g.x = Math.round(g.x / tileSize) * tileSize;
+          g.y = Math.round(g.y / tileSize) * tileSize;
 
-          let directions = [
-            {dx: 0, dy: -1}, {dx: 0, dy: 1}, {dx: -1, dy: 0}, {dx: 1, dy: 0}
+          const gCol = g.x / tileSize;
+          const gRow = g.y / tileSize;
+
+          const directions = [
+            { dx: 0, dy: -1 },
+            { dx: 0, dy: 1 },
+            { dx: -1, dy: 0 },
+            { dx: 1, dy: 0 }
           ];
 
+          // Filter valid moves (no reverse unless necessary)
           let valid = directions.filter(d => {
-            if (g.dx !== 0 || g.dy !== 0) {
-              if (d.dx === -g.dx && d.dy === -g.dy) return false;
-            }
-            let ntx = gCol + d.dx;
-            let nty = gRow + d.dy;
-            return ntx >= 0 && ntx < 19 && nty >= 0 && nty < 21 && currentMap[nty][ntx] !== 1;
+            // Don't reverse unless no other choice
+            if ((g.dx !== 0 || g.dy !== 0) && d.dx === -g.dx && d.dy === -g.dy) return false;
+
+            const nCol = gCol + d.dx;
+            const nRow = gRow + d.dy;
+
+            // Allow tunnel
+            if (nCol < 0 || nCol >= 19) return true;
+            return !isWall(nCol, nRow);
           });
 
-          // Fallback if dead-ended
+          // If no valid (dead end), allow reverse
           if (valid.length === 0) {
             valid = directions.filter(d => {
-              let ntx = gCol + d.dx;
-              let nty = gRow + d.dy;
-              return ntx >= 0 && ntx < 19 && nty >= 0 && nty < 21 && currentMap[nty][ntx] !== 1;
+              const nCol = gCol + d.dx;
+              const nRow = gRow + d.dy;
+              if (nCol < 0 || nCol >= 19) return true;
+              return !isWall(nCol, nRow);
             });
           }
 
           if (valid.length > 0) {
             let chosen = valid[0];
+
             if (frightTimer > 0) {
-              // Run away from player when frightened
+              // Run away
               let maxDist = -1;
               valid.forEach(d => {
-                let dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow);
+                const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow);
                 if (dist > maxDist) {
                   maxDist = dist;
                   chosen = d;
                 }
               });
             } else {
-              // Smart chase behavior
+              // Chase with a little randomness so they don't stack
               let minDist = Infinity;
               valid.forEach(d => {
-                let dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow);
-                // Add slight randomness so they don't stack up completely
-                let weightedDist = dist + (Math.random() * 2);
-                if (weightedDist < minDist) {
-                  minDist = weightedDist;
+                const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow) + Math.random() * 1.8;
+                if (dist < minDist) {
+                  minDist = dist;
                   chosen = d;
                 }
               });
             }
+
             g.dx = chosen.dx;
             g.dy = chosen.dy;
           }
         }
 
-        // Safety fallback if hitting a wall block unexpectedly
-        if (!canMoveTo(g.x, g.y, g.dx, g.dy, g.speed)) {
+        // Move
+        if (canMove(g.x, g.y, g.dx, g.dy, g.speed)) {
+          g.x += g.dx * g.speed;
+          g.y += g.dy * g.speed;
+        } else {
+          // Force a new decision next frame
           g.dx = 0;
           g.dy = 0;
         }
 
+        // Tunnel wrapping for ghosts
+        if (g.x < -tileSize) g.x = 18 * tileSize;
+        if (g.x > 18 * tileSize) g.x = -tileSize;
+
         // Collision with player
-        let dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
-        if (dist < 12) {
+        const dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
+        if (dist < 11) {
           if (frightTimer > 0) {
             score += 200;
+            // Send ghost back to house
             g.x = 9 * tileSize;
             g.y = 10 * tileSize;
-            g.dx = 1;
-            g.dy = 0;
+            g.dx = 0;
+            g.dy = -1;
           } else {
             lives--;
             if (lives <= 0) {
               gameState = 'GAMEOVER';
               triggerModal("GAME OVER", "The dev otter rugged your bags!", "APE BACK IN 🔄", fullReset);
             } else {
+              // Reset player + ghosts
               player.x = 9 * tileSize;
               player.y = 16 * tileSize;
               player.dx = 0;
               player.dy = 0;
               player.nextDx = 0;
               player.nextDy = 0;
+              resetGhosts();
+              frightTimer = 0;
             }
           }
         }
@@ -581,23 +617,23 @@
 
     function checkWinCondition() {
       let itemsLeft = false;
-      for(let r = 0; r < currentMap.length; r++) {
-        for(let c = 0; c < currentMap[r].length; c++) {
-          if(currentMap[r][c] === 0 || currentMap[r][c] === 3 || currentMap[r][c] === 4) {
+      for (let r = 0; r < currentMap.length; r++) {
+        for (let c = 0; c < currentMap[r].length; c++) {
+          if (currentMap[r][c] === 0 || currentMap[r][c] === 3 || currentMap[r][c] === 4) {
             itemsLeft = true;
             break;
           }
         }
-        if(itemsLeft) break;
+        if (itemsLeft) break;
       }
 
-      if(!itemsLeft) {
+      if (!itemsLeft) {
         gameState = 'CELEBRATION';
         celebrationTimer = 200;
         pCanvas.style.display = 'block';
         particles = [];
         const emojis = ['🚀', '🌕', '💎', '💰', '🦍', '🍾', '🔥', '📈'];
-        for(let i = 0; i < 60; i++) {
+        for (let i = 0; i < 60; i++) {
           particles.push({
             x: canvas.width / 2,
             y: canvas.height / 2,
@@ -695,11 +731,13 @@
         }
       }
 
+      // Player
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('🦍', player.x + 8, player.y + 8);
 
+      // Ghosts
       ghosts.forEach(g => {
         ctx.fillText(frightTimer > 0 ? '💧' : '🦦', g.x + 8, g.y + 8);
       });
