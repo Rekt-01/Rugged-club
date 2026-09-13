@@ -524,7 +524,10 @@
         };
         await supabaseClient
           .from('pool_games')
-          .upsert({ room_code: roomCode, game_state: payloadState, updated_at: new Date() }, { onConflict: 'room_code' });
+          .upsert(
+            { room_code: roomCode, game_state: payloadState, updated_at: new Date() },
+            { onConflict: 'room_code' }
+          );
       } catch (e) {
         console.error("Supabase Push error:", e);
       }
@@ -560,7 +563,10 @@
           };
           await supabaseClient
             .from('pool_games')
-            .insert([{ room_code: roomCode, game_state: initState }]);
+            .upsert(
+              { room_code: roomCode, game_state: initState, updated_at: new Date() },
+              { onConflict: 'room_code' }
+            );
           
           p1Device = null;
           p2Device = null;
@@ -610,7 +616,10 @@
 
       await supabaseClient
         .from('pool_games')
-        .upsert({ room_code: roomCode, game_state: state, updated_at: new Date() }, { onConflict: 'room_code' });
+        .upsert(
+          { room_code: roomCode, game_state: state, updated_at: new Date() },
+          { onConflict: 'room_code' }
+        );
 
       activateConnection();
       showToast(`✅ You joined as ${role}`);
