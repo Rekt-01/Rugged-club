@@ -98,7 +98,6 @@
       /* Realistic Toilet Paper Texture & Color */
       background: linear-gradient(135deg, #fbfbf8 0%, #f0eee6 50%, #e6e3d8 100%);
       color: #2b2b2b;
-      /* Torn edge effect using clip-path / irregular borders */
       border-radius: 4px 4px 12px 12px;
       padding: 35px 22px 25px 22px;
       width: 92vw;
@@ -132,7 +131,7 @@
 
     .modal-title {
       color: #111;
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: bold;
       margin-bottom: 5px;
       letter-spacing: 0.5px;
@@ -151,7 +150,7 @@
       font-size: 0.8rem;
       line-height: 1.45;
       margin-bottom: 15px;
-      max-height: 38vh;
+      max-height: 52vh;
       overflow-y: auto;
       text-align: left;
       padding-right: 5px;
@@ -168,37 +167,6 @@
     .modal-body-text::-webkit-scrollbar-thumb {
       background: #ccc;
       border-radius: 4px;
-    }
-
-    .lang-btn-container {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-
-    .lang-btn {
-      background: rgba(255, 255, 255, 0.7);
-      color: #333;
-      border: 1px solid #c8c2b4;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-family: monospace;
-      font-weight: bold;
-      font-size: 0.74rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: left;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .lang-btn:hover, .lang-btn.active {
-      background: #2b2b2b;
-      color: #f0eee6;
-      border-color: #2b2b2b;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
     }
 
     .modal-action-btn {
@@ -241,26 +209,26 @@
   <div class="modal" id="loreModal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeLoreModal()">&times;</span>
-      <div class="modal-title">🧻 RESTROOM ROLL ARCHIVE</div>
-      <div class="modal-subtitle">CHOOSE YOUR DIALECT, ANON:</div>
-      
-      <div class="lang-btn-container">
-        <button class="lang-btn" onclick="setLore(1)">
-          <span>🌐 [1] Degen Dialect (Original)</span>
-          <span>&gt;</span>
-        </button>
-        <button class="lang-btn" onclick="setLore(2)">
-          <span>🧪 [2] Copium Dialect</span>
-          <span>&gt;</span>
-        </button>
-        <button class="lang-btn" onclick="setLore(3)">
-          <span>🔥 [3] Unhinged Hopium Dialect</span>
-          <span>&gt;</span>
-        </button>
-      </div>
+      <div class="modal-title">🧻 RESTROOM ROLL MANIFESTO</div>
+      <div class="modal-subtitle">APECHAIN SURVIVAL GUIDE</div>
 
       <div class="modal-body-text" id="loreTextContainer">
-        Select a translation above to wipe away your ignorance.
+        Remember the last time you aped into a project because the promo trailer looked like a Marvel movie? The sleek 3D renders, the cinematic voiceover, the roadmaps promising metaverse penthouses and passive income while you sleep. You felt that little warm spark in your chest—<em>fuck, maybe this is the one that changes things.</em><br><br>
+        And then, forty-eight hours later, the Twitter account is wiped, the Discord says "Invite Invalid," and the founder has vanished to Dubai with your grocery money, leaving you staring at a pixelated rock worth less than a used tissue.<br><br>
+        That gut punch? We’ve all tasted it. It makes you want to throw your laptop through the drywall, touch some grass, and swear off JPEGs forever.<br><br>
+        <strong>The 3:00 AM Google Search Support Group</strong><br>
+        That exact flavor of emotional damage is why we’re sitting here in the trenches today. But instead of rage-quitting or sliding into a deep depression, a couple of smooth-brained anons who don't know the first thing about coding or digital art looked at each other and thought, <em>"How hard can it be to just... not be absolute sociopaths?"</em><br><br>
+        Turns out, it’s really hard. None of us went to art school. None of us have a computer science degree. If you peeked behind our curtain right now, it’s just a bunch of sleep-deprived degenerates frantically Googling "how to fix Solidity revert error" while surviving entirely on caffeine, cheap energy drinks, and pure spite. Our tech stack is held together by copy-pasted StackOverflow answers, duct tape, and sheer denial. We fumbled. We broke things. But because we didn't want to add <em>our</em> incompetence to your financial trauma, we did a free mint. Zero cost, zero financial risk—just an open door to come trip over our shoelaces with us.<br><br>
+        <strong>Planting Our Flag in the ApeChain Wasteland</strong><br>
+        While the rest of the timeline is digital-tourist hopping to whatever new layer-zero chain is pumping engagement farming this week, we locked ourselves in the basement on ApeChain and stayed put.<br><br>
+        It’s cozy down here in the trenches. We don't have a multi-million dollar treasury funded by your hard-earned ETH, but we do have a group chat where someone is perpetually roasting our pixelated art—which, if you squint really hard and tilt your head sideways, sort of looks like a human being. It’s hard to feel like a depressed bagholder when you're crying-laughing at the fact that your project's mascot looks less like a masterpiece and more like an accidental glitch on a 1990s graphing calculator.<br><br>
+        Our roadmap? It's not a PDF with corporate buzzwords. It’s basically just a napkin that someone spilled coffee on, and half of it says "Figure out how buttons work."<br><br>
+        <strong>The Open Door (And Zero Pressure)</strong><br>
+        * <strong>Come as you are:</strong> If you’re a crypto veteran with battle scars from every cycle, welcome home. If you’re a complete newbie who bought a wallet yesterday and thinks a "gas fee" is a tax on driving—welcome twice. There is zero sell-shaming here. We don’t care if you diamond-hand or paper-hand; we’re just glad you're breathing the same air.<br>
+        * <strong>Throw your ideas in the ring:</strong> Everyone is welcome to pitch whatever chaotic nonsense they want. We want to hear your ideas, your weird lore thoughts, and your master plans. But fair warning: <strong>we’re broke too</strong>, so whatever we build has got to be free. There’s zero pressure here—help out if you feel like it, and if you want to lurk in silence for six months, that’s totally fine too. No quotas, no mandatory participation, no corporate boss vibes.<br>
+        * <strong>The Bouncer's List:</strong> Scammers, grifters, and serial rug-devs need not apply. The iron gate is permanently welded shut for anyone whose entire business model relies on making other people cry for liquidity.<br><br>
+        At the end of the day, we’re probably not going to fix the global financial system, and our art looks like a crime against graphic design. But we’re building this together, pixel by clumsy pixel, and we're actually having fun doing it without trying to pick your pockets.<br><br>
+        Pull up a folding chair. You’re early, and for once, you’re actually safe here.
       </div>
 
       <button class="modal-action-btn" onclick="closeLoreModal()">FLUSH & CLOSE</button>
@@ -268,35 +236,12 @@
   </div>
 
   <script>
-    const loreOptions = {
-      1: `Remember the last time you aped into a project because the promo trailer looked like a Marvel movie? The sleek 3D renders, the cinematic voiceover, the roadmaps promising metaverse penthouses and passive income while you sleep. You felt that little warm spark in your chest—<em>fuck, maybe this is the one that changes things.</em><br><br>And then, forty-eight hours later, the Twitter account is wiped, the Discord says "Invite Invalid," and the founder has vanished to Dubai with your grocery money, leaving you staring at a pixelated rock worth less than a used tissue.<br><br>That gut punch? We’ve all tasted it. It makes you want to throw your laptop through the drywall, touch some grass, and swear off JPEGs forever.<br><br><strong>The 3:00 AM Google Search Support Group</strong><br>That exact flavor of emotional damage is why we’re sitting here in the trenches today. But instead of rage-quitting or sliding into a deep depression, a couple of smooth-brained anons who don't know the first thing about coding or digital art looked at each other and thought, <em>"How hard can it be to just... not be absolute sociopaths?"</em><br><br>Turns out, it’s really hard. None of us went to art school. None of us have a computer science degree. If you peeked behind our curtain right now, it’s just a bunch of sleep-deprived degenerates frantically Googling "how to fix Solidity revert error" while surviving entirely on caffeine, cheap energy drinks, and pure spite. Our tech stack is held together by copy-pasted StackOverflow answers, duct tape, and sheer denial. We fumbled. We broke things. But because we didn't want to add <em>our</em> incompetence to your financial trauma, we did a free mint. Zero cost, zero financial risk—just an open door to come trip over our shoelaces with us.<br><br><strong>Planting Our Flag in the ApeChain Wasteland</strong><br>While the rest of the timeline is digital-tourist hopping to whatever new layer-zero chain is pumping engagement farming this week, we locked ourselves in the basement on ApeChain and stayed put.<br><br>It’s cozy down here in the trenches. We don't have a multi-million dollar treasury funded by your hard-earned ETH, but we do have a group chat where someone is perpetually roasting our pixelated art—which, if you squint really hard and tilt your head sideways, sort of looks like a human being. It’s hard to feel like a depressed bagholder when you're crying-laughing at the fact that your project's mascot looks less like a masterpiece and more like an accidental glitch on a 1990s graphing calculator.<br><br>Our roadmap? It's not a PDF with corporate buzzwords. It’s basically just a napkin that someone spilled coffee on, and half of it says "Figure out how buttons work."<br><br><strong>The Open Door (And Zero Pressure)</strong><br>* <strong>Come as you are:</strong> If you’re a crypto veteran with battle scars from every cycle, welcome home. If you’re a complete newbie who bought a wallet yesterday and thinks a "gas fee" is a tax on driving—welcome twice. There is zero sell-shaming here. We don’t care if you diamond-hand or paper-hand; we’re just glad you're breathing the same air.<br>* <strong>Throw your ideas in the ring:</strong> Everyone is welcome to pitch whatever chaotic nonsense they want. We want to hear your ideas, your weird lore thoughts, and your master plans. But fair warning: <strong>we’re broke too</strong>, so whatever we build has got to be free. There’s zero pressure here—help out if you feel like it, and if you want to lurk in silence for six months, that’s totally fine too. No quotas, no mandatory participation, no corporate boss vibes.<br>* <strong>The Bouncer's List:</strong> Scammers, grifters, and serial rug-devs need not apply. The iron gate is permanently welded shut for anyone whose entire business model relies on making other people cry for liquidity.<br><br>At the end of the day, we’re probably not going to fix the global financial system, and our art looks like a crime against graphic design. But we’re building this together, pixel by clumsy pixel, and we're actually having fun doing it without trying to pick your pockets.<br><br>Pull up a folding chair. You’re early, and for once, you’re actually safe here.`,
-      
-      2: `We all crawled in here straight from rinses and smoking NFT rug pulls, blinking into the dim light of a dying laptop screen with a collective migraine and zero APE left for gas. That’s us. We aren’t VC-backed paper-pushers, master artists, or elite smart-contract devs—we're just a bunch of brain-rotted degens winging it, copying spaghetti code from GitHub at 3 AM, and fat-fingering mint functions as we go because we're building this shit out of pure spite from the trenches.<br><br>While everyone else is out chasing whatever shiny new L2 is dropping influencer exit liquidity this week, we stayed. We're locked in and riding with ApeChain because we still actually believe in $APE.<br><br>This NFT clubhouse isn't some soulless corporate mint farm; it’s a survivor camp built by serial bagholders who are sick of getting farmed by anon devs. Run by the underground Copium Cartel with <strong>Liquidation Larry</strong> at the head of the table huffing industrial-grade hopium through a gas mask, we're here to ape in, shitpost, talk charts, and cope about real life when our portfolios look like a literal crime scene. But hear this loud and clear, anon: everyone is welcome here, but we have absolute zero tolerance for hate, racism, bigotry, or toxic gatekeepers. Sell-shaming someone for panic-selling the local bottom gets you instantly blacklisted into the shadow realm—remember, <strong>no crying in the casino, bro</strong>.<br><br>We’re bound to get rekt on a few bugs, but we're building a real empire from the mud. In this ecosystem, we don't do soft stuff—we run on pure, unfiltered <strong>$CHAOS</strong> and absolute degenerate solidarity. LFG.`,
-      
-      3: `We dragged our broken, rekt carcasses straight out of the smoking craters of a hundred dead mints, blinking into the green-tinted glow of a dying monitor with a permanent migraine and exactly zero APE left for gas. That’s us. We aren't polished, PowerPoint-poisoned crypto influencers, algorithmic market makers, or Harvard-dropout devs who know what a "roadmap" is—we’re a chaotic hive-mind of brain-rotted degens stealing spaghetti code off GitHub, mainlining energy drinks at 4 AM, and fat-fingering smart contracts out of pure, unadulterated spite.<br><br>While the rest of the timeline is whoring itself out to whatever sterile new L2 is pumping influencer exit liquidity this week, we chained ourselves to ApeChain and threw away the key because we’re too stubborn (or brain-damaged) to leave.<br><br>This isn't some sanitized corporate art project or a VC-backed extraction scam. It’s an underground bio-hazard ward run by <strong>Liquidation Larry</strong> from the back of the Copium Cartel, sitting at a wobbly desk wearing a gas mask duct-taped together with old hardware wallets and huffing industrial-grade hopium. We’re here to ape blindly, shitpost into the void, scream at charts, and pretend our net worth isn't a federal crime scene.<br><br>Listen up, anon: everyone’s welcome in the trenches, but we have zero patience for crybabies, fedoras, bigots, or bootlickers. Sell-shame someone for capitulating at the literal wick of the bottom and you get launched straight into the shadow realm. Rule number one of the asylum: <strong>no crying in the casino, bro</strong>.<br><br>We’re gonna break things, exploit our own bugs, and probably get liquidated twice by Tuesday. But we’re building this empire out of pure, toxic sludge and absolute degenerate brotherhood. LFG.`
-    };
-
     function openLoreModal() {
       document.getElementById('loreModal').style.display = 'flex';
-      setLore(1); // Default to option 1 on open
     }
 
     function closeLoreModal() {
       document.getElementById('loreModal').style.display = 'none';
-    }
-
-    function setLore(optionNum) {
-      document.getElementById('loreTextContainer').innerHTML = loreOptions[optionNum];
-      
-      // Update button active state visual
-      const buttons = document.querySelectorAll('.lang-btn');
-      buttons.forEach((btn, index) => {
-        if (index + 1 === optionNum) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
     }
   </script>
 
