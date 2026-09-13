@@ -337,11 +337,18 @@
     .btn-rack:active {
       transform: scale(0.97);
     }
+
+    .timer-display {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #ffe600;
+      margin-top: 4px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Role Selection Modal -->
   <div class="role-modal" id="roleModal" style="display:none;">
     <h2>CHOOSE YOUR SEAT</h2>
     <p>Room: <span id="modalRoomName" style="color:#00ffcc"></span></p>
@@ -381,6 +388,7 @@
         <span id="p1NameDisplay" style="color:#00ffcc;">P1: ---</span>
         <span id="p2NameDisplay" style="color:#ffe600;">P2: ---</span>
       </div>
+      <div class="timer-display" id="timerDisplay">⏱️ Shot timer: --</div>
     </div>
 
     <div class="canvas-wrapper">
@@ -404,7 +412,6 @@
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Persistent device ID
     let deviceId = localStorage.getItem('pool_device_id');
     if (!deviceId) {
       deviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
@@ -423,6 +430,11 @@
     let p2Name = null;
     let realTimeChannel = null;
 
+    // Shot timer
+    let shotTimer = null;
+    let shotTimeLeft = 30;
+    const SHOT_TIME = 30;
+
     if (localName) {
       document.getElementById('playerNameInput').value = localName;
     }
@@ -431,6 +443,7 @@
       if (!newRoom) return;
       roomCode = newRoom.trim();
       localRole = null;
+      clearShotTimer();
       if (realTimeChannel) supabaseClient.removeChannel(realTimeChannel);
       if (window.syncPollInterval) clearInterval(window.syncPollInterval);
       const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?room=' + encodeURIComponent(roomCode);
@@ -470,11 +483,15 @@
     let scratched = false;
     let gameOver = false;
 
-    let cueBall = { x: 90, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
+    // Cue ball starts dead centre
+    let cueBall = { x: 180, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
     let balls = [cueBall];
 
     function generateInitialRack() {
+      // Reset cue ball to dead centre
+      cueBall = { x: 180, y: 95, vx: 0, vy: 0, r: 5.5, color: '#ffffff', isCue: true, type: 'cue', num: 0 };
       balls = [cueBall];
+
       let rackX = 240, rackY = 95, spacing = 11.5;
       let ballNumbers = [1, 2, 9, 3, 8, 10, 4, 11, 12, 5, 6, 13, 14, 15, 7];
       let numIdx = 0;
@@ -507,7 +524,7 @@
     function showToast(text) {
       toast.innerText = text;
       toast.classList.add('show');
-      setTimeout(() => { toast.classList.remove('show'); }, 2500);
+      setTimeout(() => { toast.classList.remove('show'); }, 2800);
     }
 
     function adjustAim(amount) {
@@ -525,6 +542,7 @@
         return;
       }
       if (!isAnyBallMoving() && !shotFired) {
+        clearShotTimer();
         turnPocketedAny = false;
         turnPocketedValid = false;
         scratched = false;
@@ -539,12 +557,74 @@
       return balls.some(b => Math.abs(b.vx) > 0.03 || Math.abs(b.vy) > 0.03);
     }
 
+    // ========== SHOT TIMER ==========
+    function startShotTimer() {
+      clearShotTimer();
+      if (gameOver || localRole === 'Spectator') return;
+
+      shotTimeLeft = SHOT_TIME;
+      updateTimerDisplay();
+
+      shotTimer = setInterval(() => {
+        shotTimeLeft--;
+        updateTimerDisplay();
+
+        if (shotTimeLeft <= 0) {
+          clearShotTimer();
+          // Kick the current player
+          kickCurrentPlayer();
+        }
+      }, 1000);
+    }
+
+    function clearShotTimer() {
+      if (shotTimer) {
+        clearInterval(shotTimer);
+        shotTimer = null;
+      }
+      document.getElementById('timerDisplay').innerText = '⏱️ Shot timer: --';
+    }
+
+    function updateTimerDisplay() {
+      const el = document.getElementById('timerDisplay');
+      if (shotTimeLeft <= 10) {
+        el.style.color = '#ff3333';
+      } else {
+        el.style.color = '#ffe600';
+      }
+      el.innerText = `⏱️ Shot timer: ${shotTimeLeft}s`;
+    }
+
+    async function kickCurrentPlayer() {
+      showToast(`⏰ Time's up! ${turn === 'Player 1' ? (p1Name || 'Player 1') : (p2Name || 'Player 2')} kicked for taking too long`);
+
+      // Clear the current player's seat
+      if (turn === 'Player 1') {
+        p1Device = null;
+        p1Name = null;
+      } else {
+        p2Device = null;
+        p2Name = null;
+      }
+
+      // Switch turn
+      turn = turn === 'Player 1' ? 'Player 2' : 'Player 1';
+
+      await pushStateToServer();
+
+      // If we were the one kicked, go back to seat selection
+      if ((turn === 'Player 2' && localRole === 'Player 1') || (turn === 'Player 1' && localRole === 'Player 2')) {
+        localRole = null;
+        document.getElementById('roleModal').style.display = 'flex';
+        document.getElementById('myRoleDisplay').innerText = 'SELECTING...';
+      }
+    }
+
     function handleBallPocketed(b) {
       if (gameOver) return;
 
       turnPocketedAny = true;
 
-      // === 8-BALL ===
       if (b.num === 8) {
         const shooterName = turn === 'Player 1' ? (p1Name || 'Player 1') : (p2Name || 'Player 2');
         const opponentName = turn === 'Player 1' ? (p2Name || 'Player 2') : (p1Name || 'Player 1');
@@ -562,11 +642,11 @@
 
         gameOver = true;
         shotFired = false;
+        clearShotTimer();
         balls.forEach(ball => { ball.vx = 0; ball.vy = 0; });
         return;
       }
 
-      // === NORMAL BALLS ===
       if (player1Group === null) {
         if (turn === 'Player 1') {
           player1Group = b.type;
@@ -589,13 +669,16 @@
       }
     }
 
-    // === RACK 'EM BUTTON ===
-    function rackEm() {
+    // ========== RACK 'EM ==========
+    async function rackEm() {
       if (isAnyBallMoving()) {
         showToast("Wait for balls to stop first!");
         return;
       }
 
+      clearShotTimer();
+
+      // Full reset
       generateInitialRack();
       turn = 'Player 1';
       player1Group = null;
@@ -606,11 +689,29 @@
       turnPocketedAny = false;
       turnPocketedValid = false;
 
-      document.getElementById('groupDisplay').innerText = 'OPEN MARKET';
-      document.getElementById('turnDisplay').innerText = (p1Name || 'PLAYER 1').toUpperCase();
+      // KICK BOTH PLAYERS OUT
+      p1Device = null;
+      p2Device = null;
+      p1Name = null;
+      p2Name = null;
 
-      pushStateToServer();
-      showToast("🎱 RACKED & STACKED!\nFresh game ready");
+      document.getElementById('groupDisplay').innerText = 'OPEN MARKET';
+      document.getElementById('turnDisplay').innerText = 'PLAYER 1';
+      document.getElementById('p1NameDisplay').innerText = 'P1: ---';
+      document.getElementById('p2NameDisplay').innerText = 'P2: ---';
+
+      await pushStateToServer();
+
+      // Force local player back to seat selection
+      localRole = null;
+      document.getElementById('myRoleDisplay').innerText = 'SELECTING...';
+      document.getElementById('roleModal').style.display = 'flex';
+
+      // Update button texts
+      document.getElementById('selectP1Btn').innerText = 'PLAY AS PLAYER 1';
+      document.getElementById('selectP2Btn').innerText = 'PLAY AS PLAYER 2';
+
+      showToast("🎱 RACKED & STACKED!\nBoth seats are free again");
     }
 
     async function pushStateToServer() {
@@ -749,6 +850,11 @@
 
       activateConnection();
       showToast(`✅ ${localName} joined as ${role}`);
+
+      // Start timer if it's our turn
+      if (turn === localRole) {
+        startShotTimer();
+      }
     }
 
     function activateConnection() {
@@ -784,6 +890,11 @@
           }
         } catch (e) {}
       }, 1000);
+
+      // Start timer if it's our turn
+      if (turn === localRole && !gameOver) {
+        startShotTimer();
+      }
     }
 
     function updateRoleUI() {
@@ -801,6 +912,8 @@
     }
 
     function applyRemoteState(remoteState) {
+      const oldTurn = turn;
+
       if (remoteState.p1Device !== undefined) p1Device = remoteState.p1Device;
       if (remoteState.p2Device !== undefined) p2Device = remoteState.p2Device;
       if (remoteState.p1Name !== undefined) p1Name = remoteState.p1Name;
@@ -809,6 +922,20 @@
 
       document.getElementById('p1NameDisplay').innerText = `P1: ${p1Name || '---'}`;
       document.getElementById('p2NameDisplay').innerText = `P2: ${p2Name || '---'}`;
+
+      // If seats were cleared (RACK 'EM), force local player back to modal
+      if (localRole === 'Player 1' && p1Device !== deviceId) {
+        localRole = null;
+        clearShotTimer();
+        document.getElementById('roleModal').style.display = 'flex';
+        document.getElementById('myRoleDisplay').innerText = 'SELECTING...';
+      }
+      if (localRole === 'Player 2' && p2Device !== deviceId) {
+        localRole = null;
+        clearShotTimer();
+        document.getElementById('roleModal').style.display = 'flex';
+        document.getElementById('myRoleDisplay').innerText = 'SELECTING...';
+      }
 
       if (remoteState.balls && Array.isArray(remoteState.balls) && remoteState.balls.length > 0 && !isAnyBallMoving() && !shotFired) {
         balls = remoteState.balls.map(rb => ({ ...rb }));
@@ -821,6 +948,11 @@
         turn = remoteState.turn;
         const displayName = turn === 'Player 1' ? (p1Name || 'PLAYER 1') : (p2Name || 'PLAYER 2');
         document.getElementById('turnDisplay').innerText = displayName.toUpperCase();
+
+        // Restart timer when turn changes to us
+        if (turn !== oldTurn && turn === localRole && !gameOver) {
+          startShotTimer();
+        }
       }
       if (remoteState.player1Group !== undefined) {
         player1Group = remoteState.player1Group;
@@ -857,7 +989,7 @@
         pockets.forEach(p => {
           if (Math.hypot(b.x - p.x, b.y - p.y) < currentPocketRadius + 2) {
             if (b.isCue) {
-              b.x = 90; b.y = 95; b.vx = 0; b.vy = 0;
+              b.x = 180; b.y = 95; b.vx = 0; b.vy = 0; // reset to centre
               scratched = true;
               showToast("🚨 Cue Ball Scratch!");
             } else {
@@ -900,6 +1032,13 @@
           showToast(`🔥 ${(turn === 'Player 1' ? p1Name : p2Name) || turn} keeps turn!`);
         }
         pushStateToServer();
+
+        // Restart timer for the next player
+        if (turn === localRole && !gameOver) {
+          startShotTimer();
+        } else {
+          clearShotTimer();
+        }
       }
 
       drawTable();
