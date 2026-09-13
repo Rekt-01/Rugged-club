@@ -183,8 +183,8 @@
 
   <div class="pool-container">
     <div class="header-bar">
-      <div class="title-text">🌐 ONLINE ROOM: <span id="roomDisplay" style="color:#ffe600;">...</span></div>
-      <a href="pool.html" class="exit-btn">🚪 LEAVE ROOM</a>
+      <div class="title-text">🌐 ONLINE ROOM: <span id="roomDisplay" style="color:#ffe600;">room_degens_101</span></div>
+      <a href="index.html" class="exit-btn">🚪 LEAVE ROOM</a>
     </div>
 
     <div class="scoreboard">
@@ -213,7 +213,6 @@
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY.trim());
 
     const roomCode = "room_degens_101";
-    document.getElementById('roomDisplay').innerText = roomCode;
 
     const canvas = document.getElementById('poolCanvas');
     const ctx = canvas.getContext('2d');
@@ -275,8 +274,6 @@
         cueBall.vx = Math.cos(aimAngle) * power;
         cueBall.vy = Math.sin(aimAngle) * power;
         shotFired = true;
-
-        // Broadcast new ball coordinates to Supabase
         await pushGameStateToSupabase();
       }
     }
@@ -298,7 +295,6 @@
       if (error) console.error('Sync push error:', error.message);
     }
 
-    // Realtime subscription listener for opponent shots
     supabase
       .channel('pool_room_' + roomCode)
       .on('postgres_changes', {
@@ -309,7 +305,6 @@
       }, payload => {
         const remoteState = payload.new.game_state;
         if (remoteState && remoteState.balls) {
-          // Sync remote ball positions
           remoteState.balls.forEach(remoteB => {
             let localB = balls.find(b => b.num === remoteB.num && b.isCue === remoteB.isCue);
             if (localB) {
