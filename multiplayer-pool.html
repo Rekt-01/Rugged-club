@@ -23,10 +23,13 @@
   </div>
 
   <script>
-    // TODO: Replace with your actual Supabase URL and Anon Key
-    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Configured with your Supabase credentials
+    const SUPABASE_URL = 'https://vcsauoymgxazvfxihyym.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjc2F1b3ltZ3haznZmeGloeXltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMTIzNzUsImV4cCI6MjEwNDg4ODM3NX0.x5dQeBH-4YDJKigjG0boizwZrkY7VbbneIN_w-VyBi8';
+    
+    // Clean key string assignment matching provided token
+    const cleanKey = SUPABASE_ANON_KEY.trim();
+    const supabase = window.supabase.createClient(SUPABASE_URL, cleanKey);
 
     const roomCode = "room_degens_101"; 
     document.getElementById('room-display').innerText = roomCode;
@@ -54,7 +57,7 @@
 
       if (error) {
         console.error('Sync error:', error);
-        alert('Sync failed. Make sure your pool_games table and columns match.');
+        alert('Sync failed: ' + error.message);
       } else {
         alert('Shot broadcasted successfully to Supabase!');
       }
