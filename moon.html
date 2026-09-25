@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rugged Club Minting DApp</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
   <style>
     body {
       background-color: #0d0d0d;
@@ -71,8 +70,7 @@
   </div>
 
   <script>
-    const CONTRACT_ADDRESS = "0xBBc903E03D50B848077B0f3B0412493db68b4137";
-    const EDGE_FUNCTION_URL = "https://xmiyrbgpfdiqarxsuhzi.supabase.co/functions/v1/swift-action"; //
+    const EDGE_FUNCTION_URL = "https://xmiyrbgpfdiqarxsuhzi.supabase.co/functions/v1/swift-action";
 
     async function handleMint() {
       const wallet = document.getElementById('walletInput').value.trim();
@@ -84,50 +82,28 @@
         return;
       }
 
-      if (!window.ethereum) {
-        statusDiv.innerHTML = "❌ MetaMask not found! How you gonna ape without a web3 wallet?";
-        statusDiv.style.color = "#ff3333";
-        return;
-      }
+      statusDiv.innerHTML = "Firing up the mint cannon from our bag... 🚀";
+      statusDiv.style.color = "#ffcc00";
 
       try {
-        statusDiv.innerHTML = "Pop open MetaMask and sign this transaction, ser... 🔏";
-        statusDiv.style.color = "#ffcc00";
-
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        
-        // Minimal ERC721 mint abi call
-        const abi = ["function mint() public"];
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, signer);
-
-        const tx = await contract.mint();
-        statusDiv.innerHTML = "🚀 TX Broadcasted to ApeChain! Waiting for block confirmation...";
-        
-        const receipt = await tx.wait();
-
-        statusDiv.innerHTML = "Logging your bag on the backend ledger... 🕵️‍♂️";
-
-        // Send transaction data to your secure Edge Function
+        // Send wallet address directly to the Edge Function to mint and log
         const response = await fetch(EDGE_FUNCTION_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            txHash: receipt.hash,
-            ownerWallet: wallet,
-            tokenId: 1 
+            ownerWallet: wallet
           })
         });
 
         const result = await response.json();
         
         if (!response.ok) {
-          throw new Error(result.error || "Backend rejected the mint record.");
+          throw new Error(result.error || "Backend rejected the mint request.");
         }
 
-        statusDiv.innerHTML = `✅ LFG! SUCCESSFULLY MINTED TO THE MOON! 🌕<br><small>Tx: ${receipt.hash.slice(0, 10)}...</small>`;
+        statusDiv.innerHTML = `✅ LFG! SUCCESSFULLY MINTED TO YOUR BAG! 🌕<br><small>Tx: ${result.txHash ? result.txHash.slice(0, 10) + '...' : 'Done'}</small>`;
         statusDiv.style.color = "#00ff66";
 
       } catch (err) {
@@ -135,7 +111,7 @@
         if (err.message && err.message.toLowerCase().includes("already minted")) {
           statusDiv.innerHTML = "🛑 HOLD UP BROTHER! You already minted your bag! Greedy ape detected!";
         } else {
-          statusDiv.innerHTML = `❌ REXXXT! Transaction failed: ${err.reason || err.message}`;
+          statusDiv.innerHTML = `❌ REXXXT! Transaction failed: ${err.message}`;
         }
         statusDiv.style.color = "#ff3333";
       }
