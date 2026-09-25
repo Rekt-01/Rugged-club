@@ -72,8 +72,7 @@
 
   <script>
     const CONTRACT_ADDRESS = "0xBBc903E03D50B848077B0f3B0412493db68b4137";
-    const SUPABASE_URL = "YOUR_SUPABASE_URL_HERE"; // Replace with your actual project URL
-    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY_HERE"; // Replace with your actual anon key
+    const EDGE_FUNCTION_URL = "https://xmiyrbgpfdiqarxsuhzi.supabase.co/functions/v1/swift-action"; //
 
     async function handleMint() {
       const wallet = document.getElementById('walletInput').value.trim();
@@ -85,35 +84,19 @@
         return;
       }
 
-      statusDiv.innerHTML = "Checking the blockchain ledger... 🕵️‍♂️";
-      statusDiv.style.color = "#ffcc00";
+      if (!window.ethereum) {
+        statusDiv.innerHTML = "❌ MetaMask not found! How you gonna ape without a web3 wallet?";
+        statusDiv.style.color = "#ff3333";
+        return;
+      }
 
       try {
-        // 1. Check Supabase if wallet already minted
-        const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/nfts?owner_wallet=eq.${wallet}&select=*`, {
-          headers: {
-            "apikey": SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
-          }
-        });
-        const existingMints = await checkRes.json();
-
-        if (existingMints && existingMints.length > 0) {
-          statusDiv.innerHTML = "🛑 HOLD UP BROTHER! You already minted your bag! You greedy ape, leave some bags for the rest of us!";
-          statusDiv.style.color = "#ff3333";
-          return;
-        }
-
-        // 2. Simulate/Execute Mint on ApeChain via Web3 Provider if available
-        if (!window.ethereum) {
-          throw new Error("MetaMask not found! How you gonna ape without a web3 wallet?");
-        }
+        statusDiv.innerHTML = "Pop open MetaMask and sign this transaction, ser... 🔏";
+        statusDiv.style.color = "#ffcc00";
 
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         
-        statusDiv.innerHTML = "Pop open MetaMask and sign this transaction, ser... 🔏";
-
         // Minimal ERC721 mint abi call
         const abi = ["function mint() public"];
         const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, signer);
@@ -123,29 +106,37 @@
         
         const receipt = await tx.wait();
 
-        // 3. Log to Supabase backend
-        await fetch(`${SUPABASE_URL}/rest/v1/nfts`, {
+        statusDiv.innerHTML = "Logging your bag on the backend ledger... 🕵️‍♂️";
+
+        // Send transaction data to your secure Edge Function
+        const response = await fetch(EDGE_FUNCTION_URL, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-            "Prefer": "return=minimal"
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            token_id: Math.floor(Math.random() * 10000), // Fallback token tracker representation
-            owner_wallet: wallet,
-            contract_address: CONTRACT_ADDRESS,
-            transaction_hash: receipt.hash
+            txHash: receipt.hash,
+            ownerWallet: wallet,
+            tokenId: 1 
           })
         });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || "Backend rejected the mint record.");
+        }
 
         statusDiv.innerHTML = `✅ LFG! SUCCESSFULLY MINTED TO THE MOON! 🌕<br><small>Tx: ${receipt.hash.slice(0, 10)}...</small>`;
         statusDiv.style.color = "#00ff66";
 
       } catch (err) {
         console.error(err);
-        statusDiv.innerHTML = `❌ REXXXT! Transaction failed: ${err.reason || err.message}`;
+        if (err.message && err.message.toLowerCase().includes("already minted")) {
+          statusDiv.innerHTML = "🛑 HOLD UP BROTHER! You already minted your bag! Greedy ape detected!";
+        } else {
+          statusDiv.innerHTML = `❌ REXXXT! Transaction failed: ${err.reason || err.message}`;
+        }
         statusDiv.style.color = "#ff3333";
       }
     }
