@@ -3,103 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rugged Club - Zero-Gas NFT Claim</title>
+    <title>RUGGED CLUB | FREE APECHAIN DROP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f172a;
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #05050a;
             color: #f8fafc;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #1a103c 0%, #05050a 100%);
         }
         .card {
-            background-color: #1e293b;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(168, 85, 247, 0.3);
             padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
             text-align: center;
-            max-width: 400px;
+            max-width: 420px;
             width: 100%;
+            box-sizing: border-box;
+        }
+        .badge {
+            background-color: rgba(236, 72, 153, 0.15);
+            color: #ec4899;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
         }
         h2 {
-            margin-bottom: 10px;
-            color: #38bdf8;
+            margin: 0 0 10px 0;
+            color: #ffffff;
+            font-size: 28px;
+            letter-spacing: -0.5px;
+        }
+        h2 span {
+            color: #a855f7;
         }
         p {
             color: #94a3b8;
             font-size: 14px;
             margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .highlight {
+            color: #38bdf8;
+            font-weight: 600;
         }
         .btn {
-            background-color: #38bdf8;
-            color: #0f172a;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            color: #ffffff;
             border: none;
-            padding: 12px 24px;
+            padding: 14px 24px;
             font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
+            font-weight: 700;
+            border-radius: 10px;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.2s;
+            transition: transform 0.1s, opacity 0.2s;
+            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+            letter-spacing: 0.5px;
         }
         .btn:hover {
-            background-color: #0ea5e9;
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(1px);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
         input {
             width: 100%;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 10px;
             border: 1px solid #334155;
-            background-color: #0f172a;
+            background-color: #090d16;
             color: #f8fafc;
             box-sizing: border-box;
             margin-bottom: 16px;
             font-size: 14px;
             outline: none;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: border-color 0.2s;
         }
         input:focus {
-            border-color: #38bdf8;
+            border-color: #a855f7;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
         }
         #statusMessage {
-            margin-top: 16px;
-            font-size: 14px;
+            margin-top: 20px;
+            font-size: 13px;
+            min-height: 24px;
             word-break: break-all;
+        }
+        .success-link {
+            color: #34d399;
+            text-decoration: underline;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h2>Rugged Club</h2>
-        <p>Paste your wallet address below and hit send to claim your free NFT on ApeChain.</p>
+        <div class="badge">🔥 Zero Gas • 1 Per Wallet</div>
+        <h2>RUGGED <span>CLUB</span></h2>
+        <p>Drop your wallet address below. We're footing the gas. Claim your free pass on <span class="highlight">ApeChain</span> now.</p>
 
-        <!-- Wallet Address Input & Send Button -->
+        <!-- Input & Button -->
         <input type="text" id="walletInput" placeholder="Paste your wallet address (0x...)" />
-        <button class="btn" onclick="triggerClaim()">Send NFT</button>
+        <button id="claimBtn" class="btn" onclick="triggerClaim()">CLAIM FREE NFT</button>
 
         <div id="statusMessage"></div>
     </div>
 
     <script>
-        // Your live Supabase Edge Function URL
         const SUPABASE_FUNCTION_URL = 'https://xmiyrbgpfdiqarxsuhzi.supabase.co/functions/v1/swift-action';
+
+        const loadingPhrases = [
+            "Waking up the ApeChain validators...",
+            "Checking your degen credentials...",
+            "Brewing coffee for the relayer wallet...",
+            "Bypassing gas fees...",
+            "Minting straight to your bag..."
+        ];
 
         async function triggerClaim() {
             const walletAddress = document.getElementById('walletInput').value.trim();
             const statusMsg = document.getElementById('statusMessage');
+            const claimBtn = document.getElementById('claimBtn');
 
-            // Basic validation for an Ethereum/ApeChain address format
             if (!walletAddress || !walletAddress.startsWith('0x') || walletAddress.length < 42) {
                 statusMsg.style.color = "#f87171";
-                statusMsg.innerText = "Please enter a valid 0x wallet address.";
+                statusMsg.innerText = "⚠️ Drop a valid 0x wallet address first!";
                 return;
             }
 
-            statusMsg.style.color = "#38bdf8";
-            statusMsg.innerText = "Processing your claim... Please wait.";
+            claimBtn.disabled = true;
+            let phraseIndex = 0;
+            statusMsg.style.color = "#c084fc";
+            statusMsg.innerText = loadingPhrases[phraseIndex];
+
+            // Rotate funny text while waiting
+            const phraseInterval = setInterval(() => {
+                phraseIndex = (phraseIndex + 1) % loadingPhrases.length;
+                statusMsg.innerText = loadingPhrases[phraseIndex];
+            }, 2500);
 
             try {
                 const response = await fetch(SUPABASE_FUNCTION_URL, {
@@ -111,19 +176,26 @@
                 });
 
                 const data = await response.json();
+                clearInterval(phraseInterval);
 
                 if (response.ok && data.success) {
                     statusMsg.style.color = "#34d399";
-                    statusMsg.innerText = "Success! NFT has been sent to your wallet.";
-                    console.log("Transaction Hash:", data.txHash);
+                    statusMsg.innerHTML = `🎉 LFG! NFT dropped into your bag.<br><a class="success-link" href="https://apescan.io/tx/${data.txHash}" target="_blank">View Transaction on Apescan</a>`;
+                    claimBtn.innerText = "CLAIMED 🚀";
                 } else {
+                    clearInterval(phraseInterval);
+                    claimBtn.disabled = false;
                     statusMsg.style.color = "#f87171";
-                    statusMsg.innerText = "Error: " + (data.error || "Claim failed.");
+                    statusMsg.innerText = "❌ " + (data.error || "Transaction failed. (Maybe already claimed?)");
+                    claimBtn.innerText = "CLAIM FREE NFT";
                 }
             } catch (err) {
+                clearInterval(phraseInterval);
+                claimBtn.disabled = false;
                 console.error(err);
                 statusMsg.style.color = "#f87171";
-                statusMsg.innerText = "Network error connecting to backend.";
+                statusMsg.innerText = "❌ Network error. Check your connection and retry.";
+                claimBtn.innerText = "CLAIM FREE NFT";
             }
         }
     </script>
