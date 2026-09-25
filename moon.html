@@ -3,142 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rug Club | Airdrop Portal</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+    <title>Rugged Club - Zero-Gas NFT Claim</title>
     <style>
         body {
-            font-family: 'Share Tech Mono', monospace;
-            background-color: #030704;
-            color: #22c55e;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        .title-font {
-            font-family: 'VT323', monospace;
+        .card {
+            background-color: #1e293b;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
         }
-        /* CRT Scanline Effect */
-        .scanlines {
-            background: linear-gradient(
-                to bottom,
-                rgba(255,255,255,0),
-                rgba(255,255,255,0) 50%,
-                rgba(0, 0, 0, 0.4) 50%,
-                rgba(0, 0, 0, 0.4)
-            );
-            background-size: 100% 4px;
+        h2 {
+            margin-bottom: 10px;
+            color: #38bdf8;
         }
-        .cyber-card {
-            background: rgba(5, 15, 8, 0.85);
-            box-shadow: 0 0 30px rgba(34, 197, 94, 0.12), inset 0 0 15px rgba(34, 197, 94, 0.05);
-            border: 1px solid rgba(34, 197, 94, 0.35);
+        p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 24px;
         }
-        .cyber-btn {
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.35);
-            transition: all 0.25s ease;
+        .btn {
+            background-color: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
         }
-        .cyber-btn:hover:not(:disabled) {
-            box-shadow: 0 0 30px rgba(34, 197, 94, 0.7);
-            transform: translateY(-2px);
+        .btn:hover {
+            background-color: #0ea5e9;
         }
-        .glow-text {
-            text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: #f8fafc;
+            box-sizing: border-box;
+            margin-bottom: 16px;
+            font-size: 14px;
+            outline: none;
+        }
+        input:focus {
+            border-color: #38bdf8;
+        }
+        #statusMessage {
+            margin-top: 16px;
+            font-size: 14px;
+            word-break: break-all;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between scanlines p-4 sm:p-6 selection:bg-green-500 selection:text-black">
+<body>
 
-    <!-- Top Header Bar -->
-    <header class="w-full max-w-md mx-auto flex justify-between items-center py-4 border-b border-green-900/40">
-        <div class="flex items-center space-x-2.5">
-            <div class="w-8 h-8 rounded bg-green-950 border border-green-700 flex items-center justify-center text-lg shadow-inner">🦍</div>
-            <span class="title-font text-2xl tracking-widest text-green-400 font-bold glow-text">RUG_CLUB</span>
-        </div>
-        <div class="text-xs px-3 py-1 rounded-full bg-green-950/85 border border-green-700/60 text-green-400 flex items-center gap-2 shadow-sm">
-            <span class="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
-            <span class="tracking-wider font-semibold">APECHAIN</span>
-        </div>
-    </header>
+    <div class="card">
+        <h2>Rugged Club</h2>
+        <p>Paste your wallet address below and hit send to claim your free NFT on ApeChain.</p>
 
-    <!-- Main Content Container -->
-    <main class="w-full max-w-md mx-auto my-auto py-6">
-        <div class="cyber-card rounded-2xl p-6 sm:p-8 text-center relative backdrop-blur-xl">
-            
-            <!-- Graphic Element -->
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-950/60 border border-green-700/50 flex items-center justify-center text-3xl shadow-inner animate-pulse">
-                🚀
-            </div>
-            
-            <!-- Title -->
-            <h1 class="title-font text-4xl sm:text-5xl tracking-widest text-green-400 mb-2 uppercase glow-text">
-                RUG CLUB AIRDROP
-            </h1>
-            
-            <!-- Subtitle -->
-            <p class="text-green-500/70 text-sm sm:text-base mb-8 leading-relaxed">
-                Drop your wallet address, anon.<br>Zero gas fees. Zero risk. Don't get rekt.
-            </p>
+        <!-- Wallet Address Input & Send Button -->
+        <input type="text" id="walletInput" placeholder="Paste your wallet address (0x...)" />
+        <button class="btn" onclick="triggerClaim()">Send NFT</button>
 
-            <!-- Mint Form -->
-            <form id="mintForm" class="space-y-4 text-left">
-                <div>
-                    <label for="walletAddress" class="block text-xs uppercase tracking-wider text-green-600 mb-1.5 font-semibold">Recipient Wallet Address</label>
-                    <div class="relative">
-                        <input 
-                            type="text" 
-                            id="walletAddress" 
-                            placeholder="0x..." 
-                            required
-                            autocomplete="off"
-                            spellcheck="false"
-                            class="w-full bg-black/60 border border-green-800/80 rounded-xl px-4 py-4 text-green-300 placeholder-green-800/80 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-400/20 text-sm sm:text-base tracking-wider font-mono shadow-inner"
-                        >
-                    </div>
-                </div>
+        <div id="statusMessage"></div>
+    </div>
 
-                <button 
-                    type="submit" 
-                    id="mintBtn"
-                    class="w-full cyber-btn bg-green-500 hover:bg-green-400 text-black font-extrabold uppercase tracking-widest py-4 rounded-xl text-base sm:text-lg cursor-pointer flex items-center justify-center space-x-2 mt-2"
-                >
-                    <span>APE IN / MINT</span>
-                </button>
-            </form>
-
-            <!-- Status / Feedback Box -->
-            <div id="statusMessage" class="hidden mt-6 p-4 rounded-xl border text-xs sm:text-sm tracking-wide transition-all text-left">
-                <!-- Populated dynamically via JS -->
-            </div>
-
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="w-full max-w-md mx-auto text-center py-4 text-[11px] text-green-700/80 border-t border-green-900/40 tracking-widest uppercase">
-        &copy; 2026 RUG_CLUB &bull; SECURE PROTOCOL
-    </footer>
-
-    <!-- Script Logic -->
     <script>
-        const mintForm = document.getElementById('mintForm');
-        const mintBtn = document.getElementById('mintBtn');
-        const walletInput = document.getElementById('walletAddress');
-        const statusMessage = document.getElementById('statusMessage');
-
-        // Wired directly to your deployed Supabase Edge Function
+        // Your live Supabase Edge Function URL
         const SUPABASE_FUNCTION_URL = 'https://xmiyrbgpfdiqarxsuhzi.supabase.co/functions/v1/swift-action';
 
-        mintForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const recipientAddress = walletInput.value.trim();
+        async function triggerClaim() {
+            const walletAddress = document.getElementById('walletInput').value.trim();
+            const statusMsg = document.getElementById('statusMessage');
 
-            // Client-side address validation format check
-            if (!recipientAddress.startsWith('0x') || recipientAddress.length !== 42) {
-                showStatus('REXXXT! Transaction failed: Invalid EVM wallet address provided.', 'error');
+            // Basic validation for an Ethereum/ApeChain address format
+            if (!walletAddress || !walletAddress.startsWith('0x') || walletAddress.length < 42) {
+                statusMsg.style.color = "#f87171";
+                statusMsg.innerText = "Please enter a valid 0x wallet address.";
                 return;
             }
 
-            setLoading(true);
-            showStatus('PROCESSING... Broadcasting transaction to ApeChain nodes...', 'info');
+            statusMsg.style.color = "#38bdf8";
+            statusMsg.innerText = "Processing your claim... Please wait.";
 
             try {
                 const response = await fetch(SUPABASE_FUNCTION_URL, {
@@ -146,50 +107,24 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ recipientAddress })
+                    body: JSON.stringify({ userWallet: walletAddress })
                 });
 
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    showStatus('GO CHECK YOUR WALLET! 🚀 NFT airdropped successfully on-chain.', 'success');
-                    walletInput.value = ''; // Reset input field on success
+                    statusMsg.style.color = "#34d399";
+                    statusMsg.innerText = "Success! NFT has been sent to your wallet.";
+                    console.log("Transaction Hash:", data.txHash);
                 } else {
-                    throw new Error(data.error || 'Server rejected the transaction request.');
+                    statusMsg.style.color = "#f87171";
+                    statusMsg.innerText = "Error: " + (data.error || "Claim failed.");
                 }
-
             } catch (err) {
                 console.error(err);
-                showStatus(`REXXXT! Mint failed: ${err.message}`, 'error');
-            } finally {
-                setLoading(false);
+                statusMsg.style.color = "#f87171";
+                statusMsg.innerText = "Network error connecting to backend.";
             }
-        });
-
-        function setLoading(isLoading) {
-            if (isLoading) {
-                mintBtn.disabled = true;
-                mintBtn.innerHTML = '<span class="animate-pulse flex items-center gap-2">MINTING ON-CHAIN...</span>';
-                mintBtn.classList.add('opacity-60', 'cursor-not-allowed');
-            } else {
-                mintBtn.disabled = false;
-                mintBtn.innerHTML = 'APE IN / MINT';
-                mintBtn.classList.remove('opacity-60', 'cursor-not-allowed');
-            }
-        }
-
-        function showStatus(message, type) {
-            statusMessage.classList.remove('hidden', 'border-green-500', 'bg-green-950/50', 'text-green-400', 'border-red-500', 'bg-red-950/50', 'text-red-400', 'border-green-800', 'bg-green-950/20', 'text-green-300');
-            
-            if (type === 'success') {
-                statusMessage.classList.add('border-green-500', 'bg-green-950/50', 'text-green-400');
-            } else if (type === 'error') {
-                statusMessage.classList.add('border-red-500', 'bg-red-950/50', 'text-red-400');
-            } else {
-                statusMessage.classList.add('border-green-800', 'bg-green-950/20', 'text-green-300');
-            }
-
-            statusMessage.textContent = message;
         }
     </script>
 </body>
