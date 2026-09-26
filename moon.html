@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RUGGED CLUB | FREE APECHAIN DROP</title>
+    <title>RUGGED CLUB | MOON ROOM</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -16,24 +16,24 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #1a103c 0%, #05050a 100%);
+            background-image: radial-gradient(circle at 50% 50%, #2a0815 0%, #05050a 100%);
         }
         .card {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(168, 85, 247, 0.3);
+            border: 1px solid rgba(239, 68, 68, 0.3);
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.15);
             text-align: center;
             max-width: 420px;
             width: 100%;
             box-sizing: border-box;
         }
         .badge {
-            background-color: rgba(236, 72, 153, 0.15);
-            color: #ec4899;
-            border: 1px solid rgba(236, 72, 153, 0.3);
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
@@ -50,154 +50,87 @@
             letter-spacing: -0.5px;
         }
         h2 span {
-            color: #a855f7;
+            color: #ef4444;
         }
         p {
             color: #94a3b8;
             font-size: 14px;
             margin-bottom: 24px;
-            line-height: 1.5;
+            line-height: 1.6;
         }
         .highlight {
-            color: #38bdf8;
+            color: #f87171;
             font-weight: 600;
         }
-        .btn {
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-            color: #ffffff;
-            border: none;
-            padding: 14px 24px;
+        .graveyard-box {
+            background: #090d16;
+            border: 1px dashed #334155;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .graveyard-box h3 {
+            margin: 0 0 8px 0;
             font-size: 16px;
+            color: #cbd5e1;
+        }
+        .timer {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fbbf24;
+            letter-spacing: 1px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            font-size: 14px;
             font-weight: 700;
             border-radius: 10px;
             cursor: pointer;
             width: 100%;
-            transition: transform 0.1s, opacity 0.2s;
-            box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+            transition: transform 0.1s, background 0.2s;
             letter-spacing: 0.5px;
+            text-decoration: none;
+            display: inline-block;
+            box-sizing: border-box;
+            margin-top: 10px;
         }
         .btn:hover {
-            opacity: 0.95;
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
             transform: translateY(-1px);
         }
-        .btn:active {
-            transform: translateY(1px);
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        input {
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid #334155;
-            background-color: #090d16;
-            color: #f8fafc;
-            box-sizing: border-box;
-            margin-bottom: 16px;
-            font-size: 14px;
-            outline: none;
-            font-family: 'Space Grotesk', sans-serif;
-            transition: border-color 0.2s;
-        }
-        input:focus {
-            border-color: #a855f7;
-            box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
-        }
-        #statusMessage {
-            margin-top: 20px;
-            font-size: 13px;
-            min-height: 24px;
-            word-break: break-all;
-        }
-        .success-link {
-            color: #34d399;
-            text-decoration: underline;
-            font-weight: 600;
+        .footer-note {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div class="badge">🔥 Zero Gas • 1 Per Wallet</div>
-        <h2>RUGGED <span>CLUB</span></h2>
-        <p>Drop your wallet address below. We're footing the gas. Claim your free pass on <span class="highlight">ApeChain</span> now.</p>
+        <div class="badge">💀 MOON ROOM • LOCKED</div>
+        <h2>TOO LATE, <span>SO SAD</span></h2>
+        <p>You wandered off the path. The main claim portal on <span class="highlight">ApeChain</span> is elsewhere.</p>
 
-        <!-- Input & Button -->
-        <input type="text" id="walletInput" placeholder="Paste your wallet address (0x...)" />
-        <button id="claimBtn" class="btn" onclick="triggerClaim()">CLAIM FREE NFT</button>
+        <div class="graveyard-box">
+            <h3>Next Degen Play:</h3>
+            <div class="timer" id="fakeTimer">SOON™</div>
+        </div>
 
-        <div id="statusMessage"></div>
+        <a href="index.html" class="btn">RETURN TO MAIN DROP 🚀</a>
+        <p class="footer-note">Don't get lost next time.</p>
     </div>
 
     <script>
-        const SUPABASE_FUNCTION_URL = 'https://xmiyrbgpfdiqarxsuhzi.supabase.co/functions/v1/swift-action';
-
-        const loadingPhrases = [
-            "Waking up the ApeChain validators...",
-            "Checking your degen credentials...",
-            "Brewing coffee for the relayer wallet...",
-            "Bypassing gas fees...",
-            "Minting straight to your bag..."
-        ];
-
-        async function triggerClaim() {
-            const walletAddress = document.getElementById('walletInput').value.trim();
-            const statusMsg = document.getElementById('statusMessage');
-            const claimBtn = document.getElementById('claimBtn');
-
-            if (!walletAddress || !walletAddress.startsWith('0x') || walletAddress.length < 42) {
-                statusMsg.style.color = "#f87171";
-                statusMsg.innerText = "⚠️ Drop a valid 0x wallet address first!";
-                return;
-            }
-
-            claimBtn.disabled = true;
-            let phraseIndex = 0;
-            statusMsg.style.color = "#c084fc";
-            statusMsg.innerText = loadingPhrases[phraseIndex];
-
-            // Rotate funny text while waiting
-            const phraseInterval = setInterval(() => {
-                phraseIndex = (phraseIndex + 1) % loadingPhrases.length;
-                statusMsg.innerText = loadingPhrases[phraseIndex];
-            }, 2500);
-
-            try {
-                const response = await fetch(SUPABASE_FUNCTION_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userWallet: walletAddress })
-                });
-
-                const data = await response.json();
-                clearInterval(phraseInterval);
-
-                if (response.ok && data.success) {
-                    statusMsg.style.color = "#34d399";
-                    statusMsg.innerHTML = `🎉 LFG! NFT dropped into your bag.<br><a class="success-link" href="https://apescan.io/tx/${data.txHash}" target="_blank">View Transaction on Apescan</a>`;
-                    claimBtn.innerText = "CLAIMED 🚀";
-                } else {
-                    clearInterval(phraseInterval);
-                    claimBtn.disabled = false;
-                    statusMsg.style.color = "#f87171";
-                    statusMsg.innerText = "❌ " + (data.error || "Transaction failed. (Maybe already claimed?)");
-                    claimBtn.innerText = "CLAIM FREE NFT";
-                }
-            } catch (err) {
-                clearInterval(phraseInterval);
-                claimBtn.disabled = false;
-                console.error(err);
-                statusMsg.style.color = "#f87171";
-                statusMsg.innerText = "❌ Network error. Check your connection and retry.";
-                claimBtn.innerText = "CLAIM FREE NFT";
-            }
-        }
+        let seconds = 69;
+        setInterval(() => {
+            seconds--;
+            if (seconds <= 0) seconds = 420;
+            document.getElementById('fakeTimer').innerText = `COMING NEVER (${seconds}s)`;
+        }, 1000);
     </script>
 </body>
 </html>
