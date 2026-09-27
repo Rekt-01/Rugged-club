@@ -1,698 +1,695 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>APE-man</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      touch-action: manipulation;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Moon Platformer Adventure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #030712;
+            color: white;
+            touch-action: none;
+            user-select: none;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        
+        #game-wrapper {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
 
-    body {
-      background-color: #020205;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-      font-family: monospace;
-    }
+        #game-container {
+            position: relative;
+            width: 100%;
+            image-rendering: pixelated;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.4), 0 0 0 4px #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #020617;
+        }
 
-    .arcade-container {
-      background: #0d0d12;
-      border: 3px solid #ff00ff;
-      border-radius: 14px;
-      padding: 10px;
-      width: 98vw;
-      max-width: 440px;
-      box-shadow: 0 0 35px rgba(255, 0, 255, 0.4);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 5 / 3;
+            background-color: #020617;
+        }
 
-    .header-bar {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-
-    .title-text {
-      color: #ff00ff;
-      font-size: 0.65rem;
-      font-weight: bold;
-      text-shadow: 0 0 6px #ff00ff;
-    }
-
-    .header-controls {
-      display: flex;
-      gap: 4px;
-    }
-
-    .control-btn {
-      background: rgba(0, 255, 255, 0.15);
-      border: 2px solid #00ffff;
-      color: #00ffff;
-      padding: 3px 5px;
-      border-radius: 5px;
-      font-size: 0.55rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .control-btn:hover { background: #00ffff; color: #000; }
-
-    .exit-btn {
-      background: rgba(255, 51, 51, 0.15);
-      border: 2px solid #ff3333;
-      color: #ff3333;
-      padding: 3px 5px;
-      border-radius: 5px;
-      font-size: 0.55rem;
-      font-weight: bold;
-      text-decoration: none;
-    }
-    .exit-btn:hover { background: #ff3333; color: #000; }
-
-    .scoreboard {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      background: #121218;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 5px 10px;
-      margin-bottom: 6px;
-      font-size: 0.65rem;
-      color: #fff;
-    }
-    .score-item span { color: #00ffff; font-weight: bold; }
-
-    .canvas-wrapper {
-      position: relative;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 2px solid #222;
-      background: #000;
-    }
-
-    canvas {
-      display: block;
-      background: #00000a;
-    }
-
-    .dpad {
-      display: grid;
-      grid-template-columns: repeat(3, 50px);
-      grid-template-rows: repeat(2, 44px);
-      gap: 5px;
-      margin-top: 8px;
-      justify-content: center;
-    }
-
-    .dpad-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 2px solid #00ffff;
-      border-radius: 6px;
-      color: #00ffff;
-      font-size: 1rem;
-      font-weight: bold;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-    }
-    .dpad-btn:active {
-      background: rgba(0, 255, 255, 0.3);
-    }
-    .btn-up { grid-column: 2; grid-row: 1; }
-    .btn-left { grid-column: 1; grid-row: 2; }
-    .btn-down { grid-column: 2; grid-row: 2; }
-    .btn-right { grid-column: 3; grid-row: 2; }
-
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 20;
-      justify-content: center;
-      align-items: center;
-      backdrop-filter: blur(5px);
-    }
-    .modal-card {
-      background: #0d0d12;
-      border: 3px solid #00ffff;
-      border-radius: 12px;
-      padding: 18px;
-      width: 90vw;
-      max-width: 380px;
-      text-align: center;
-      box-shadow: 0 0 35px rgba(0, 255, 255, 0.5);
-    }
-    .modal-title {
-      font-size: 0.95rem;
-      font-weight: bold;
-      color: #00ffff;
-      margin-bottom: 10px;
-    }
-    .modal-desc {
-      font-size: 0.7rem;
-      color: #fff;
-      margin-bottom: 15px;
-      line-height: 1.4;
-    }
-    .modal-btn {
-      background: #00ffff;
-      color: #000;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-weight: bold;
-      font-family: monospace;
-      cursor: pointer;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-    }
-    .modal-btn:hover { background: #ff00ff; color: #fff; }
-
-    #particleCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      display: none;
-    }
-  </style>
+        .touch-btn {
+            background: rgba(59, 130, 246, 0.25);
+            border: 3px solid rgba(59, 130, 246, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: white;
+            user-select: none;
+            touch-action: manipulation;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        }
+        .touch-btn:active, .touch-btn.active {
+            background: rgba(59, 130, 246, 0.6);
+            transform: scale(0.95);
+        }
+        
+        .bar-btn {
+            background: linear-gradient(to right, #4f46e5, #3b82f6);
+            border: 2px solid #93c5fd;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            transition: all 0.2s ease;
+        }
+        .bar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.6);
+        }
+    </style>
 </head>
 <body>
 
-  <div class="arcade-container">
-    <div class="header-bar">
-      <div class="title-text">🦍 APE-man</div>
-      <div class="header-controls">
-        <button class="control-btn" id="musicToggleBtn" onclick="toggleMusic()">🔊 MUSIC</button>
-        <a href="index.html" class="exit-btn">🚪 EXIT</a>
-      </div>
+    <div id="game-wrapper">
+        <!-- Top Navigation Header with Return to Bar button -->
+        <div class="w-full max-w-[800px] flex justify-between items-center mb-2 px-2">
+            <h1 class="text-[10px] sm:text-xs text-blue-400 font-bold tracking-wider">🌙 LUNAR EXPLORER</h1>
+            <a href="index.html" class="bar-btn px-4 py-2 rounded-lg text-[10px] sm:text-xs text-white font-bold flex items-center gap-2 cursor-pointer">
+                ⬅ Return to Bar
+            </a>
+        </div>
+
+        <div id="game-container">
+            <!-- In-game HUD Overlay -->
+            <div id="ui-layer" class="absolute top-0 left-0 w-full p-4 flex justify-between text-[10px] sm:text-xs md:text-sm pointer-events-none z-10" style="text-shadow: 2px 2px 0 #000;">
+                <div>
+                    <p class="text-blue-300">SCORE</p>
+                    <p id="score">000000</p>
+                </div>
+                <div>
+                    <p class="text-blue-300">CRYSTALS</p>
+                    <p>💎 x<span id="crystals">00</span></p>
+                </div>
+                <div>
+                    <p class="text-blue-300">SECTOR</p>
+                    <p>MOON-1</p>
+                </div>
+                <div>
+                    <p class="text-blue-300">OXYGEN</p>
+                    <p id="oxygen">300s</p>
+                </div>
+            </div>
+
+            <canvas id="gameCanvas" width="800" height="480"></canvas>
+            
+            <!-- Game Over / Start Screen -->
+            <div id="overlay" class="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center z-20 p-4">
+                <h2 class="text-lg sm:text-2xl text-blue-400 mb-3 text-center leading-relaxed">MOON MISSION</h2>
+                <p id="overlay-msg" class="text-[9px] sm:text-xs text-slate-300 mb-6 text-center leading-loose">
+                    Low gravity lunar surface!<br>Use A/D or Arrows to move. W / Space / Jump to float.<br>Collect glowing crystals & avoid space bugs!
+                </p>
+                <button id="start-btn" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 border-4 border-white text-xs sm:text-sm transition-transform transform hover:scale-105 active:scale-95 cursor-pointer shadow-lg rounded text-white font-bold">
+                    LAUNCH MISSION
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Touch Controls Layout -->
+        <div class="w-full max-w-[800px] flex justify-between items-center mt-3 px-4">
+            <div class="flex gap-4">
+                <div id="btn-left" class="touch-btn w-16 h-16 sm:w-14 sm:h-14">◀</div>
+                <div id="btn-right" class="touch-btn w-16 h-16 sm:w-14 sm:h-14">▶</div>
+            </div>
+            <div>
+                <div id="btn-jump" class="touch-btn w-20 h-20 sm:w-16 sm:h-16 font-bold text-xs bg-blue-500/30 border-blue-400/60">JUMP</div>
+            </div>
+        </div>
     </div>
 
-    <div class="scoreboard">
-      <div class="score-item">SCORE: <span id="scoreDisplay">0</span></div>
-      <div class="score-item">LIVES: <span id="livesDisplay">3</span></div>
-    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const TILE_SIZE = 32;
+        const GRAVITY = 0.22; // Low moon gravity
+        const FRICTION = 0.88;
+        const MAX_SPEED = 3.8;
+        const JUMP_FORCE = -7.5;
+        
+        let gameState = 'START';
+        let score = 0;
+        let crystalsCount = 0;
+        let oxygenTime = 300;
+        let frameCount = 0;
 
-    <div class="canvas-wrapper">
-      <canvas id="arcadeCanvas" width="304" height="336"></canvas>
-      <canvas id="particleCanvas" width="304" height="336"></canvas>
-    </div>
-
-    <div class="dpad">
-      <button class="dpad-btn btn-up" onclick="setDirection(0, -1)">▲</button>
-      <button class="dpad-btn btn-left" onclick="setDirection(-1, 0)">◀</button>
-      <button class="dpad-btn btn-down" onclick="setDirection(0, 1)">▼</button>
-      <button class="dpad-btn btn-right" onclick="setDirection(1, 0)">▶</button>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="endGameModal">
-    <div class="modal-card">
-      <div class="modal-title" id="modalTitle">GAME OVER</div>
-      <div class="modal-desc" id="modalDesc">The otters got you!</div>
-      <button class="modal-btn" id="modalActionBtn" onclick="fullReset()">PLAY AGAIN</button>
-    </div>
-  </div>
-
-  <script>
-    const canvas = document.getElementById('arcadeCanvas');
-    const ctx = canvas.getContext('2d');
-    const pCanvas = document.getElementById('particleCanvas');
-    const pCtx = pCanvas.getContext('2d');
-
-    const tileSize = 16;
-    let score = 0;
-    let lives = 3;
-    let gameState = 'PLAYING';
-    let frightTimer = 0;
-    let celebrationTimer = 0;
-    let particles = [];
-
-    // Audio
-    let audioCtx = null;
-    let musicPlaying = false;
-    let musicInterval = null;
-    let audioInitialized = false;
-
-    function initAudio() {
-      if (audioInitialized) return;
-      try {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AudioContext();
-        audioInitialized = true;
-      } catch(e) {}
-    }
-
-    function toggleMusic() {
-      initAudio();
-      musicPlaying = !musicPlaying;
-      let btn = document.getElementById('musicToggleBtn');
-      if (musicPlaying) {
-        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        btn.innerText = "🔊 ON";
-        startSynthwaveTrack();
-      } else {
-        btn.innerText = "🔇 OFF";
-        stopSynthwaveTrack();
-      }
-    }
-
-    function playNote(freq, duration, type = 'square', gainVal = 0.03) {
-      if (!musicPlaying || !audioCtx) return;
-      try {
-        let osc = audioCtx.createOscillator();
-        let gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-      } catch(e) {}
-    }
-
-    function startSynthwaveTrack() {
-      if (musicInterval) clearInterval(musicInterval);
-      const bassNotes = [110, 110, 130.81, 146.83, 110, 110, 164.81, 146.83];
-      const arpNotes = [220, 261.63, 329.63, 392.00, 440, 392.00, 329.63, 261.63];
-      let step = 0;
-      musicInterval = setInterval(() => {
-        if (!musicPlaying) return;
-        playNote(bassNotes[step % bassNotes.length], 0.15, 'sawtooth', 0.04);
-        if (step % 2 === 0) playNote(arpNotes[(step/2) % arpNotes.length], 0.12, 'square', 0.02);
-        step++;
-      }, 180);
-    }
-
-    function stopSynthwaveTrack() {
-      if (musicInterval) {
-        clearInterval(musicInterval);
-        musicInterval = null;
-      }
-    }
-
-    window.addEventListener('pointerdown', () => {
-      if (!audioInitialized) {
-        initAudio();
-        musicPlaying = true;
-        document.getElementById('musicToggleBtn').innerText = "🔊 ON";
-        startSynthwaveTrack();
-      }
-    }, { once: true });
-
-    // Map
-    const originalMap = [
-      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-      [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
-      [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-      [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-      [1,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1],
-      [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
-      [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
-      [1,1,1,1,0,1,1,1,2,1,2,1,1,1,0,1,1,1,1],
-      [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
-      [1,1,1,1,0,1,2,1,1,2,1,1,2,1,0,1,1,1,1],
-      [2,2,2,2,0,2,2,1,2,2,2,1,2,2,0,2,2,2,2],
-      [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
-      [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
-      [1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1],
-      [1,3,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,3,1],
-      [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-      [1,0,0,1,0,0,0,0,0,4,0,0,0,0,0,1,0,0,1],
-      [1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1],
-      [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
-      [1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
-      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-    ];
-
-    let currentMap = [];
-    let player = {
-      x: 9 * tileSize,
-      y: 16 * tileSize,
-      dx: 0, dy: 0,
-      nextDx: 0, nextDy: 0,
-      speed: 1 // Ape speed
-    };
-
-    let ghosts = [];
-
-    function resetGhosts() {
-      ghosts = [
-        { x: 9 * tileSize, y: 9 * tileSize, dx: 0, dy: -1, speed: 0.8 },
-        { x: 8 * tileSize, y: 10 * tileSize, dx: 1, dy: 0, speed: 0.8 },
-        { x: 10 * tileSize, y: 10 * tileSize, dx: -1, dy: 0, speed: 0.8 }
-      ];
-    }
-
-    function initGame() {
-      currentMap = JSON.parse(JSON.stringify(originalMap));
-      player.x = 9 * tileSize;
-      player.y = 16 * tileSize;
-      player.dx = 0;
-      player.dy = 0;
-      player.nextDx = 0;
-      player.nextDy = 0;
-      resetGhosts();
-      frightTimer = 0;
-    }
-
-    function setDirection(x, y) {
-      if (gameState !== 'PLAYING') return;
-      player.nextDx = x;
-      player.nextDy = y;
-    }
-
-    window.addEventListener('keydown', e => {
-      if (e.key === 'ArrowUp' || e.key === 'w') setDirection(0, -1);
-      if (e.key === 'ArrowDown' || e.key === 's') setDirection(0, 1);
-      if (e.key === 'ArrowLeft' || e.key === 'a') setDirection(-1, 0);
-      if (e.key === 'ArrowRight' || e.key === 'd') setDirection(1, 0);
-    });
-
-    function isTileOpen(col, row) {
-      if (col < 0 || col >= 19) return true; // Tunnels
-      if (row < 0 || row >= 21) return false;
-      return currentMap[row][col] !== 1;
-    }
-
-    function chooseGhostDirection(g, pCol, pRow) {
-      const gCol = Math.round(g.x / tileSize);
-      const gRow = Math.round(g.y / tileSize);
-
-      const dirs = [
-        {dx: 0, dy: -1},
-        {dx: 0, dy: 1},
-        {dx: -1, dy: 0},
-        {dx: 1, dy: 0}
-      ];
-
-      let valid = dirs.filter(d => {
-        if (d.dx === -g.dx && d.dy === -g.dy) return false;
-        return isTileOpen(gCol + d.dx, gRow + d.dy);
-      });
-
-      if (valid.length === 0) {
-        valid = dirs.filter(d => isTileOpen(gCol + d.dx, gRow + d.dy));
-      }
-
-      if (valid.length === 0) return;
-
-      let chosen = valid[0];
-
-      if (frightTimer > 0) {
-        let best = -1;
-        valid.forEach(d => {
-          const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow);
-          if (dist > best) {
-            best = dist;
-            chosen = d;
-          }
-        });
-      } else {
-        let best = Infinity;
-        valid.forEach(d => {
-          const dist = Math.hypot((gCol + d.dx) - pCol, (gRow + d.dy) - pRow) + Math.random() * 1.5;
-          if (dist < best) {
-            best = dist;
-            chosen = d;
-          }
-        });
-      }
-
-      g.dx = chosen.dx;
-      g.dy = chosen.dy;
-    }
-
-    function update() {
-      if (gameState === 'CELEBRATION') {
-        updateCelebrationParticles();
-        return;
-      }
-      if (gameState !== 'PLAYING') return;
-
-      if (frightTimer > 0) frightTimer--;
-
-      // ===== PLAYER (Rail System) =====
-      const atIntersection = (player.x % tileSize === 0) && (player.y % tileSize === 0);
-      const pCol = Math.round(player.x / tileSize);
-      const pRow = Math.round(player.y / tileSize);
-
-      if (player.nextDx !== 0 || player.nextDy !== 0) {
-        if (player.dx === -player.nextDx && player.dy === -player.nextDy) {
-          player.dx = player.nextDx;
-          player.dy = player.nextDy;
-        } else if (atIntersection) {
-          if (isTileOpen(pCol + player.nextDx, pRow + player.nextDy)) {
-            player.dx = player.nextDx;
-            player.dy = player.nextDy;
-          }
-        }
-      }
-
-      if (atIntersection) {
-        if (!isTileOpen(pCol + player.dx, pRow + player.dy)) {
-          player.dx = 0;
-          player.dy = 0;
-        }
-      }
-
-      player.x += player.dx * player.speed;
-      player.y += player.dy * player.speed;
-
-      if (player.x < 0) player.x = (19 - 1) * tileSize;
-      else if (player.x >= 19 * tileSize) player.x = 0;
-
-      let eatCol = Math.floor((player.x + 8) / tileSize);
-      let eatRow = Math.floor((player.y + 8) / tileSize);
-
-      if (eatCol >= 0 && eatCol < 19 && eatRow >= 0 && eatRow < 21) {
-        if (currentMap[eatRow][eatCol] === 0) {
-          currentMap[eatRow][eatCol] = 2;
-          score += 10;
-          checkWinCondition();
-        } else if (currentMap[eatRow][eatCol] === 4) {
-          currentMap[eatRow][eatCol] = 2;
-          score += 100;
-          checkWinCondition();
-        } else if (currentMap[eatRow][eatCol] === 3) {
-          currentMap[eatRow][eatCol] = 2;
-          score += 50;
-          frightTimer = 420;
-          checkWinCondition();
-        }
-      }
-
-      document.getElementById('scoreDisplay').innerText = score;
-      document.getElementById('livesDisplay').innerText = lives;
-
-      // ===== GHOSTS (Otters Speed set to 0.8) =====
-      ghosts.forEach(g => {
-        g.x += g.dx * g.speed;
-        g.y += g.dy * g.speed;
-
-        if (g.x < 0) g.x = (19 - 1) * tileSize;
-        else if (g.x >= 19 * tileSize) g.x = 0;
-
-        const gCol = Math.round(g.x / tileSize);
-        const gRow = Math.round(g.y / tileSize);
-        const gridX = gCol * tileSize;
-        const gridY = gRow * tileSize;
-
-        // Using speed threshold to safely snap and route otters
-        if (Math.abs(g.x - gridX) <= g.speed && Math.abs(g.y - gridY) <= g.speed) {
-          g.x = gridX;
-          g.y = gridY;
-          
-          if (!isTileOpen(gCol + g.dx, gRow + g.dy)) {
-            g.dx = 0;
-            g.dy = 0;
-          }
-          
-          chooseGhostDirection(g, pCol, pRow);
-        }
-
-        const dist = Math.hypot((player.x + 8) - (g.x + 8), (player.y + 8) - (g.y + 8));
-        if (dist < 11) {
-          if (frightTimer > 0) {
-            score += 200;
-            g.x = 9 * tileSize;
-            g.y = 10 * tileSize;
-            g.dx = 0;
-            g.dy = -1;
-          } else {
-            lives--;
-            if (lives <= 0) {
-              gameState = 'GAMEOVER';
-              triggerModal("GAME OVER", "The otters got you!", "PLAY AGAIN", fullReset);
-            } else {
-              player.x = 9 * tileSize;
-              player.y = 16 * tileSize;
-              player.dx = 0;
-              player.dy = 0;
-              player.nextDx = 0;
-              player.nextDy = 0;
-              resetGhosts();
-              frightTimer = 0;
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
-          }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
-      });
-    }
 
-    function checkWinCondition() {
-      let left = false;
-      for (let r = 0; r < 21; r++) {
-        for (let c = 0; c < 19; c++) {
-          if (currentMap[r][c] === 0 || currentMap[r][c] === 3 || currentMap[r][c] === 4) {
-            left = true;
-            break;
-          }
+        function playSound(type) {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+                
+                if (type === 'jump') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(440, now + 0.25);
+                    gainNode.gain.setValueAtTime(0.1, now);
+                    gainNode.gain.linearRampToValueAtTime(0, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'crystal') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(587.33, now);
+                    osc.frequency.setValueAtTime(880, now + 0.1);
+                    gainNode.gain.setValueAtTime(0.12, now);
+                    gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'stomp') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+                    gainNode.gain.setValueAtTime(0.15, now);
+                    gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === 'hit') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(120, now);
+                    osc.frequency.linearRampToValueAtTime(50, now + 0.2);
+                    gainNode.gain.setValueAtTime(0.15, now);
+                    gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                }
+            } catch (e) {
+                console.error("Audio error", e);
+            }
         }
-        if (left) break;
-      }
 
-      if (!left) {
-        gameState = 'CELEBRATION';
-        celebrationTimer = 180;
-        pCanvas.style.display = 'block';
-        particles = [];
-        const emojis = ['🚀','🌕','💎','💰','🦍','🔥'];
-        for (let i = 0; i < 50; i++) {
-          particles.push({
-            x: canvas.width/2,
-            y: canvas.height/2,
-            vx: (Math.random()-0.5)*7,
-            vy: (Math.random()-0.7)*8,
-            emoji: emojis[Math.floor(Math.random()*emojis.length)],
-            size: 14 + Math.random()*10,
-            alpha: 1
-          });
+        const levelLayout = [
+            "........................................................................................................................",
+            "........................................................................................................................",
+            "........................................................................................................................",
+            "........................................................................................................................",
+            "........................................................................................................................",
+            ".......💎....................MMM........................................................................................",
+            ".............................................................................💎..........................................",
+            "................E...........................E..............E...............MMM..........................................",
+            ".............MMMMM........................MMMM...........MMMM........................E...................CC.............",
+            "...................................................................................MMMMMM................CC.............",
+            "..................................💎..............................💎.....................................CC.............",
+            "MMMMMMMMMMMMMMMMMMMMMMMMMMMM......CC................................CC...................................CC.............",
+            "RRR.RRR...RRRR...RR...RRRRRR......CCMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM..CCMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMCCMMMMMMMMMMMMMM",
+            "RRR.RRR...RRRR...RR...RRRRRR......CCRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..CCRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRCCRRRRRRRRRRRRRR",
+            "RRR.RRR...RRRR...RR...RRRRRR......CCRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..CCRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRCCRRRRRRRRRRRRRR"
+        ];
+
+        let map = [];
+        const MAP_ROWS = levelLayout.length;
+        const MAP_COLS = levelLayout[0].length;
+        let mapWidth = MAP_COLS * TILE_SIZE;
+
+        let enemies = [];
+        let items = [];
+        
+        function buildMap() {
+            map = [];
+            enemies = [];
+            for (let r = 0; r < MAP_ROWS; r++) {
+                let row = [];
+                for (let c = 0; c < MAP_COLS; c++) {
+                    let char = levelLayout[r][c];
+                    if (char === 'E') {
+                        enemies.push(new Enemy(c * TILE_SIZE, r * TILE_SIZE));
+                        row.push('.');
+                    } else if (char === '💎') {
+                        items.push(new Crystal(c * TILE_SIZE + 8, r * TILE_SIZE + 8));
+                        row.push('.');
+                    } else {
+                        row.push(char);
+                    }
+                }
+                map.push(row);
+            }
         }
-      }
-    }
 
-    function updateCelebrationParticles() {
-      celebrationTimer--;
-      pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+        const keys = { right: false, left: false, up: false };
 
-      pCtx.font = "bold 16px monospace";
-      pCtx.textAlign = "center";
-      pCtx.fillStyle = "#00ffff";
-      pCtx.fillText("🎉 ARENA CLEARED! 🎉", pCanvas.width/2, pCanvas.height/2 - 15);
-      pCtx.fillStyle = "#ffcc00";
-      pCtx.fillText("YOU WIN!", pCanvas.width/2, pCanvas.height/2 + 15);
+        window.addEventListener('keydown', e => {
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+                if (!keys.up) tryJump();
+                keys.up = true;
+            }
+        });
 
-      particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.18;
-        p.alpha -= 0.006;
-        pCtx.save();
-        pCtx.globalAlpha = Math.max(p.alpha, 0);
-        pCtx.font = `${p.size}px sans-serif`;
-        pCtx.textAlign = 'center';
-        pCtx.fillText(p.emoji, p.x, p.y);
-        pCtx.restore();
-      });
+        window.addEventListener('keyup', e => {
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') keys.up = false;
+        });
 
-      if (celebrationTimer <= 0) {
-        pCanvas.style.display = 'none';
-        triggerModal("YOU WIN!", `Score: ${score}`, "PLAY AGAIN", fullReset);
-      }
-    }
+        const bindTouch = (id, key) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const handleDown = (e) => {
+                e.preventDefault();
+                initAudio();
+                if (key === 'up' && !keys.up) tryJump();
+                keys[key] = true;
+                el.classList.add('active');
+            };
+            const handleUp = (e) => {
+                e.preventDefault();
+                keys[key] = false;
+                el.classList.remove('active');
+            };
+            el.addEventListener('touchstart', handleDown, { passive: false });
+            el.addEventListener('touchend', handleUp, { passive: false });
+            el.addEventListener('touchcancel', handleUp, { passive: false });
+            el.addEventListener('mousedown', handleDown);
+            el.addEventListener('mouseup', handleUp);
+            el.addEventListener('mouseleave', handleUp);
+        };
 
-    function fullReset() {
-      score = 0;
-      lives = 3;
-      gameState = 'PLAYING';
-      frightTimer = 0;
-      document.getElementById('endGameModal').style.display = 'none';
-      pCanvas.style.display = 'none';
-      initGame();
-    }
+        bindTouch('btn-left', 'left');
+        bindTouch('btn-right', 'right');
+        bindTouch('btn-jump', 'up');
 
-    function triggerModal(title, desc, btnText, callback) {
-      document.getElementById('modalTitle').innerText = title;
-      document.getElementById('modalDesc').innerText = desc;
-      let btn = document.getElementById('modalActionBtn');
-      btn.innerText = btnText;
-      btn.onclick = callback;
-      document.getElementById('endGameModal').style.display = 'flex';
-    }
+        function tryJump() {
+            if (player && player.grounded) {
+                player.vy = JUMP_FORCE;
+                player.grounded = false;
+                playSound('jump');
+            }
+        }
 
-    function draw() {
-      ctx.fillStyle = '#00000a';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+        class Astronaut {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 24;
+                this.height = 32;
+                this.vx = 0;
+                this.vy = 0;
+                this.grounded = false;
+                this.facingRight = true;
+                this.isDead = false;
+            }
 
-      for (let r = 0; r < 21; r++) {
-        for (let c = 0; c < 19; c++) {
-          if (currentMap[r][c] === 1) {
-            ctx.fillStyle = '#1a1a3a';
-            ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
-            ctx.strokeStyle = '#00ffff';
-            ctx.lineWidth = 0.5;
-            ctx.strokeRect(c * tileSize, r * tileSize, tileSize, tileSize);
-          } else if (currentMap[r][c] === 0) {
-            ctx.fillStyle = '#ffcc00';
+            update() {
+                if (this.isDead) {
+                    this.vy += GRAVITY;
+                    this.y += this.vy;
+                    return;
+                }
+
+                if (keys.right) {
+                    this.vx += 0.4;
+                    this.facingRight = true;
+                } else if (keys.left) {
+                    this.vx -= 0.4;
+                    this.facingRight = false;
+                } else {
+                    this.vx *= FRICTION;
+                }
+
+                if (this.vx > MAX_SPEED) this.vx = MAX_SPEED;
+                if (this.vx < -MAX_SPEED) this.vx = -MAX_SPEED;
+                if (Math.abs(this.vx) < 0.1) this.vx = 0;
+
+                this.x += this.vx;
+                this.checkCollisions(true);
+
+                if (this.x < 0) {
+                    this.x = 0;
+                    this.vx = 0;
+                }
+
+                this.vy += GRAVITY;
+                this.y += this.vy;
+                this.grounded = false;
+                this.checkCollisions(false);
+
+                if (this.y > canvas.height + 100) {
+                    die();
+                }
+            }
+
+            checkCollisions(isX) {
+                let leftCol = Math.floor(this.x / TILE_SIZE);
+                let rightCol = Math.floor((this.x + this.width - 1) / TILE_SIZE);
+                let topRow = Math.floor(this.y / TILE_SIZE);
+                let bottomRow = Math.floor((this.y + this.height - 1) / TILE_SIZE);
+
+                if (leftCol < 0) leftCol = 0;
+                if (rightCol >= MAP_COLS) rightCol = MAP_COLS - 1;
+                if (topRow < 0) topRow = 0;
+                if (bottomRow >= MAP_ROWS) bottomRow = MAP_ROWS - 1;
+
+                for (let r = topRow; r <= bottomRow; r++) {
+                    for (let c = leftCol; c <= rightCol; c++) {
+                        let tile = map[r][c];
+                        if (tile !== '.') {
+                            if (isX) {
+                                if (this.vx > 0) {
+                                    this.x = c * TILE_SIZE - this.width;
+                                } else if (this.vx < 0) {
+                                    this.x = (c + 1) * TILE_SIZE;
+                                }
+                                this.vx = 0;
+                            } else {
+                                if (this.vy > 0) {
+                                    this.y = r * TILE_SIZE - this.height;
+                                    this.vy = 0;
+                                    this.grounded = true;
+                                } else if (this.vy < 0) {
+                                    this.y = (r + 1) * TILE_SIZE;
+                                    this.vy = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x + this.width/2, this.y + this.height/2);
+                if (!this.facingRight) ctx.scale(-1, 1);
+                
+                // Spacesuit Body (White/Silver)
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillRect(-this.width/2 + 2, -this.height/2 + 8, this.width - 4, this.height - 8);
+                
+                // Helmet Visor (Glowing Gold/Cyan)
+                ctx.fillStyle = '#38bdf8';
+                ctx.fillRect(-this.width/2 + 4, -this.height/2, this.width - 6, 12);
+                ctx.fillStyle = '#0284c7';
+                ctx.fillRect(-this.width/2 + 6, -this.height/2 + 2, 4, 8);
+
+                // Backpack (Oxygen tank)
+                ctx.fillStyle = '#64748b';
+                ctx.fillRect(-this.width/2 - 4, -this.height/2 + 10, 6, 14);
+
+                // Boots
+                ctx.fillStyle = '#334155';
+                ctx.fillRect(-this.width/2 + 2, this.height/2 - 4, 8, 4);
+                ctx.fillRect(this.width/2 - 10, this.height/2 - 4, 8, 4);
+
+                ctx.restore();
+            }
+        }
+
+        class Crystal {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 16;
+                this.height = 16;
+                this.collected = false;
+                this.floatOffset = Math.random() * Math.PI;
+            }
+            update() {
+                this.floatOffset += 0.08;
+            }
+            draw() {
+                if (this.collected) return;
+                ctx.save();
+                ctx.translate(this.x + this.width/2, this.y + this.height/2 + Math.sin(this.floatOffset) * 3);
+                ctx.fillStyle = '#38bdf8';
+                ctx.beginPath();
+                ctx.moveTo(0, -10);
+                ctx.lineTo(8, 0);
+                ctx.lineTo(0, 10);
+                ctx.lineTo(-8, 0);
+                ctx.closePath();
+                ctx.fill();
+                ctx.strokeStyle = '#bae6fd';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        class Enemy {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 28;
+                this.height = 24;
+                this.vx = -1.0;
+                this.vy = 0;
+                this.isDead = false;
+                this.deathTimer = 0;
+            }
+
+            update() {
+                if (this.isDead) {
+                    this.deathTimer++;
+                    return;
+                }
+
+                this.vy += GRAVITY;
+                this.y += this.vy;
+                this.x += this.vx;
+
+                let cLeft = Math.floor(this.x / TILE_SIZE);
+                let cRight = Math.floor((this.x + this.width) / TILE_SIZE);
+                let rBottom = Math.floor((this.y + this.height) / TILE_SIZE);
+                let rTop = Math.floor(this.y / TILE_SIZE);
+                
+                if (rBottom < MAP_ROWS && (map[rBottom][cLeft] !== '.' || map[rBottom][cRight] !== '.')) {
+                    this.y = rBottom * TILE_SIZE - this.height;
+                    this.vy = 0;
+                }
+
+                if (this.vx < 0 && cLeft >= 0 && map[rTop][cLeft] !== '.') {
+                    this.x = (cLeft + 1) * TILE_SIZE;
+                    this.vx *= -1;
+                } else if (this.vx > 0 && cRight < MAP_COLS && map[rTop][cRight] !== '.') {
+                    this.x = cRight * TILE_SIZE - this.width;
+                    this.vx *= -1;
+                }
+
+                if (!player.isDead) {
+                    if (this.x < player.x + player.width &&
+                        this.x + this.width > player.x &&
+                        this.y < player.y + player.height &&
+                        this.y + this.height > player.y) {
+                        
+                        if (player.vy > 0 && player.y + player.height - player.vy <= this.y + 10) {
+                            this.isDead = true;
+                            playSound('stomp');
+                            player.vy = JUMP_FORCE * 0.7;
+                            score += 300;
+                        } else {
+                            playSound('hit');
+                            die();
+                        }
+                    }
+                }
+            }
+
+            draw() {
+                if (this.deathTimer > 35) return;
+
+                ctx.save();
+                ctx.translate(this.x + this.width/2, this.y + this.height/2);
+
+                if (this.isDead) {
+                    ctx.fillStyle = '#64748b';
+                    ctx.fillRect(-this.width/2, this.height/2 - 6, this.width, 6);
+                } else {
+                    // Alien Space Bug / Floating Drone
+                    ctx.fillStyle = '#f43f5e';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.width/2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#fef08a';
+                    ctx.fillRect(-6, -4, 4, 4);
+                    ctx.fillRect(2, -4, 4, 4);
+                }
+                ctx.restore();
+            }
+        }
+
+        let player;
+        let camera = { x: 0, y: 0 };
+
+        function initGame() {
+            initAudio();
+            buildMap();
+            player = new Astronaut(64, 100);
+            score = 0;
+            crystalsCount = 0;
+            oxygenTime = 300;
+            frameCount = 0;
+            gameState = 'PLAYING';
+            document.getElementById('overlay').classList.add('hidden');
+        }
+
+        function die() {
+            if (player.isDead) return;
+            player.isDead = true;
+            player.vy = JUMP_FORCE;
+            player.vx = 0;
+
+            setTimeout(() => {
+                gameState = 'GAMEOVER';
+                document.getElementById('overlay').classList.remove('hidden');
+                document.getElementById('overlay-msg').innerHTML = `MISSION FAILED<br><br>Score: ${score}<br>Crystals: ${crystalsCount}`;
+                document.getElementById('start-btn').innerText = "TRY AGAIN";
+            }, 1800);
+        }
+
+        function drawMap() {
+            let startCol = Math.max(0, Math.floor(camera.x / TILE_SIZE));
+            let endCol = Math.min(MAP_COLS, startCol + Math.ceil(canvas.width / TILE_SIZE) + 1);
+
+            for (let r = 0; r < MAP_ROWS; r++) {
+                for (let c = startCol; c < endCol; c++) {
+                    let tile = map[r][c];
+                    if (tile === '.') continue;
+
+                    let tx = c * TILE_SIZE;
+                    let ty = r * TILE_SIZE;
+
+                    ctx.save();
+                    ctx.translate(tx, ty);
+
+                    if (tile === 'M') {
+                        // Moon regolith surface
+                        ctx.fillStyle = '#334155';
+                        ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+                        ctx.fillStyle = '#475569';
+                        ctx.fillRect(4, 4, TILE_SIZE-8, TILE_SIZE-8);
+                    } else if (tile === 'R') {
+                        // Deep lunar rock
+                        ctx.fillStyle = '#1e293b';
+                        ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+                    } else if (tile === 'C') {
+                        // Crater walls / Pipe structure
+                        ctx.fillStyle = '#0f172a';
+                        ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+                        ctx.fillStyle = '#334155';
+                        ctx.fillRect(0, 0, 6, TILE_SIZE);
+                    }
+                    ctx.restore();
+                }
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score.toString().padStart(6, '0');
+            document.getElementById('crystals').innerText = crystalsCount.toString().padStart(2, '0');
+            document.getElementById('oxygen').innerText = Math.floor(oxygenTime) + 's';
+        }
+
+        function gameLoop() {
+            if (gameState === 'PLAYING') {
+                frameCount++;
+                
+                if (frameCount % 60 === 0) {
+                    oxygenTime--;
+                    if (oxygenTime <= 0 && !player.isDead) die();
+                }
+
+                player.update();
+
+                let targetCamX = player.x - canvas.width / 2 + player.width / 2;
+                if (targetCamX < 0) targetCamX = 0;
+                if (targetCamX > mapWidth - canvas.width) targetCamX = mapWidth - canvas.width;
+                
+                camera.x += (targetCamX - camera.x) * 0.12;
+                
+                for (let e of enemies) e.update();
+                
+                // Check crystal pickups
+                for (let item of items) {
+                    item.update();
+                    if (!item.collected &&
+                        player.x < item.x + item.width &&
+                        player.x + player.width > item.x &&
+                        player.y < item.y + item.height &&
+                        player.y + player.height > item.y) {
+                        item.collected = true;
+                        crystalsCount++;
+                        score += 150;
+                        playSound('crystal');
+                    }
+                }
+
+                updateUI();
+            }
+
+            // Deep Space Background
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Twinkling Space Stars & Distant Planets
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < 35; i++) {
+                let sx = (i * 123 + Math.floor(i * 41)) % canvas.width;
+                let sy = (i * 77) % (canvas.height - 100);
+                let alpha = (Math.sin(frameCount * 0.05 + i) + 1) * 0.5;
+                ctx.globalAlpha = Math.max(0.2, alpha);
+                ctx.fillRect(sx, sy, i % 2 === 0 ? 2 : 1, i % 2 === 0 ? 2 : 1);
+            }
+            ctx.globalAlpha = 1.0;
+
+            // Distant Planet / Moon
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
             ctx.beginPath();
-            ctx.arc(c * tileSize + 8, r * tileSize + 8, 2.5, 0, Math.PI * 2);
+            ctx.arc(680, 100, 70, 0, Math.PI * 2);
             ctx.fill();
-          } else if (currentMap[r][c] === 4) {
-            ctx.font = '13px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('💰', c * tileSize + 8, r * tileSize + 8);
-          } else if (currentMap[r][c] === 3) {
-            ctx.font = '12px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('💎', c * tileSize + 8, r * tileSize + 8);
-          }
+
+            ctx.save();
+            ctx.translate(Math.floor(-camera.x), 0);
+
+            drawMap();
+            for (let item of items) item.draw();
+            for (let e of enemies) e.draw();
+            if (player) player.draw();
+
+            ctx.restore();
+
+            requestAnimationFrame(gameLoop);
         }
-      }
 
-      // Player
-      ctx.font = '14px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('🦍', player.x + 8, player.y + 8);
+        document.getElementById('start-btn').addEventListener('click', initGame);
 
-      // Ghosts
-      ghosts.forEach(g => {
-        ctx.fillText(frightTimer > 0 ? '💧' : '🦦', g.x + 8, g.y + 8);
-      });
-    }
-
-    function loop() {
-      update();
-      draw();
-      requestAnimationFrame(loop);
-    }
-
-    initGame();
-    loop();
-  </script>
+        player = new Astronaut(64, 100);
+        buildMap();
+        requestAnimationFrame(gameLoop);
+    </script>
 </body>
 </html>
+```
