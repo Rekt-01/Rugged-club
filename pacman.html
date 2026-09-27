@@ -2,694 +2,491 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Moon Platformer Adventure</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Retro Adventure Game</title>
     <style>
         body {
-            font-family: 'Press Start 2P', cursive;
-            background-color: #030712;
-            color: white;
-            touch-action: none;
-            user-select: none;
-            overflow: hidden;
             margin: 0;
             padding: 0;
+            background-color: #111;
+            color: #fff;
+            font-family: 'Courier New', monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-        }
-        
-        #game-wrapper {
-            width: 100%;
-            max-width: 800px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-            box-sizing: border-box;
+            overflow: hidden;
+            touch-action: none;
         }
 
         #game-container {
             position: relative;
-            width: 100%;
-            image-rendering: pixelated;
-            box-shadow: 0 0 40px rgba(59, 130, 246, 0.4), 0 0 0 4px #1e293b;
-            border-radius: 12px;
-            overflow: hidden;
-            background-color: #020617;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            border: 4px solid #444;
+            background-color: #206020;
         }
 
         canvas {
             display: block;
+            background-color: #206020;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        .bar-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: 2px solid #fff;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 10;
+        }
+        .bar-btn:hover { background: #c0392b; }
+
+        /* Mobile Touch Controls */
+        #touch-controls {
+            display: flex;
+            justify-content: space-between;
             width: 100%;
-            height: auto;
-            aspect-ratio: 5 / 3;
-            background-color: #020617;
+            max-width: 600px;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+
+        .dpad {
+            display: grid;
+            grid-template-columns: 60px 60px 60px;
+            grid-template-rows: 60px 60px;
+            gap: 5px;
         }
 
         .touch-btn {
-            background: rgba(59, 130, 246, 0.25);
-            border: 3px solid rgba(59, 130, 246, 0.6);
-            backdrop-filter: blur(4px);
-            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
-            color: white;
             user-select: none;
-            touch-action: manipulation;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            -webkit-user-select: none;
+            cursor: pointer;
         }
-        .touch-btn:active, .touch-btn.active {
-            background: rgba(59, 130, 246, 0.6);
-            transform: scale(0.95);
+        .touch-btn:active, .touch-btn.pressed {
+            background: rgba(255, 255, 255, 0.5);
         }
-        
-        .bar-btn {
-            background: linear-gradient(to right, #4f46e5, #3b82f6);
-            border: 2px solid #93c5fd;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-            transition: all 0.2s ease;
+
+        #btn-up { grid-column: 2; grid-row: 1; }
+        #btn-left { grid-column: 1; grid-row: 2; }
+        #btn-right { grid-column: 3; grid-row: 2; }
+        #btn-down { grid-column: 2; grid-row: 2; }
+
+        .actions {
+            display: flex;
+            align-items: center;
         }
-        .bar-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.6);
+
+        #btn-sword {
+            width: 90px;
+            height: 90px;
+            background: rgba(231, 76, 60, 0.6);
+            border: 2px solid #ff6b6b;
+            border-radius: 50%;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            cursor: pointer;
+        }
+        #btn-sword:active {
+            background: rgba(231, 76, 60, 0.9);
+        }
+
+        @media (min-width: 768px) {
+            #touch-controls { display: none; } /* Hide on desktop if using keyboard */
         }
     </style>
 </head>
 <body>
 
-    <div id="game-wrapper">
-        <!-- Top Navigation Header with Return to Bar button -->
-        <div class="w-full max-w-[800px] flex justify-between items-center mb-2 px-2">
-            <h1 class="text-[10px] sm:text-xs text-blue-400 font-bold tracking-wider">🌙 LUNAR EXPLORER</h1>
-            <a href="index.html" class="bar-btn px-4 py-2 rounded-lg text-[10px] sm:text-xs text-white font-bold flex items-center gap-2 cursor-pointer">
-                ⬅ Return to Bar
-            </a>
+    <div id="game-container">
+        <a href="index.html" class="bar-btn">Return to Bar</a>
+        <canvas id="gameCanvas" width="480" height="360"></canvas>
+    </div>
+
+    <!-- On-screen mobile touch pad -->
+    <div id="touch-controls">
+        <div class="dpad">
+            <div class="touch-btn" id="btn-up">▲</div>
+            <div class="touch-btn" id="btn-left">◀</div>
+            <div class="touch-btn" id="btn-down">▼</div>
+            <div class="touch-btn" id="btn-right">▶</div>
         </div>
-
-        <div id="game-container">
-            <!-- In-game HUD Overlay -->
-            <div id="ui-layer" class="absolute top-0 left-0 w-full p-4 flex justify-between text-[10px] sm:text-xs md:text-sm pointer-events-none z-10" style="text-shadow: 2px 2px 0 #000;">
-                <div>
-                    <p class="text-blue-300">SCORE</p>
-                    <p id="score">000000</p>
-                </div>
-                <div>
-                    <p class="text-blue-300">CRYSTALS</p>
-                    <p>💎 x<span id="crystals">00</span></p>
-                </div>
-                <div>
-                    <p class="text-blue-300">SECTOR</p>
-                    <p>MOON-1</p>
-                </div>
-                <div>
-                    <p class="text-blue-300">OXYGEN</p>
-                    <p id="oxygen">300s</p>
-                </div>
-            </div>
-
-            <canvas id="gameCanvas" width="800" height="480"></canvas>
-            
-            <!-- Game Over / Start Screen -->
-            <div id="overlay" class="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center z-20 p-4">
-                <h2 class="text-lg sm:text-2xl text-blue-400 mb-3 text-center leading-relaxed">MOON MISSION</h2>
-                <p id="overlay-msg" class="text-[9px] sm:text-xs text-slate-300 mb-6 text-center leading-loose">
-                    Low gravity lunar surface!<br>Use A/D or Arrows to move. W / Space / Jump to float.<br>Collect glowing crystals & avoid space bugs!
-                </p>
-                <button id="start-btn" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 border-4 border-white text-xs sm:text-sm transition-transform transform hover:scale-105 active:scale-95 cursor-pointer shadow-lg rounded text-white font-bold">
-                    LAUNCH MISSION
-                </button>
-            </div>
-        </div>
-
-        <!-- Mobile Touch Controls Layout -->
-        <div class="w-full max-w-[800px] flex justify-between items-center mt-3 px-4">
-            <div class="flex gap-4">
-                <div id="btn-left" class="touch-btn w-16 h-16 sm:w-14 sm:h-14">◀</div>
-                <div id="btn-right" class="touch-btn w-16 h-16 sm:w-14 sm:h-14">▶</div>
-            </div>
-            <div>
-                <div id="btn-jump" class="touch-btn w-20 h-20 sm:w-16 sm:h-16 font-bold text-xs bg-blue-500/30 border-blue-400/60">JUMP</div>
-            </div>
+        <div class="actions">
+            <div class="touch-btn" id="btn-sword">SWORD</div>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        const TILE_SIZE = 32;
-        const GRAVITY = 0.22; // Low moon gravity
-        const FRICTION = 0.88;
-        const MAX_SPEED = 3.8;
-        const JUMP_FORCE = -7.5;
-        
-        let gameState = 'START';
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Game State
+        let gameState = "PLAYING"; // PLAYING, WON, GAMEOVER
         let score = 0;
-        let crystalsCount = 0;
-        let oxygenTime = 300;
-        let frameCount = 0;
+        let hasKey = false;
 
-        let audioCtx;
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
-        function playSound(type) {
-            if (!audioCtx) return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                osc.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                const now = audioCtx.currentTime;
-                
-                if (type === 'jump') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(220, now);
-                    osc.frequency.exponentialRampToValueAtTime(440, now + 0.25);
-                    gainNode.gain.setValueAtTime(0.1, now);
-                    gainNode.gain.linearRampToValueAtTime(0, now + 0.25);
-                    osc.start(now);
-                    osc.stop(now + 0.25);
-                } else if (type === 'crystal') {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(587.33, now);
-                    osc.frequency.setValueAtTime(880, now + 0.1);
-                    gainNode.gain.setValueAtTime(0.12, now);
-                    gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
-                    osc.start(now);
-                    osc.stop(now + 0.3);
-                } else if (type === 'stomp') {
-                    osc.type = 'square';
-                    osc.frequency.setValueAtTime(150, now);
-                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
-                    gainNode.gain.setValueAtTime(0.15, now);
-                    gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
-                    osc.start(now);
-                    osc.stop(now + 0.2);
-                } else if (type === 'hit') {
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(120, now);
-                    osc.frequency.linearRampToValueAtTime(50, now + 0.2);
-                    gainNode.gain.setValueAtTime(0.15, now);
-                    gainNode.gain.linearRampToValueAtTime(0, now + 0.2);
-                    osc.start(now);
-                    osc.stop(now + 0.2);
-                }
-            } catch (e) {
-                console.error("Audio error", e);
-            }
-        }
-
-        const levelLayout = [
-            "........................................................................................................................",
-            "........................................................................................................................",
-            "........................................................................................................................",
-            "........................................................................................................................",
-            "........................................................................................................................",
-            ".......💎....................MMM........................................................................................",
-            ".............................................................................💎..........................................",
-            "................E...........................E..............E...............MMM..........................................",
-            ".............MMMMM........................MMMM...........MMMM........................E...................CC.............",
-            "...................................................................................MMMMMM................CC.............",
-            "..................................💎..............................💎.....................................CC.............",
-            "MMMMMMMMMMMMMMMMMMMMMMMMMMMM......CC................................CC...................................CC.............",
-            "RRR.RRR...RRRR...RR...RRRRRR......CCMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM..CCMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMCCMMMMMMMMMMMMMM",
-            "RRR.RRR...RRRR...RR...RRRRRR......CCRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..CCRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRCCRRRRRRRRRRRRRR",
-            "RRR.RRR...RRRR...RR...RRRRRR......CCRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..CCRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRCCRRRRRRRRRRRRRR"
-        ];
-
-        let map = [];
-        const MAP_ROWS = levelLayout.length;
-        const MAP_COLS = levelLayout[0].length;
-        let mapWidth = MAP_COLS * TILE_SIZE;
-
-        let enemies = [];
-        let items = [];
-        
-        function buildMap() {
-            map = [];
-            enemies = [];
-            for (let r = 0; r < MAP_ROWS; r++) {
-                let row = [];
-                for (let c = 0; c < MAP_COLS; c++) {
-                    let char = levelLayout[r][c];
-                    if (char === 'E') {
-                        enemies.push(new Enemy(c * TILE_SIZE, r * TILE_SIZE));
-                        row.push('.');
-                    } else if (char === '💎') {
-                        items.push(new Crystal(c * TILE_SIZE + 8, r * TILE_SIZE + 8));
-                        row.push('.');
-                    } else {
-                        row.push(char);
-                    }
-                }
-                map.push(row);
-            }
-        }
-
-        const keys = { right: false, left: false, up: false };
-
-        window.addEventListener('keydown', e => {
-            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
-            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
-            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
-                if (!keys.up) tryJump();
-                keys.up = true;
-            }
-        });
-
-        window.addEventListener('keyup', e => {
-            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
-            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
-            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') keys.up = false;
-        });
-
-        const bindTouch = (id, key) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            const handleDown = (e) => {
-                e.preventDefault();
-                initAudio();
-                if (key === 'up' && !keys.up) tryJump();
-                keys[key] = true;
-                el.classList.add('active');
-            };
-            const handleUp = (e) => {
-                e.preventDefault();
-                keys[key] = false;
-                el.classList.remove('active');
-            };
-            el.addEventListener('touchstart', handleDown, { passive: false });
-            el.addEventListener('touchend', handleUp, { passive: false });
-            el.addEventListener('touchcancel', handleUp, { passive: false });
-            el.addEventListener('mousedown', handleDown);
-            el.addEventListener('mouseup', handleUp);
-            el.addEventListener('mouseleave', handleUp);
+        // Player object
+        const player = {
+            x: 220,
+            y: 280,
+            width: 20,
+            height: 24,
+            speed: 2.5,
+            dir: "DOWN", // UP, DOWN, LEFT, RIGHT
+            hp: 6,       // 3 hearts (2 hp each)
+            maxHp: 6,
+            isAttacking: false,
+            attackTimer: 0
         };
 
-        bindTouch('btn-left', 'left');
-        bindTouch('btn-right', 'right');
-        bindTouch('btn-jump', 'up');
+        // World Objects: Trees, Walls, Locked Door, Chest
+        const obstacles = [
+            // Border walls
+            { x: 0, y: 0, w: 480, h: 20, type: "wall" },
+            { x: 0, y: 340, w: 480, h: 20, type: "wall" },
+            { x: 0, y: 0, w: 20, h: 360, type: "wall" },
+            { x: 460, y: 0, w: 20, h: 360, type: "wall" },
+            
+            // Obstacles & Trees in the overworld
+            { x: 100, y: 80, w: 60, h: 40, type: "tree" },
+            { x: 300, y: 80, w: 80, h: 40, type: "tree" },
+            { x: 100, y: 200, w: 40, h: 60, type: "tree" },
+            { x: 320, y: 200, w: 60, h: 60, type: "tree" },
 
-        function tryJump() {
-            if (player && player.grounded) {
-                player.vy = JUMP_FORCE;
-                player.grounded = false;
-                playSound('jump');
+            // Dungeon structure center divider
+            { x: 200, y: 140, w: 80, h: 20, type: "wall" },
+            // Locked Door
+            { x: 220, y: 140, w: 40, h: 20, type: "door", locked: true }
+        ];
+
+        // Key location
+        let key = { x: 380, y: 60, w: 16, h: 16, collected: false };
+
+        // Treasure Chest location
+        const chest = { x: 232, y: 50, w: 24, h: 24, opened: false };
+
+        // Enemies
+        let enemies = [
+            { x: 80, y: 150, w: 20, h: 20, speed: 1, hp: 2, dirTimer: 0, dx: 1, dy: 0 },
+            { x: 380, y: 280, w: 20, h: 20, speed: 1.2, hp: 2, dirTimer: 0, dx: 0, dy: -1 },
+            { x: 230, y: 90, w: 20, h: 20, speed: 1.5, hp: 2, dirTimer: 0, dx: -1, dy: 1 } // Inside dungeon
+        ];
+
+        // Input tracking
+        const keys = { up: false, down: false, left: false, right: false };
+
+        window.addEventListener("keydown", (e) => {
+            if (e.code === "ArrowUp" || e.code === "KeyW") keys.up = true;
+            if (e.code === "ArrowDown" || e.code === "KeyS") keys.down = true;
+            if (e.code === "ArrowLeft" || e.code === "KeyA") keys.left = true;
+            if (e.code === "ArrowRight" || e.code === "KeyD") keys.right = true;
+            if (e.code === "Space") triggerAttack();
+        });
+
+        window.addEventListener("keyup", (e) => {
+            if (e.code === "ArrowUp" || e.code === "KeyW") keys.up = false;
+            if (e.code === "ArrowDown" || e.code === "KeyS") keys.down = false;
+            if (e.code === "ArrowLeft" || e.code === "KeyA") keys.left = false;
+            if (e.code === "ArrowRight" || e.code === "KeyD") keys.right = false;
+        });
+
+        // Setup Touch Controls
+        function bindTouch(id, keyName) {
+            const el = document.getElementById(id);
+            el.addEventListener("touchstart", (e) => { e.preventDefault(); keys[keyName] = true; el.classList.add("pressed"); });
+            el.addEventListener("touchend", (e) => { e.preventDefault(); keys[keyName] = false; el.classList.remove("pressed"); });
+            el.addEventListener("mousedown", (e) => { keys[keyName] = true; el.classList.add("pressed"); });
+            el.addEventListener("mouseup", (e) => { keys[keyName] = false; el.classList.remove("pressed"); });
+        }
+        bindTouch("btn-up", "up");
+        bindTouch("btn-down", "down");
+        bindTouch("btn-left", "left");
+        bindTouch("btn-right", "right");
+
+        document.getElementById("btn-sword").addEventListener("touchstart", (e) => { e.preventDefault(); triggerAttack(); });
+        document.getElementById("btn-sword").addEventListener("mousedown", (e) => { triggerAttack(); });
+
+        function triggerAttack() {
+            if (gameState !== "PLAYING") return;
+            if (!player.isAttacking) {
+                player.isAttacking = true;
+                player.attackTimer = 15; // Duration of sword frame
             }
         }
 
-        class Astronaut {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.width = 24;
-                this.height = 32;
-                this.vx = 0;
-                this.vy = 0;
-                this.grounded = false;
-                this.facingRight = true;
-                this.isDead = false;
-            }
+        // Collision checking helper
+        function checkRectCollision(r1, r2) {
+            return r1.x < r2.x + r2.w &&
+                   r1.x + r1.w > r2.x &&
+                   r1.y < r2.y + r2.h &&
+                   r1.y + r1.h > r2.y;
+        }
 
-            update() {
-                if (this.isDead) {
-                    this.vy += GRAVITY;
-                    this.y += this.vy;
-                    return;
-                }
+        function update() {
+            if (gameState !== "PLAYING") return;
 
-                if (keys.right) {
-                    this.vx += 0.4;
-                    this.facingRight = true;
-                } else if (keys.left) {
-                    this.vx -= 0.4;
-                    this.facingRight = false;
-                } else {
-                    this.vx *= FRICTION;
-                }
-
-                if (this.vx > MAX_SPEED) this.vx = MAX_SPEED;
-                if (this.vx < -MAX_SPEED) this.vx = -MAX_SPEED;
-                if (Math.abs(this.vx) < 0.1) this.vx = 0;
-
-                this.x += this.vx;
-                this.checkCollisions(true);
-
-                if (this.x < 0) {
-                    this.x = 0;
-                    this.vx = 0;
-                }
-
-                this.vy += GRAVITY;
-                this.y += this.vy;
-                this.grounded = false;
-                this.checkCollisions(false);
-
-                if (this.y > canvas.height + 100) {
-                    die();
+            // Handle Attack Timer
+            if (player.isAttacking) {
+                player.attackTimer--;
+                if (player.attackTimer <= 0) {
+                    player.isAttacking = false;
                 }
             }
 
-            checkCollisions(isX) {
-                let leftCol = Math.floor(this.x / TILE_SIZE);
-                let rightCol = Math.floor((this.x + this.width - 1) / TILE_SIZE);
-                let topRow = Math.floor(this.y / TILE_SIZE);
-                let bottomRow = Math.floor((this.y + this.height - 1) / TILE_SIZE);
+            // Player Movement
+            let vx = 0;
+            let vy = 0;
+            if (keys.up) { vy = -player.speed; player.dir = "UP"; }
+            if (keys.down) { vy = player.speed; player.dir = "DOWN"; }
+            if (keys.left) { vx = -player.speed; player.dir = "LEFT"; }
+            if (keys.right) { vx = player.speed; player.dir = "RIGHT"; }
 
-                if (leftCol < 0) leftCol = 0;
-                if (rightCol >= MAP_COLS) rightCol = MAP_COLS - 1;
-                if (topRow < 0) topRow = 0;
-                if (bottomRow >= MAP_ROWS) bottomRow = MAP_ROWS - 1;
+            // Move X and check collision
+            player.x += vx;
+            let playerBox = { x: player.x, y: player.y, w: player.width, h: player.height };
+            for (let obs of obstacles) {
+                if (obs.type === "door" && obs.locked === false) continue; // Walk through unlocked door
+                if (checkRectCollision(playerBox, obs)) {
+                    if (obs.type === "door" && hasKey) {
+                        obs.locked = false; // Open door!
+                    } else {
+                        player.x -= vx; // revert
+                        break;
+                    }
+                }
+            }
 
-                for (let r = topRow; r <= bottomRow; r++) {
-                    for (let c = leftCol; c <= rightCol; c++) {
-                        let tile = map[r][c];
-                        if (tile !== '.') {
-                            if (isX) {
-                                if (this.vx > 0) {
-                                    this.x = c * TILE_SIZE - this.width;
-                                } else if (this.vx < 0) {
-                                    this.x = (c + 1) * TILE_SIZE;
-                                }
-                                this.vx = 0;
-                            } else {
-                                if (this.vy > 0) {
-                                    this.y = r * TILE_SIZE - this.height;
-                                    this.vy = 0;
-                                    this.grounded = true;
-                                } else if (this.vy < 0) {
-                                    this.y = (r + 1) * TILE_SIZE;
-                                    this.vy = 0;
-                                }
-                            }
+            // Move Y and check collision
+            player.y += vy;
+            playerBox = { x: player.x, y: player.y, w: player.width, h: player.height };
+            for (let obs of obstacles) {
+                if (obs.type === "door" && obs.locked === false) continue;
+                if (checkRectCollision(playerBox, obs)) {
+                    if (obs.type === "door" && hasKey) {
+                        obs.locked = false;
+                    } else {
+                        player.y -= vy; // revert
+                        break;
+                    }
+                }
+            }
+
+            // Check Key collection
+            if (!key.collected && checkRectCollision(playerBox, key)) {
+                key.collected = true;
+                hasKey = true;
+            }
+
+            // Check Chest collection (Win Condition)
+            if (hasKey && !chest.opened && checkRectCollision(playerBox, chest)) {
+                chest.opened = true;
+                gameState = "WON";
+            }
+
+            // Sword Attack Collision with Enemies
+            if (player.isAttacking) {
+                let swordBox = { x: player.x, y: player.y, w: player.width, h: player.height };
+                if (player.dir === "UP") swordBox.y -= 20;
+                if (player.dir === "DOWN") swordBox.y += 20;
+                if (player.dir === "LEFT") swordBox.x -= 20;
+                if (player.dir === "RIGHT") swordBox.x += 20;
+
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    if (checkRectCollision(swordBox, enemies[i])) {
+                        enemies[i].hp--;
+                        if (enemies[i].hp <= 0) {
+                            enemies.splice(i, 1); // Defeat enemy
+                            score += 100;
                         }
                     }
                 }
             }
 
-            draw() {
-                ctx.save();
-                ctx.translate(this.x + this.width/2, this.y + this.height/2);
-                if (!this.facingRight) ctx.scale(-1, 1);
-                
-                // Spacesuit Body (White/Silver)
-                ctx.fillStyle = '#f8fafc';
-                ctx.fillRect(-this.width/2 + 2, -this.height/2 + 8, this.width - 4, this.height - 8);
-                
-                // Helmet Visor (Glowing Gold/Cyan)
-                ctx.fillStyle = '#38bdf8';
-                ctx.fillRect(-this.width/2 + 4, -this.height/2, this.width - 6, 12);
-                ctx.fillStyle = '#0284c7';
-                ctx.fillRect(-this.width/2 + 6, -this.height/2 + 2, 4, 8);
+            // Enemy AI & Movement
+            for (let en of enemies) {
+                en.dirTimer++;
+                if (en.dirTimer > 80) {
+                    en.dirTimer = 0;
+                    const dirs = [{dx: 1, dy: 0}, {dx: -1, dy: 0}, {dx: 0, dy: 1}, {dx: 0, dy: -1}];
+                    const chosen = dirs[Math.floor(Math.random() * dirs.length)];
+                    en.dx = chosen.dx;
+                    en.dy = chosen.dy;
+                }
 
-                // Backpack (Oxygen tank)
-                ctx.fillStyle = '#64748b';
-                ctx.fillRect(-this.width/2 - 4, -this.height/2 + 10, 6, 14);
+                en.x += en.dx * en.speed;
+                let enBox = { x: en.x, y: en.y, w: en.w, h: en.h };
+                for (let obs of obstacles) {
+                    if (obs.type === "door" && obs.locked === false) continue;
+                    if (checkRectCollision(enBox, obs)) { en.x -= en.dx * en.speed; en.dx *= -1; break; }
+                }
 
-                // Boots
-                ctx.fillStyle = '#334155';
-                ctx.fillRect(-this.width/2 + 2, this.height/2 - 4, 8, 4);
-                ctx.fillRect(this.width/2 - 10, this.height/2 - 4, 8, 4);
+                en.y += en.dy * en.speed;
+                enBox = { x: en.x, y: en.y, w: en.w, h: en.h };
+                for (let obs of obstacles) {
+                    if (obs.type === "door" && obs.locked === false) continue;
+                    if (checkRectCollision(enBox, obs)) { en.y -= en.dy * en.speed; en.dy *= -1; break; }
+                }
 
-                ctx.restore();
+                // Check damage to player
+                if (checkRectCollision(playerBox, en)) {
+                    player.hp--;
+                    player.x -= en.dx * 15;
+                    player.y -= en.dy * 15;
+                    if (player.hp <= 0) {
+                        gameState = "GAMEOVER";
+                    }
+                }
             }
         }
 
-        class Crystal {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.width = 16;
-                this.height = 16;
-                this.collected = false;
-                this.floatOffset = Math.random() * Math.PI;
-            }
-            update() {
-                this.floatOffset += 0.08;
-            }
-            draw() {
-                if (this.collected) return;
-                ctx.save();
-                ctx.translate(this.x + this.width/2, this.y + this.height/2 + Math.sin(this.floatOffset) * 3);
-                ctx.fillStyle = '#38bdf8';
-                ctx.beginPath();
-                ctx.moveTo(0, -10);
-                ctx.lineTo(8, 0);
-                ctx.lineTo(0, 10);
-                ctx.lineTo(-8, 0);
-                ctx.closePath();
-                ctx.fill();
-                ctx.strokeStyle = '#bae6fd';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-                ctx.restore();
-            }
-        }
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        class Enemy {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.width = 28;
-                this.height = 24;
-                this.vx = -1.0;
-                this.vy = 0;
-                this.isDead = false;
-                this.deathTimer = 0;
-            }
+            // Draw Ground
+            ctx.fillStyle = "#206020";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            update() {
-                if (this.isDead) {
-                    this.deathTimer++;
-                    return;
-                }
-
-                this.vy += GRAVITY;
-                this.y += this.vy;
-                this.x += this.vx;
-
-                let cLeft = Math.floor(this.x / TILE_SIZE);
-                let cRight = Math.floor((this.x + this.width) / TILE_SIZE);
-                let rBottom = Math.floor((this.y + this.height) / TILE_SIZE);
-                let rTop = Math.floor(this.y / TILE_SIZE);
-                
-                if (rBottom < MAP_ROWS && (map[rBottom][cLeft] !== '.' || map[rBottom][cRight] !== '.')) {
-                    this.y = rBottom * TILE_SIZE - this.height;
-                    this.vy = 0;
-                }
-
-                if (this.vx < 0 && cLeft >= 0 && map[rTop][cLeft] !== '.') {
-                    this.x = (cLeft + 1) * TILE_SIZE;
-                    this.vx *= -1;
-                } else if (this.vx > 0 && cRight < MAP_COLS && map[rTop][cRight] !== '.') {
-                    this.x = cRight * TILE_SIZE - this.width;
-                    this.vx *= -1;
-                }
-
-                if (!player.isDead) {
-                    if (this.x < player.x + player.width &&
-                        this.x + this.width > player.x &&
-                        this.y < player.y + player.height &&
-                        this.y + this.height > player.y) {
-                        
-                        if (player.vy > 0 && player.y + player.height - player.vy <= this.y + 10) {
-                            this.isDead = true;
-                            playSound('stomp');
-                            player.vy = JUMP_FORCE * 0.7;
-                            score += 300;
-                        } else {
-                            playSound('hit');
-                            die();
-                        }
+            // Draw Obstacles
+            for (let obs of obstacles) {
+                if (obs.type === "tree") {
+                    ctx.fillStyle = "#144014";
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    ctx.fillStyle = "#1e7a1e";
+                    ctx.fillRect(obs.x + 4, obs.y + 4, obs.w - 8, obs.h - 8);
+                } else if (obs.type === "wall") {
+                    ctx.fillStyle = "#555555";
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    ctx.strokeStyle = "#333333";
+                    ctx.strokeRect(obs.x, obs.y, obs.w, obs.h);
+                } else if (obs.type === "door") {
+                    if (obs.locked) {
+                        ctx.fillStyle = "#8b4513";
+                        ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                        ctx.fillStyle = "#f1c40f";
+                        ctx.fillRect(obs.x + 16, obs.y + 6, 8, 8);
                     }
                 }
             }
 
-            draw() {
-                if (this.deathTimer > 35) return;
-
-                ctx.save();
-                ctx.translate(this.x + this.width/2, this.y + this.height/2);
-
-                if (this.isDead) {
-                    ctx.fillStyle = '#64748b';
-                    ctx.fillRect(-this.width/2, this.height/2 - 6, this.width, 6);
-                } else {
-                    // Alien Space Bug / Floating Drone
-                    ctx.fillStyle = '#f43f5e';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.width/2, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#fef08a';
-                    ctx.fillRect(-6, -4, 4, 4);
-                    ctx.fillRect(2, -4, 4, 4);
-                }
-                ctx.restore();
+            // Draw Key
+            if (!key.collected) {
+                ctx.fillStyle = "#f1c40f";
+                ctx.fillRect(key.x + 4, key.y + 4, 8, 8);
+                ctx.fillRect(key.x + 2, key.y + 10, 12, 4);
             }
-        }
 
-        let player;
-        let camera = { x: 0, y: 0 };
+            // Draw Chest
+            ctx.fillStyle = chest.opened ? "#27ae60" : "#d35400";
+            ctx.fillRect(chest.x, chest.y, chest.w, chest.h);
+            ctx.fillStyle = "#f1c40f";
+            ctx.fillRect(chest.x + 8, chest.y + 8, 8, 8);
 
-        function initGame() {
-            initAudio();
-            buildMap();
-            player = new Astronaut(64, 100);
-            score = 0;
-            crystalsCount = 0;
-            oxygenTime = 300;
-            frameCount = 0;
-            gameState = 'PLAYING';
-            document.getElementById('overlay').classList.add('hidden');
-        }
-
-        function die() {
-            if (player.isDead) return;
-            player.isDead = true;
-            player.vy = JUMP_FORCE;
-            player.vx = 0;
-
-            setTimeout(() => {
-                gameState = 'GAMEOVER';
-                document.getElementById('overlay').classList.remove('hidden');
-                document.getElementById('overlay-msg').innerHTML = `MISSION FAILED<br><br>Score: ${score}<br>Crystals: ${crystalsCount}`;
-                document.getElementById('start-btn').innerText = "TRY AGAIN";
-            }, 1800);
-        }
-
-        function drawMap() {
-            let startCol = Math.max(0, Math.floor(camera.x / TILE_SIZE));
-            let endCol = Math.min(MAP_COLS, startCol + Math.ceil(canvas.width / TILE_SIZE) + 1);
-
-            for (let r = 0; r < MAP_ROWS; r++) {
-                for (let c = startCol; c < endCol; c++) {
-                    let tile = map[r][c];
-                    if (tile === '.') continue;
-
-                    let tx = c * TILE_SIZE;
-                    let ty = r * TILE_SIZE;
-
-                    ctx.save();
-                    ctx.translate(tx, ty);
-
-                    if (tile === 'M') {
-                        // Moon regolith surface
-                        ctx.fillStyle = '#334155';
-                        ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
-                        ctx.fillStyle = '#475569';
-                        ctx.fillRect(4, 4, TILE_SIZE-8, TILE_SIZE-8);
-                    } else if (tile === 'R') {
-                        // Deep lunar rock
-                        ctx.fillStyle = '#1e293b';
-                        ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
-                    } else if (tile === 'C') {
-                        // Crater walls / Pipe structure
-                        ctx.fillStyle = '#0f172a';
-                        ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
-                        ctx.fillStyle = '#334155';
-                        ctx.fillRect(0, 0, 6, TILE_SIZE);
-                    }
-                    ctx.restore();
-                }
+            // Draw Enemies
+            for (let en of enemies) {
+                ctx.fillStyle = "#c0392b";
+                ctx.fillRect(en.x, en.y, en.w, en.h);
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(en.x + 3, en.y + 5, 4, 4);
+                ctx.fillRect(en.x + 13, en.y + 5, 4, 4);
             }
-        }
 
-        function updateUI() {
-            document.getElementById('score').innerText = score.toString().padStart(6, '0');
-            document.getElementById('crystals').innerText = crystalsCount.toString().padStart(2, '0');
-            document.getElementById('oxygen').innerText = Math.floor(oxygenTime) + 's';
+            // Draw Player
+            ctx.fillStyle = "#3498db";
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            
+            // Player Cap
+            ctx.fillStyle = "#27ae60";
+            if (player.dir === "UP") ctx.fillRect(player.x + 4, player.y, 12, 8);
+            if (player.dir === "DOWN") ctx.fillRect(player.x + 4, player.y, 12, 8);
+            if (player.dir === "LEFT") ctx.fillRect(player.x, player.y + 4, 8, 12);
+            if (player.dir === "RIGHT") ctx.fillRect(player.x + 12, player.y + 4, 8, 12);
+
+            // Draw Sword Slash
+            if (player.isAttacking) {
+                ctx.fillStyle = "#ecf0f1";
+                let sx = player.x, sy = player.y, sw = 0, sh = 0;
+                if (player.dir === "UP") { sx = player.x - 4; sy = player.y - 16; sw = 28; sh = 16; }
+                if (player.dir === "DOWN") { sx = player.x - 4; sy = player.y + player.height; sw = 28; sh = 16; }
+                if (player.dir === "LEFT") { sx = player.x - 16; sy = player.y - 4; sw = 16; sh = 32; }
+                if (player.dir === "RIGHT") { sx = player.x + player.width; sy = player.y - 4; sw = 16; sh = 32; }
+                ctx.fillRect(sx, sy, sw, sh);
+            }
+
+            // Draw HUD
+            ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+            ctx.fillRect(0, 0, canvas.width, 35);
+
+            for (let i = 0; i < player.maxHp / 2; i++) {
+                let hx = 20 + i * 25;
+                let hy = 10;
+                ctx.fillStyle = (i * 2 < player.hp) ? "#e74c3c" : "#555";
+                ctx.font = "16px sans-serif";
+                ctx.fillText("❤️", hx, hy + 14);
+            }
+
+            ctx.fillStyle = "#fff";
+            ctx.font = "12px 'Courier New'";
+            ctx.fillText("KEY: " + (hasKey ? "🔑 (UNLOCKED)" : "🔒 (NEEDED)"), 180, 22);
+            ctx.fillText("SCORE: " + score, 360, 22);
+
+            // Game Over / Win Screens
+            if (gameState === "GAMEOVER") {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#e74c3c";
+                ctx.font = "bold 28px 'Courier New'";
+                ctx.textAlign = "center";
+                ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2 - 10);
+                ctx.fillStyle = "#fff";
+                ctx.font = "14px 'Courier New'";
+                ctx.fillText("Refresh page to try again", canvas.width / 2, canvas.height / 2 + 25);
+                ctx.textAlign = "left";
+            } else if (gameState === "WON") {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#f1c40f";
+                ctx.font = "bold 28px 'Courier New'";
+                ctx.textAlign = "center";
+                ctx.fillText("VICTORY!", canvas.width / 2, canvas.height / 2 - 10);
+                ctx.fillStyle = "#fff";
+                ctx.font = "14px 'Courier New'";
+                ctx.fillText("You opened the treasure chest!", canvas.width / 2, canvas.height / 2 + 25);
+                ctx.textAlign = "left";
+            }
         }
 
         function gameLoop() {
-            if (gameState === 'PLAYING') {
-                frameCount++;
-                
-                if (frameCount % 60 === 0) {
-                    oxygenTime--;
-                    if (oxygenTime <= 0 && !player.isDead) die();
-                }
-
-                player.update();
-
-                let targetCamX = player.x - canvas.width / 2 + player.width / 2;
-                if (targetCamX < 0) targetCamX = 0;
-                if (targetCamX > mapWidth - canvas.width) targetCamX = mapWidth - canvas.width;
-                
-                camera.x += (targetCamX - camera.x) * 0.12;
-                
-                for (let e of enemies) e.update();
-                
-                // Check crystal pickups
-                for (let item of items) {
-                    item.update();
-                    if (!item.collected &&
-                        player.x < item.x + item.width &&
-                        player.x + player.width > item.x &&
-                        player.y < item.y + item.height &&
-                        player.y + player.height > item.y) {
-                        item.collected = true;
-                        crystalsCount++;
-                        score += 150;
-                        playSound('crystal');
-                    }
-                }
-
-                updateUI();
-            }
-
-            // Deep Space Background
-            ctx.fillStyle = '#020617';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Twinkling Space Stars & Distant Planets
-            ctx.fillStyle = '#ffffff';
-            for (let i = 0; i < 35; i++) {
-                let sx = (i * 123 + Math.floor(i * 41)) % canvas.width;
-                let sy = (i * 77) % (canvas.height - 100);
-                let alpha = (Math.sin(frameCount * 0.05 + i) + 1) * 0.5;
-                ctx.globalAlpha = Math.max(0.2, alpha);
-                ctx.fillRect(sx, sy, i % 2 === 0 ? 2 : 1, i % 2 === 0 ? 2 : 1);
-            }
-            ctx.globalAlpha = 1.0;
-
-            // Distant Planet / Moon
-            ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
-            ctx.beginPath();
-            ctx.arc(680, 100, 70, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.save();
-            ctx.translate(Math.floor(-camera.x), 0);
-
-            drawMap();
-            for (let item of items) item.draw();
-            for (let e of enemies) e.draw();
-            if (player) player.draw();
-
-            ctx.restore();
-
+            update();
+            draw();
             requestAnimationFrame(gameLoop);
         }
 
-        document.getElementById('start-btn').addEventListener('click', initGame);
-
-        player = new Astronaut(64, 100);
-        buildMap();
-        requestAnimationFrame(gameLoop);
+        gameLoop();
     </script>
 </body>
 </html>
-```
