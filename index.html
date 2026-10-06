@@ -2,9 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>The Rugged Bar v14.7 - Space Command</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <meta name="theme-color" content="#020205"/>
+  <meta name="description" content="The Rugged Bar — enter the degen clubhouse. Click everything. Get rugged."/>
+  <title>The Rugged Bar v15.0 — Space Command</title>
   <style>
+    :root {
+      --bg: #020205;
+      --neon-green: #00ff66;
+      --neon-cyan: #00ffcc;
+      --neon-pink: #ff007a;
+      --neon-yellow: #ffe600;
+      --neon-red: #ff3333;
+      --neon-blue: #5885f2;
+      --panel: rgba(0, 0, 0, 0.88);
+      --font: "SF Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -13,102 +29,170 @@
       user-select: none;
     }
 
-    body {
-      background-color: #020205;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+    html, body {
+      background: var(--bg);
+      min-height: 100%;
+      height: 100%;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #fff;
     }
 
     .viewport {
       position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      overflow: hidden; perspective: 1200px;
+      inset: 0;
+      overflow: hidden;
+      perspective: 1400px;
+      background: #000;
     }
 
     .scene-container {
-      position: absolute; top: 50%; left: 50%;
-      width: 100vw; height: 177.78vw;
-      max-height: 100vh; max-width: 56.25vh;
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 100vw;
+      height: 177.78vw;
+      max-height: 100vh;
+      max-width: 56.25vh;
       transform: translate(-50%, -50%);
       overflow: hidden;
       background: #000;
+      box-shadow: 0 0 80px rgba(0, 255, 102, 0.08);
     }
 
     @media (min-aspect-ratio: 9/16) {
       .scene-container { width: 56.25vh; height: 100vh; }
     }
 
-    /* --- CLUBHOUSE BAR ENVIRONMENT --- */
     .clubhouse-bg {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      position: absolute;
+      inset: 0;
       background: url('clubhouse.JPG') no-repeat center center / cover;
-      transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1), filter 0.5s ease;
-      z-index: 1; opacity: 0;
+      z-index: 1;
+      opacity: 0;
+      transition: transform 2.8s var(--ease-out), filter 0.6s ease, opacity 0.8s ease;
+      will-change: transform, filter;
     }
     .viewport.bar-active .clubhouse-bg { opacity: 1; }
 
     .viewport.lights-off .clubhouse-bg {
-      filter: brightness(0.25) contrast(1.4) hue-rotate(-15deg);
+      filter: brightness(0.22) contrast(1.5) hue-rotate(-18deg) saturate(0.7);
     }
     .viewport.lights-off::after {
       content: '';
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 2; pointer-events: none;
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 40% 40%, transparent 0%, rgba(0,0,0,0.75) 100%);
+      z-index: 2;
+      pointer-events: none;
       transition: opacity 0.5s ease;
     }
 
     .viewport.panic-active .clubhouse-bg {
-      filter: grayscale(1) contrast(3) brightness(0.5);
-      animation: staticGlitch 0.15s infinite;
+      filter: grayscale(1) contrast(3.2) brightness(0.45);
+      animation: staticGlitch 0.12s infinite;
     }
     @keyframes staticGlitch {
-      0% { transform: translate(0, 0) scale(1.05); }
-      20% { transform: translate(-3px, 3px) scale(1.05); }
-      40% { transform: translate(3px, -2px) scale(1.05); }
-      60% { transform: translate(-2px, -3px) scale(1.05); }
-      80% { transform: translate(2px, 2px) scale(1.05); }
-      100% { transform: translate(0, 0) scale(1.05); }
+      0%   { transform: translate(0,0) scale(1.04); }
+      25%  { transform: translate(-4px,3px) scale(1.04); }
+      50%  { transform: translate(3px,-2px) scale(1.04); }
+      75%  { transform: translate(-2px,-4px) scale(1.04); }
+      100% { transform: translate(0,0) scale(1.04); }
+    }
+
+    .crt-overlay {
+      position: absolute; inset: 0;
+      z-index: 8;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.04) 50%),
+        linear-gradient(90deg, rgba(255,0,0,0.015), rgba(0,255,0,0.008), rgba(0,0,255,0.015));
+      background-size: 100% 3px, 3px 100%;
+      opacity: 0.55;
+      mix-blend-mode: overlay;
+    }
+
+    .vignette {
+      position: absolute; inset: 0;
+      z-index: 7;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%);
     }
 
     .hotspot {
-      position: absolute; z-index: 3; cursor: pointer; display: none;
-      border: none; background: transparent;
-      transition: background 0.3s ease;
+      position: absolute;
+      z-index: 3;
+      cursor: pointer;
+      display: none;
+      border: none;
+      background: transparent;
       text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
     }
+    .viewport.open .hotspot { display: block; }
+
+    .hotspot::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 10px;
+      border: 1.5px solid transparent;
+      opacity: 0;
+      transition: opacity 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      pointer-events: none;
+    }
+    .hotspot:hover::after,
+    .hotspot:active::after {
+      opacity: 1;
+    }
+    .hotspot:hover { transform: scale(1.02); }
 
     .arcade-hotspot { top: 50%; left: 51.5%; width: 15%; height: 8%; }
-    .arcade-hotspot:hover, .arcade-hotspot:active { background: rgba(255, 230, 0, 0.15); border-radius: 6px; }
+    .arcade-hotspot:hover { background: rgba(255, 230, 0, 0.18); }
+    .arcade-hotspot:hover::after { border-color: var(--neon-yellow); box-shadow: 0 0 18px rgba(255,230,0,0.45); }
 
     .pool-hotspot { top: 55.5%; left: 58.5%; width: 26%; height: 6.5%; }
-    .pool-hotspot:hover, .pool-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
+    .pool-hotspot:hover { background: rgba(0, 255, 102, 0.18); }
+    .pool-hotspot:hover::after { border-color: var(--neon-green); box-shadow: 0 0 18px rgba(0,255,102,0.45); }
 
     .laptop-hotspot { top: 45.5%; left: 22.5%; width: 10.5%; height: 6.5%; }
-    .laptop-hotspot:hover, .laptop-hotspot:active { background: rgba(0, 255, 102, 0.15); border-radius: 6px; }
+    .laptop-hotspot:hover { background: rgba(0, 255, 102, 0.18); }
+    .laptop-hotspot:hover::after { border-color: var(--neon-green); box-shadow: 0 0 18px rgba(0,255,102,0.45); }
 
     .sofa-hotspot { top: 60.5%; left: 24%; width: 35%; height: 12%; }
-    .sofa-hotspot:hover, .sofa-hotspot:active { background: rgba(88, 101, 242, 0.15); border-radius: 6px; }
+    .sofa-hotspot:hover { background: rgba(88, 101, 242, 0.18); }
+    .sofa-hotspot:hover::after { border-color: var(--neon-blue); box-shadow: 0 0 18px rgba(88,101,242,0.45); }
 
     .table-hotspot { top: 66%; left: 14%; width: 10%; height: 9%; }
-    .table-hotspot:hover, .table-hotspot:active { background: rgba(255, 0, 122, 0.25); border-radius: 6px; }
+    .table-hotspot:hover { background: rgba(255, 0, 122, 0.22); }
+    .table-hotspot:hover::after { border-color: var(--neon-pink); box-shadow: 0 0 18px rgba(255,0,122,0.45); }
 
     .otter-hotspot {
-      position: absolute; top: 81.5%; left: 41.5%; width: 17%; height: 7.5%; border-radius: 50%; z-index: 3;
+      top: 81.5%; left: 41.5%; width: 17%; height: 7.5%;
+      border-radius: 50%;
     }
-    .otter-hotspot:hover, .otter-hotspot:active { background: rgba(32, 129, 226, 0.25); }
+    .otter-hotspot:hover { background: rgba(32, 129, 226, 0.28); }
+    .otter-hotspot:hover::after { border-color: #2081e2; box-shadow: 0 0 20px rgba(32,129,226,0.5); border-radius: 50%; }
 
-    /* --- HIDDEN ROCKET LINK OVERLAY --- */
+    .hotspot-hint {
+      position: absolute;
+      inset: -6px;
+      border-radius: inherit;
+      border: 1.5px solid var(--neon-green);
+      opacity: 0;
+      pointer-events: none;
+      animation: hintPulse 2.4s ease-out forwards;
+      z-index: 4;
+    }
+    @keyframes hintPulse {
+      0%   { opacity: 0.9; transform: scale(0.92); box-shadow: 0 0 0 0 rgba(0,255,102,0.5); }
+      40%  { opacity: 0.6; }
+      100% { opacity: 0; transform: scale(1.25); box-shadow: 0 0 0 12px transparent; }
+    }
+
     .rocket-table-link {
       position: absolute;
-      top: 61.5%;
-      left: 64.2%;
-      width: 3.5%;
-      height: 13.5%;
+      top: 61.5%; left: 64.2%;
+      width: 3.5%; height: 13.5%;
       z-index: 4;
       display: none;
       background: transparent;
@@ -119,346 +203,845 @@
     }
     .viewport.open .rocket-table-link { display: block; }
     .rocket-table-link:hover {
-      background: rgba(255, 0, 122, 0.25);
+      background: rgba(255, 0, 122, 0.28);
       border-radius: 4px;
+      box-shadow: 0 0 16px rgba(255,0,122,0.4);
     }
 
     .top-controls-bar {
-      position: absolute; top: 23%; left: 50%; transform: translateX(-50%);
-      width: 92%; max-width: 420px; display: flex; justify-content: space-between;
-      align-items: center; z-index: 5; opacity: 0; transition: opacity 0.5s ease;
+      position: absolute;
+      top: 22.5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 94%;
+      max-width: 440px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 5;
+      opacity: 0;
+      transition: opacity 0.6s ease 0.3s;
       pointer-events: none;
+      gap: 6px;
     }
-    .viewport.open .top-controls-bar { opacity: 1; pointer-events: auto; }
+    .viewport.open .top-controls-bar {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
-    .control-group { display: flex; gap: 6px; align-items: center; }
+    .control-group {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
 
     .door-ape-sign {
-      background: rgba(0, 0, 0, 0.85); border: 2px solid #00ff66; border-radius: 6px;
-      padding: 6px 10px; display: flex; align-items: center; gap: 5px;
-      box-shadow: 0 0 15px rgba(0, 255, 102, 0.5); text-decoration: none;
-      font-family: monospace; transition: all 0.3s ease; cursor: pointer;
+      background: var(--panel);
+      border: 2px solid var(--neon-green);
+      border-radius: 8px;
+      padding: 7px 11px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 0 18px rgba(0, 255, 102, 0.35);
+      text-decoration: none;
+      font-family: var(--font);
+      transition: all 0.25s ease;
+      cursor: pointer;
+      white-space: nowrap;
     }
     .door-ape-sign:hover {
-      background: rgba(0, 255, 102, 0.15);
-      box-shadow: 0 0 25px rgba(0, 255, 102, 0.8);
-      transform: scale(1.03);
+      background: rgba(0, 255, 102, 0.12);
+      box-shadow: 0 0 28px rgba(0, 255, 102, 0.65);
+      transform: scale(1.04);
     }
-    .door-ape-sign .sign-label { font-size: 0.6rem; color: #00ff66; font-weight: bold; text-transform: uppercase; }
-    .door-ape-sign .sign-price { font-size: 0.75rem; font-weight: bold; color: #fff; text-shadow: 0 0 6px #00ff66; }
-
-    .lights-toggle-btn, .panic-btn {
-      background: rgba(0, 0, 0, 0.85); border: 2px solid #ffe600; border-radius: 6px;
-      padding: 6px 8px; color: #ffe600; font-family: monospace; font-size: 0.65rem;
-      font-weight: bold; cursor: pointer; box-shadow: 0 0 12px rgba(255, 230, 0, 0.4);
-      transition: all 0.3s ease; display: flex; align-items: center; gap: 3px; text-decoration: none;
+    .door-ape-sign .sign-label {
+      font-size: 0.62rem;
+      color: var(--neon-green);
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
-    .lights-toggle-btn:hover, .panic-btn:hover { background: rgba(255, 230, 0, 0.2); box-shadow: 0 0 20px rgba(255, 230, 0, 0.7); transform: scale(1.03); }
-    .viewport.lights-off .lights-toggle-btn { border-color: #ff007a; color: #ff007a; box-shadow: 0 0 12px rgba(255, 0, 122, 0.4); }
+    .door-ape-sign .sign-price {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 8px var(--neon-green);
+    }
 
-    .panic-btn { border-color: #ff3333; color: #ff3333; box-shadow: 0 0 12px rgba(255, 51, 51, 0.4); }
-    .panic-btn:hover { background: rgba(255, 51, 51, 0.2); box-shadow: 0 0 20px rgba(255, 51, 51, 0.8); }
+    .ctrl-btn {
+      background: var(--panel);
+      border: 2px solid var(--neon-yellow);
+      border-radius: 8px;
+      padding: 7px 9px;
+      color: var(--neon-yellow);
+      font-family: var(--font);
+      font-size: 0.62rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 14px rgba(255, 230, 0, 0.3);
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .ctrl-btn:hover {
+      background: rgba(255, 230, 0, 0.15);
+      box-shadow: 0 0 22px rgba(255, 230, 0, 0.55);
+      transform: scale(1.04);
+    }
+    .viewport.lights-off .ctrl-btn.lights {
+      border-color: var(--neon-pink);
+      color: var(--neon-pink);
+      box-shadow: 0 0 14px rgba(255, 0, 122, 0.35);
+    }
+    .ctrl-btn.panic {
+      border-color: var(--neon-red);
+      color: var(--neon-red);
+      box-shadow: 0 0 14px rgba(255, 51, 51, 0.35);
+    }
+    .ctrl-btn.panic:hover {
+      background: rgba(255, 51, 51, 0.18);
+      box-shadow: 0 0 24px rgba(255, 51, 51, 0.7);
+    }
 
     .rekt-speech-bubble {
-      position: absolute; top: 31%; left: 50%; transform: translateX(-50%) scale(0.9);
-      background: rgba(0, 0, 0, 0.95); border: 2px solid #ff007a; border-radius: 8px;
-      padding: 8px 14px; color: #ff007a; font-family: monospace; font-size: 0.75rem;
-      font-weight: bold; z-index: 6; text-align: center; box-shadow: 0 0 20px rgba(255, 0, 122, 0.6);
-      opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: absolute;
+      top: 30.5%;
+      left: 50%;
+      transform: translateX(-50%) scale(0.85);
+      background: rgba(0, 0, 0, 0.95);
+      border: 2px solid var(--neon-pink);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: var(--neon-pink);
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 700;
+      z-index: 6;
+      text-align: center;
+      box-shadow: 0 0 24px rgba(255, 0, 122, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s var(--ease-bounce);
+      max-width: 90%;
     }
-    .rekt-speech-bubble.show { opacity: 1; transform: translateX(-50%) scale(1); }
-
-    .panic-modal {
-      display: none; position: fixed; top: 0; left: 0;
-      width: 100vw; height: 100vh; background: rgba(255, 0, 0, 0.25);
-      z-index: 12; justify-content: center; align-items: center;
-      backdrop-filter: blur(3px);
+    .rekt-speech-bubble.show {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
     }
-    .panic-card {
-      background: #0d0d12; border: 3px solid #ff3333; border-radius: 12px;
-      padding: 25px 20px; width: 88vw; max-width: 380px; text-align: center;
-      box-shadow: 0 0 35px rgba(255, 51, 51, 0.8); font-family: monospace;
-    }
-    .panic-title { color: #ff3333; font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; text-shadow: 0 0 8px rgba(255, 51, 51, 0.6); }
-    .panic-desc { color: #fff; font-size: 0.85rem; line-height: 1.4; margin-bottom: 20px; }
-    .panic-dismiss-btn { background: #ff3333; color: #000; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-family: monospace; cursor: pointer; box-shadow: 0 0 12px rgba(255, 51, 51, 0.6); }
 
     .doors-container {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 4; display: flex; perspective: 1500px; pointer-events: none; opacity: 0;
-      transition: opacity 0.3s ease;
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: flex;
+      perspective: 1600px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.35s ease;
     }
-    .viewport.bar-active .doors-container { opacity: 1; pointer-events: auto; }
+    .viewport.bar-active .doors-container {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
     .door {
-      width: 50%; height: 100%; 
-      background: #1c1008;
-      background-image: 
-        linear-gradient(90deg, rgba(0,0,0,0.6) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.8) 100%),
-        radial-gradient(circle, rgba(60,40,25,0.2) 10%, transparent 10%),
-        repeating-linear-gradient(0deg, #180e07, #180e07 40px, #120a05 41px, #120a05 80px);
-      box-shadow: inset 0 0 80px rgba(0,0,0,0.9);
-      position: relative; transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1);
-      transform-style: preserve-3d;
-      border-top: 6px solid #0d0603;
-      border-bottom: 6px solid #0d0603;
+      width: 50%;
+      height: 100%;
+      background: #1a0f08;
+      background-image:
+        linear-gradient(90deg, rgba(0,0,0,0.7) 0%, transparent 12%, transparent 88%, rgba(0,0,0,0.85) 100%),
+        radial-gradient(circle at 30% 40%, rgba(80,50,25,0.25) 0%, transparent 60%),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 18px,
+          rgba(0,0,0,0.15) 18px,
+          rgba(0,0,0,0.15) 20px
+        );
+      transform-origin: left center;
+      transition: transform 2.6s var(--ease-out);
+      position: relative;
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+    }
+    .door-right {
+      transform-origin: right center;
+      background-image:
+        linear-gradient(270deg, rgba(0,0,0,0.7) 0%, transparent 12%, transparent 88%, rgba(0,0,0,0.85) 100%),
+        radial-gradient(circle at 70% 40%, rgba(80,50,25,0.25) 0%, transparent 60%),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 18px,
+          rgba(0,0,0,0.15) 18px,
+          rgba(0,0,0,0.15) 20px
+        );
     }
 
-    .door-left { transform-origin: left center; border-right: 6px solid #080402; }
-    .door-right { transform-origin: right center; border-left: 6px solid #080402; }
+    .door .handle {
+      position: absolute;
+      top: 48%;
+      width: 14px;
+      height: 48px;
+      background: linear-gradient(180deg, #c0c0c0, #666);
+      border-radius: 6px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: box-shadow 0.2s ease;
+    }
+    .door-left .handle { right: 18px; }
+    .door-right .handle { left: 18px; }
+    .door .handle:hover {
+      box-shadow: 0 0 14px rgba(0,255,102,0.5), inset 0 1px 2px rgba(255,255,255,0.4);
+    }
+
+    .viewport.open .door-left  { transform: rotateY(-98deg); }
+    .viewport.open .door-right { transform: rotateY(98deg); }
 
     .door::before {
-      content: ''; position: absolute; top: 15px; bottom: 15px; width: 20px;
-      background: repeating-linear-gradient(180deg, #2b2b2b, #2b2b2b 40px, #111 41px, #111 60px);
-      border: 1px solid #000; opacity: 0.85;
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, transparent, var(--neon-green), transparent);
+      opacity: 0.35;
+      filter: blur(1px);
     }
-    .door-left::before { right: 15px; }
-    .door-right::before { left: 15px; }
+    .door-left::before  { right: 0; }
+    .door-right::before { left: 0; }
+    .viewport.open .door::before { opacity: 0; }
 
-    .handle {
-      position: absolute; top: 50%; width: 14px; height: 140px;
-      background: linear-gradient(135deg, #444, #111);
-      border: 2px solid #555; border-radius: 6px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.9), inset 0 0 5px rgba(255,255,255,0.2);
-      transform: translateY(-50%);
+    .front-buttons-container {
+      position: absolute;
+      bottom: 14%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 6;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 86%;
+      max-width: 340px;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .viewport.open .front-buttons-container {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(30px);
+    }
+
+    .degen-action-btn {
+      background: rgba(0,0,0,0.92);
+      border-radius: 14px;
+      padding: 14px 18px;
       cursor: pointer;
-      transition: filter 0.2s ease;
+      text-align: center;
+      transition: all 0.25s ease;
+      border: 2px solid transparent;
     }
-    .handle:hover { filter: brightness(1.3); }
-    .door-left .handle { right: 45px; }
-    .door-right .handle { left: 45px; }
+    .degen-action-btn:hover { transform: scale(1.035); }
+    .degen-action-btn:active { transform: scale(0.98); }
 
-    .degen-saying-banner {
-      position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
-      font-family: monospace; font-size: 0.75rem; font-weight: bold;
-      color: #ffe600; background: rgba(0, 0, 0, 0.85);
-      border: 1px solid rgba(255, 230, 0, 0.5); padding: 5px 14px;
-      border-radius: 6px; letter-spacing: 1.5px;
-      text-shadow: 0 0 8px rgba(255, 230, 0, 0.8);
-      box-shadow: 0 0 15px rgba(255, 230, 0, 0.3);
-      z-index: 5; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+    .btn-main-text {
+      font-family: var(--font);
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: block;
     }
-    .viewport.bar-active .degen-saying-banner { opacity: 1; animation: keepClickingPulse 2s infinite alternate; }
+    .btn-sub-text {
+      font-family: var(--font);
+      font-size: 0.68rem;
+      color: #aaa;
+      font-style: italic;
+      display: block;
+    }
 
-    @keyframes keepClickingPulse {
-      0% { border-color: rgba(255, 230, 0, 0.3); box-shadow: 0 0 10px rgba(255, 230, 0, 0.2); }
-      100% { border-color: rgba(255, 230, 0, 0.9); box-shadow: 0 0 20px rgba(255, 230, 0, 0.6); }
+    .enter-btn {
+      border-color: var(--neon-green);
+      box-shadow: 0 0 22px rgba(0,255,102,0.35), inset 0 0 20px rgba(0,255,102,0.05);
+    }
+    .enter-btn .btn-main-text {
+      color: var(--neon-green);
+      text-shadow: 0 0 12px var(--neon-green);
+    }
+    .enter-btn:hover {
+      background: rgba(0, 255, 102, 0.12);
+      box-shadow: 0 0 32px rgba(0,255,102,0.6);
+    }
+
+    .grass-btn {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 22px rgba(0,255,204,0.3);
+    }
+    .grass-btn .btn-main-text {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 12px var(--neon-cyan);
+    }
+    .grass-btn:hover {
+      background: rgba(0, 255, 204, 0.12);
+      box-shadow: 0 0 32px rgba(0,255,204,0.55);
+    }
+
+    .keep-clicking {
+      position: absolute;
+      bottom: 7.5%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid var(--neon-yellow);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-family: var(--font);
+      font-size: 0.65rem;
+      color: var(--neon-yellow);
+      letter-spacing: 1px;
+      box-shadow: 0 0 12px rgba(255,230,0,0.3);
+      animation: pulseText 2.2s ease-in-out infinite;
+      transition: opacity 0.4s ease;
+      white-space: nowrap;
+    }
+    .viewport.open .keep-clicking { opacity: 0; pointer-events: none; }
+    @keyframes pulseText {
+      0%, 100% { opacity: 0.75; }
+      50% { opacity: 1; text-shadow: 0 0 10px var(--neon-yellow); }
     }
 
     .door-version {
-      position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%);
-      font-family: monospace; font-size: 0.85rem; font-weight: bold;
-      color: rgba(0, 255, 102, 0.7); background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(0, 255, 102, 0.4); padding: 3px 10px;
-      border-radius: 4px; letter-spacing: 2px;
-      text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
-      z-index: 5; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+      position: absolute;
+      bottom: 3.2%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      font-family: var(--font);
+      font-size: 0.6rem;
+      color: var(--neon-green);
+      background: rgba(0,0,0,0.7);
+      border: 1px solid rgba(0,255,102,0.4);
+      border-radius: 6px;
+      padding: 3px 10px;
+      letter-spacing: 1px;
+      transition: opacity 0.4s ease;
     }
-    .viewport.bar-active .door-version { opacity: 1; }
+    .viewport.open .door-version { opacity: 0.5; }
 
-    .front-buttons-container {
-      position: absolute; bottom: 17%; left: 50%; transform: translateX(-50%);
-      width: 90%; max-width: 380px; display: flex; flex-direction: column; gap: 12px;
-      z-index: 5; text-align: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+    .degen-score {
+      position: absolute;
+      bottom: 4%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      font-family: var(--font);
+      font-size: 0.68rem;
+      color: var(--neon-cyan);
+      background: rgba(0,0,0,0.75);
+      border: 1px solid rgba(0,255,204,0.35);
+      border-radius: 8px;
+      padding: 5px 12px;
+      opacity: 0;
+      transition: opacity 0.5s ease 0.8s;
+      pointer-events: none;
+      letter-spacing: 0.5px;
     }
-    .viewport.bar-active .front-buttons-container { opacity: 1; pointer-events: auto; }
+    .viewport.open .degen-score { opacity: 1; }
 
-    .degen-action-btn {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: rgba(0, 0, 0, 0.9); padding: 12px 16px; border-radius: 10px;
-      text-decoration: none; cursor: pointer; transition: all 0.25s ease;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); border: none; width: 100%;
+    .panic-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 0, 0, 0.22);
+      z-index: 20;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+      animation: panicFlash 0.4s ease;
     }
-    .degen-action-btn:hover { transform: scale(1.03); }
-
-    .btn-main-text { font-family: monospace; font-size: 1rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 3px; }
-    .btn-sub-text { font-family: monospace; font-size: 0.65rem; color: #aaa; font-style: italic; }
-
-    .enter-btn { border: 2px solid #00ff66; box-shadow: 0 0 20px rgba(0,255,102,0.4); }
-    .enter-btn .btn-main-text { color: #00ff66; text-shadow: 0 0 8px #00ff66; }
-    .enter-btn:hover { background: rgba(0, 255, 102, 0.15); box-shadow: 0 0 25px rgba(0,255,102,0.7); }
-
-    .grass-btn { border: 2px solid #00ffcc; box-shadow: 0 0 20px rgba(0,255,204,0.4); }
-    .grass-btn .btn-main-text { color: #00ffcc; text-shadow: 0 0 8px #00ffcc; }
-    .grass-btn:hover { background: rgba(0, 255, 204, 0.15); box-shadow: 0 0 25px rgba(0,255,204,0.7); }
-
-    .viewport.open .door-left { transform: rotateY(-105deg); }
-    .viewport.open .door-right { transform: rotateY(105deg); }
-    .viewport.open .clubhouse-bg { transform: scale(1.05); }
-    .viewport.open .front-buttons-container { opacity: 0; pointer-events: none; }
-    .viewport.open .degen-saying-banner { opacity: 0; }
-    .viewport.open .door-version { opacity: 0; }
-    .viewport.open .doors-container { pointer-events: none; }
-    .viewport.open .hotspot { display: flex; }
+    @keyframes panicFlash {
+      0% { background: rgba(255,0,0,0.6); }
+      100% { background: rgba(255,0,0,0.22); }
+    }
+    .panic-card {
+      background: #0d0d12;
+      border: 3px solid var(--neon-red);
+      border-radius: 14px;
+      padding: 28px 22px;
+      width: 90vw;
+      max-width: 390px;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(255, 51, 51, 0.7);
+      font-family: var(--font);
+      animation: cardPop 0.35s var(--ease-bounce);
+    }
+    @keyframes cardPop {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .panic-title {
+      color: var(--neon-red);
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      text-shadow: 0 0 12px rgba(255,51,51,0.7);
+      letter-spacing: 1px;
+    }
+    .panic-desc {
+      color: #eee;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+    .panic-dismiss-btn {
+      background: var(--neon-red);
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-weight: 800;
+      font-family: var(--font);
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(255,51,51,0.55);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .panic-dismiss-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 28px rgba(255,51,51,0.8);
+    }
 
     .modal {
-      display: none; position: fixed; top: 0; left: 0;
-      width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95);
-      z-index: 10; justify-content: center; align-items: center;
-      flex-direction: column;
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 15;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(6px);
+      animation: fadeIn 0.25s ease;
     }
-
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     .modal-content {
-      position: relative; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      background: #000; border: 3px solid #00ff66; border-radius: 12px;
-      box-shadow: 0 0 25px #00ff66; padding: 12px; max-width: 95vw;
+      position: relative;
+      background: #0a0a10;
+      border: 2px solid var(--neon-green);
+      border-radius: 14px;
+      width: 94vw;
+      max-width: 480px;
+      max-height: 88vh;
+      overflow: auto;
+      box-shadow: 0 0 40px rgba(0,255,102,0.25);
+      padding: 18px;
+      animation: cardPop 0.3s var(--ease-bounce);
     }
-
-    .modal-content.opensea-style { border-color: #2081e2; box-shadow: 0 0 25px #2081e2; }
-    
-    .modal-content.desk-style {
-      border-color: #ff007a; box-shadow: 0 0 25px #ff007a; background: #0d0d12;
-      width: 92vw; max-width: 440px; padding: 25px 15px; text-align: center;
-    }
-
-    .modal-content.grass-style {
-      border-color: #00ffcc; box-shadow: 0 0 30px #00ffcc; background: #0d1210;
-      width: 92vw; max-width: 440px; padding: 20px; text-align: center;
-    }
-
     .close-btn {
-      position: absolute; top: -40px; right: 0; color: #fff;
-      font-size: 2rem; font-weight: bold; cursor: pointer; z-index: 11;
+      position: absolute;
+      top: 10px; right: 14px;
+      font-size: 1.6rem;
+      color: #888;
+      cursor: pointer;
+      z-index: 2;
+      line-height: 1;
+      transition: color 0.2s;
     }
+    .close-btn:hover { color: var(--neon-pink); }
 
     .web-iframe {
-      width: 85vw; max-width: 600px; height: 70vh; max-height: 500px;
-      border: none; border-radius: 8px; background: #fff;
+      width: 100%;
+      height: 55vh;
+      border: none;
+      border-radius: 8px;
+      background: #000;
+      display: none;
     }
 
-    .desk-terminal-title { font-size: 1.1rem; color: #ff007a; font-family: monospace; font-weight: bold; margin-bottom: 12px; text-shadow: 0 0 8px rgba(255, 0, 122, 0.5); }
-    .desk-terminal-screen { background: #121218; border: 1px solid #333; border-radius: 8px; padding: 15px; min-height: 95px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-    .desk-terminal-text { font-family: monospace; font-size: 0.85rem; color: #00ffcc; line-height: 1.4; text-shadow: 0 0 5px rgba(0, 255, 204, 0.4); }
-    
-    .desk-btn-group { display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; width: 100%; }
-    .desk-cycle-btn { background: #ff007a; color: #fff; border: none; padding: 8px 14px; border-radius: 18px; font-weight: bold; font-family: monospace; font-size: 0.8rem; cursor: pointer; box-shadow: 0 0 8px rgba(255, 0, 122, 0.6); transition: transform 0.1s; }
-    .desk-ticker-btn { background: #1a1a2e; color: #00ffcc; border: 1px solid #00ffcc; padding: 8px 14px; border-radius: 18px; font-weight: bold; font-family: monospace; font-size: 0.8rem; cursor: pointer; box-shadow: 0 0 8px rgba(0, 255, 204, 0.2); transition: all 0.1s; }
-    .desk-ticker-btn.active { background: #00ffcc; color: #000; box-shadow: 0 0 12px rgba(0, 255, 204, 0.8); }
-    .desk-cycle-btn:active, .desk-ticker-btn:active { transform: scale(0.95); }
-
-    .token-scanner-box { border-top: 1px dashed #333; padding-top: 12px; width: 100%; display: flex; flex-direction: column; gap: 8px; }
-    .scanner-label { font-family: monospace; font-size: 0.75rem; color: #aaa; text-align: left; }
-    .scanner-input-row { display: flex; gap: 8px; }
-    .scanner-input { flex: 1; background: #0b0c10; border: 1px solid #ff007a; border-radius: 6px; padding: 6px 10px; color: #fff; font-family: monospace; font-size: 0.85rem; outline: none; }
-    .scanner-submit-btn { background: #00ff66; color: #000; border: none; border-radius: 6px; padding: 0 12px; font-family: monospace; font-weight: bold; font-size: 0.8rem; cursor: pointer; }
-    .scanner-submit-btn:active { transform: scale(0.95); }
-
-    .opensea-card-container {
-      width: 85vw; max-width: 420px; background: #121214; border: 2px solid #2081e2;
-      border-radius: 12px; padding: 20px; text-align: center; color: #fff;
-      box-shadow: 0 0 20px rgba(32, 129, 226, 0.4);
+    .desk-terminal-title {
+      font-family: var(--font);
+      color: var(--neon-green);
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      text-shadow: 0 0 10px rgba(0,255,102,0.5);
+      letter-spacing: 1px;
     }
-    .opensea-card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #2081e2; letter-spacing: 1px; }
-    .opensea-card-desc { font-size: 0.85rem; color: #aaa; margin-bottom: 20px; line-height: 1.4; }
+    .desk-terminal-screen {
+      background: #050508;
+      border: 1px solid rgba(0,255,102,0.35);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 110px;
+      margin-bottom: 14px;
+      font-family: var(--font);
+      font-size: 0.82rem;
+      color: var(--neon-green);
+      line-height: 1.55;
+      box-shadow: inset 0 0 20px rgba(0,255,102,0.08);
+    }
+    .desk-btn-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .desk-cycle-btn, .desk-ticker-btn {
+      flex: 1;
+      min-width: 120px;
+      background: rgba(0,255,102,0.12);
+      border: 1px solid var(--neon-green);
+      color: var(--neon-green);
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .desk-cycle-btn:hover, .desk-ticker-btn:hover {
+      background: rgba(0,255,102,0.25);
+      box-shadow: 0 0 12px rgba(0,255,102,0.3);
+    }
+    .token-scanner-box {
+      border-top: 1px dashed rgba(0,255,102,0.25);
+      padding-top: 12px;
+    }
+    .scanner-label {
+      font-family: var(--font);
+      font-size: 0.7rem;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .scanner-input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .scanner-input {
+      flex: 1;
+      background: #050508;
+      border: 1px solid rgba(0,255,102,0.4);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--neon-green);
+      font-family: var(--font);
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .scanner-input:focus { border-color: var(--neon-green); box-shadow: 0 0 10px rgba(0,255,102,0.25); }
+    .scanner-submit-btn {
+      background: var(--neon-green);
+      color: #000;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-family: var(--font);
+      font-weight: 800;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .opensea-card-title {
+      font-family: var(--font);
+      color: #2081e2;
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .opensea-card-desc {
+      font-size: 0.82rem;
+      color: #aaa;
+      margin-bottom: 16px;
+      line-height: 1.45;
+    }
     .opensea-visit-btn {
-      display: inline-block; background: #2081e2; color: #fff; font-weight: bold; text-decoration: none;
-      padding: 10px 24px; border-radius: 25px; box-shadow: 0 0 12px rgba(32, 129, 226, 0.6); transition: all 0.2s ease;
+      display: inline-block;
+      background: #2081e2;
+      color: #fff;
+      text-decoration: none;
+      padding: 11px 22px;
+      border-radius: 10px;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      box-shadow: 0 0 16px rgba(32,129,226,0.4);
     }
-    .opensea-visit-btn:hover { background: #1868b7; transform: scale(1.03); }
+    .opensea-visit-btn:hover {
+      background: #1868b7;
+      transform: scale(1.03);
+    }
 
-    .grass-cam-title { font-family: monospace; color: #00ffcc; font-size: 1.05rem; font-weight: bold; margin-bottom: 4px; text-shadow: 0 0 8px rgba(0, 255, 204, 0.6); }
-    .grass-cam-subtitle { font-family: monospace; color: #aaa; font-size: 0.7rem; margin-bottom: 10px; line-height: 1.3; }
-    
+    .grass-cam-title {
+      font-family: var(--font);
+      color: var(--neon-cyan);
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+      text-shadow: 0 0 10px rgba(0,255,204,0.5);
+    }
+    .grass-cam-subtitle {
+      font-family: var(--font);
+      color: #999;
+      font-size: 0.7rem;
+      margin-bottom: 12px;
+      line-height: 1.35;
+    }
     .retro-cam-frame {
-      position: relative; width: 100%; height: 210px; border: 2px solid #00ffcc;
-      border-radius: 8px; background: #000; overflow: hidden; margin-bottom: 10px;
-      box-shadow: inset 0 0 15px rgba(0, 255, 204, 0.2);
+      position: relative;
+      width: 100%;
+      height: 220px;
+      border: 2px solid var(--neon-cyan);
+      border-radius: 10px;
+      background: #000;
+      overflow: hidden;
+      margin-bottom: 12px;
+      box-shadow: inset 0 0 20px rgba(0,255,204,0.15);
     }
     .retro-cam-frame img {
-      width: 100%; height: 100%; object-fit: cover; filter: contrast(1.1) brightness(0.9);
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: contrast(1.12) brightness(0.92);
     }
     .retro-cam-frame::after {
-      content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-      z-index: 2; background-size: 100% 3px, 3px 100%; pointer-events: none;
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%),
+        linear-gradient(90deg, rgba(255,0,0,0.05), rgba(0,255,0,0.02), rgba(0,0,255,0.05));
+      background-size: 100% 3px, 3px 100%;
+      pointer-events: none;
+      z-index: 2;
     }
     .cam-hud-overlay {
-      position: absolute; top: 8px; left: 10px; z-index: 3; font-family: monospace;
-      font-size: 0.65rem; color: #00ffcc; text-shadow: 0 0 4px #00ffcc; display: flex; gap: 8px; align-items: center;
+      position: absolute;
+      top: 10px; left: 12px;
+      z-index: 3;
+      font-family: var(--font);
+      font-size: 0.65rem;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 5px var(--neon-cyan);
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
-    .live-dot { width: 7px; height: 7px; background: #ff3333; border-radius: 50%; box-shadow: 0 0 6px #ff3333; animation: liveBlink 1s infinite; }
-    @keyframes liveBlink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
+    .live-dot {
+      width: 8px; height: 8px;
+      background: #ff3333;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #ff3333;
+      animation: liveBlink 1s infinite;
+    }
+    @keyframes liveBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.25; }
+    }
     .grass-counter-box {
-      font-family: monospace; font-size: 0.75rem; color: #ffe600; margin-bottom: 12px;
-      background: rgba(255, 230, 0, 0.08); border: 1px dashed rgba(255, 230, 0, 0.4);
-      padding: 6px; border-radius: 6px;
+      font-family: var(--font);
+      font-size: 0.78rem;
+      color: var(--neon-yellow);
+      margin-bottom: 14px;
+      background: rgba(255,230,0,0.07);
+      border: 1px dashed rgba(255,230,0,0.35);
+      padding: 8px;
+      border-radius: 8px;
     }
-    .grass-back-btn { background: #00ffcc; color: #000; border: none; padding: 9px 20px; border-radius: 18px; font-weight: bold; font-family: monospace; font-size: 0.8rem; cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
-    .grass-back-btn:active { transform: scale(0.95); }
+    .grass-back-btn {
+      background: var(--neon-cyan);
+      color: #000;
+      border: none;
+      padding: 11px 22px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-family: var(--font);
+      font-size: 0.82rem;
+      cursor: pointer;
+      box-shadow: 0 0 14px rgba(0,255,204,0.45);
+      transition: transform 0.15s;
+    }
+    .grass-back-btn:active { transform: scale(0.96); }
+
+    .boot-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: #020205;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: var(--font);
+      transition: opacity 0.7s ease, visibility 0.7s;
+    }
+    .boot-screen.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .boot-logo {
+      font-size: 1.4rem;
+      color: var(--neon-green);
+      text-shadow: 0 0 20px var(--neon-green);
+      letter-spacing: 4px;
+      margin-bottom: 18px;
+      font-weight: 900;
+    }
+    .boot-status {
+      font-size: 0.75rem;
+      color: #666;
+      margin-bottom: 24px;
+      min-height: 1.2em;
+    }
+    .boot-bar {
+      width: 200px;
+      height: 4px;
+      background: #1a1a22;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .boot-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+      border-radius: 2px;
+      transition: width 0.15s linear;
+      box-shadow: 0 0 10px var(--neon-green);
+    }
+
+    .particles {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 3px; height: 3px;
+      background: var(--neon-green);
+      border-radius: 50%;
+      opacity: 0;
+      animation: floatUp 8s linear infinite;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 0; transform: translateY(100%) scale(0.5); }
+      10%  { opacity: 0.6; }
+      90%  { opacity: 0.3; }
+      100% { opacity: 0; transform: translateY(-20vh) scale(1.2); }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(0,0,0,0.92);
+      border: 1px solid var(--neon-green);
+      color: var(--neon-green);
+      font-family: var(--font);
+      font-size: 0.75rem;
+      padding: 10px 18px;
+      border-radius: 10px;
+      z-index: 30;
+      opacity: 0;
+      transition: all 0.3s var(--ease-out);
+      pointer-events: none;
+      box-shadow: 0 0 20px rgba(0,255,102,0.25);
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
 <body>
 
+  <div class="boot-screen" id="bootScreen">
+    <div class="boot-logo">RUGGED BAR</div>
+    <div class="boot-status" id="bootStatus">Initializing space command...</div>
+    <div class="boot-bar"><div class="boot-bar-fill" id="bootFill"></div></div>
+  </div>
+
   <div class="viewport bar-active" id="scene">
     <div class="scene-container">
-      
       <div class="clubhouse-bg"></div>
-      
-      <a href="pacman.html" class="hotspot arcade-hotspot" title="Pac-Man Arcade"></a>
-      <a href="pool.html" class="hotspot pool-hotspot" title="Pool Table"></a>
-      
-      <div class="hotspot laptop-hotspot" onclick="openWebModal('dex')"></div>
-      <div class="hotspot table-hotspot" onclick="openWebModal('desk')"></div>
-      <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')"></div>
-      <a href="https://discord.com/invite/seBPAKKj5q" target="_blank" class="hotspot sofa-hotspot"></a>
+      <div class="particles" id="particles"></div>
+      <div class="crt-overlay"></div>
+      <div class="vignette"></div>
 
-      <a href="moon.html" target="_blank" class="rocket-table-link" title="moon"></a>
-    </div>
+      <a href="pacman.html" class="hotspot arcade-hotspot" title="Pac-Man Arcade" data-label="ARCADE"></a>
+      <a href="pool.html" class="hotspot pool-hotspot" title="Pool Table" data-label="POOL"></a>
+      <div class="hotspot laptop-hotspot" onclick="openWebModal('dex')" title="Charts" data-label="CHARTS"></div>
+      <div class="hotspot table-hotspot" onclick="openWebModal('desk')" title="Degen Terminal" data-label="TERMINAL"></div>
+      <div class="hotspot otter-hotspot" onclick="openWebModal('opensea')" title="Otters / NFTs" data-label="OTTERS"></div>
+      <a href="https://discord.com/invite/seBPAKKj5q" target="_blank" rel="noopener" class="hotspot sofa-hotspot" title="Discord" data-label="DISCORD"></a>
+      <a href="moon.html" class="rocket-table-link" title="Moon Mission"></a>
 
-    <div class="top-controls-bar">
-      <button class="door-ape-sign" onclick="openWebModal('dex')">
-        <span class="sign-label">$APE:</span>
-        <span class="sign-price" id="signApePrice">...</span>
-      </button>
-      <div class="control-group">
-        <a href="toilets.html" class="lights-toggle-btn">🚽🚻 Toilets</a>
-        <button class="lights-toggle-btn" id="lightsToggleBtn" onclick="toggleLights()">💡 LIGHTS</button>
-        <button class="panic-btn" onclick="triggerPanic()">🚨 SELL ALL</button>
+      <div class="top-controls-bar">
+        <button class="door-ape-sign" onclick="openWebModal('dex')" title="Token price">
+          <span class="sign-label">$APE:</span>
+          <span class="sign-price" id="signApePrice">...</span>
+        </button>
+        <div class="control-group">
+          <a href="toilets.html" class="ctrl-btn">🚽 Toilets</a>
+          <button class="ctrl-btn lights" id="lightsToggleBtn" onclick="toggleLights()">💡 LIGHTS</button>
+          <button class="ctrl-btn panic" onclick="triggerPanic()">🚨 SELL ALL</button>
+        </div>
       </div>
-    </div>
 
-    <div class="rekt-speech-bubble" id="rektBubble">
-      Bro wtf turn the lights back on before I get REKT!
-    </div>
+      <div class="rekt-speech-bubble" id="rektBubble">
+        Bro wtf turn the lights back on before I get REKT!
+      </div>
 
-    <div class="degen-saying-banner">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
-    <div class="door-version">v14.4</div>
+      <div class="degen-score" id="degenScore">CLICKS: 0 · ALPHA: LOW</div>
 
-    <div class="front-buttons-container">
-      <button class="degen-action-btn enter-btn" onclick="openDoors()">
-        <span class="btn-main-text">ENTER THE BAR</span>
-        <span class="btn-sub-text">"Ready to get rugged? Grab a seat."</span>
-      </button>
-      <button class="degen-action-btn grass-btn" onclick="openTouchGrassModal()">
-        <span class="btn-main-text">TOUCH GRASS</span>
-        <span class="btn-sub-text">"Look at actual trees for once."</span>
-      </button>
-    </div>
+      <div class="doors-container">
+        <div class="door door-left"><div class="handle" onclick="openDoors()"></div></div>
+        <div class="door door-right"><div class="handle" onclick="openDoors()"></div></div>
+      </div>
 
-    <div class="doors-container">
-      <div class="door door-left"><div class="handle" onclick="openDoors()"></div></div>
-      <div class="door door-right"><div class="handle" onclick="openDoors()"></div></div>
+      <div class="front-buttons-container">
+        <button class="degen-action-btn enter-btn" onclick="openDoors()">
+          <span class="btn-main-text">ENTER THE BAR</span>
+          <span class="btn-sub-text">"Ready to get rugged? Grab a seat."</span>
+        </button>
+        <button class="degen-action-btn grass-btn" onclick="openTouchGrassModal()">
+          <span class="btn-main-text">TOUCH GRASS</span>
+          <span class="btn-sub-text">"Look at actual trees for once."</span>
+        </button>
+      </div>
+
+      <div class="keep-clicking">⚡ KEEP CLICKING — ALPHA AWAITS ⚡</div>
+      <div class="door-version">v15.0</div>
     </div>
   </div>
 
   <div class="panic-modal" id="panicModal">
     <div class="panic-card">
       <div class="panic-title">⚠️ PAPER HANDS DETECTED</div>
-      <div class="panic-desc" id="panicMessageText">🧾 ORDER EXECUTED: Sold your entire bag at the absolute bottom (-99.8%). Thank you for providing exit liquidity to the whales.</div>
+      <div class="panic-desc" id="panicMessageText">
+        🧾 ORDER EXECUTED: Sold your entire bag at the absolute bottom (−99.8%). Thank you for providing exit liquidity to the whales.
+      </div>
       <button class="panic-dismiss-btn" onclick="dismissPanic()">BUY BACK HIGHER 🔄</button>
     </div>
   </div>
 
   <div class="modal" id="webModal">
     <div class="modal-content" id="webModalContent">
-      <span class="close-btn" onclick="closeWebModal()">&times;</span>
-      <iframe class="web-iframe" id="webIframe" src=""></iframe>
-      
-      <div id="deskModalContainer" style="display: none;">
-        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v14.4</div>
+      <span class="close-btn" onclick="closeWebModal()" title="Close">×</span>
+      <iframe class="web-iframe" id="webIframe" src="" title="Embedded content"></iframe>
+
+      <div id="deskModalContainer" style="display:none;">
+        <div class="desk-terminal-title">🧠 THE DEGEN TERMINAL v15.0</div>
         <div class="desk-terminal-screen">
           <div class="desk-terminal-text" id="deskMessageDisplay">Initializing hopium feed...</div>
         </div>
@@ -469,229 +1052,330 @@
         <div class="token-scanner-box">
           <div class="scanner-label">SIMULATE TOKEN AUDIT:</div>
           <div class="scanner-input-row">
-            <input type="text" id="tokenScannerInput" class="scanner-input" placeholder="e.g. $MOON, $SCAM" maxlength="8">
-            <button class="scanner-submit-btn" onclick="runTokenScan()">SCAN COIN</button>
+            <input type="text" id="tokenScannerInput" class="scanner-input" placeholder="e.g. $MOON, $SCAM" maxlength="10" autocomplete="off">
+            <button class="scanner-submit-btn" onclick="runTokenScan()">SCAN</button>
           </div>
         </div>
       </div>
 
-      <div id="openseaCardModal" class="opensea-card-container" style="display: none;">
+      <div id="openseaCardModal" style="display:none;">
         <div class="opensea-card-title">OPENSEA COLLECTION</div>
-        <div class="opensea-card-desc">Explore our official NFT collection safely on OpenSea without leaving the ecosystem context.</div>
-        <a href="https://opensea.io/collection/legods" target="_blank" class="opensea-visit-btn">OPEN COLLECTION 🌊</a>
+        <div class="opensea-card-desc">Explore the official NFT collection. Otters approved. NFA. DYOR.</div>
+        <a href="https://opensea.io/collection/legods" target="_blank" rel="noopener" class="opensea-visit-btn">OPEN COLLECTION 🌊</a>
       </div>
 
-      <div id="grassCardModal" class="grass-style" style="display: none;">
+      <div id="grassCardModal" style="display:none;">
         <div class="grass-cam-title">🌿 CAM-04: OUTSIDE WORLD</div>
         <div class="grass-cam-subtitle">WARNING: Natural sunlight may cause temporary trader disorientation.</div>
-        
         <div class="retro-cam-frame">
           <div class="cam-hud-overlay">
             <div class="live-dot"></div>
-            <span>REC // NATURE_FEED.GIF</span>
+            <span>REC // NATURE_FEED</span>
           </div>
-          <img src="https://media3.giphy.com/media/v1.Y2lkPTZjMDliOTUybHJocXIxaGZkdm1weGZ4cXY4bDl4d3U1c3ZxbmRtbTJ0a2M4MzM2eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/prD7xEkMs3WSFGGNYt/giphy.gif" alt="Touching Grass Security Feed">
+          <img src="https://media3.giphy.com/media/v1.Y2lkPTZjMDliOTUybHJocXIxaGZkdm1weGZ4cXY4bDl4d3U1c3ZxbmRtbTJ0a2M4MzM2eSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/prD7xEkMs3WSFGGNYt/giphy.gif" alt="Touching Grass Security Feed" loading="lazy">
         </div>
-
         <div class="grass-counter-box" id="grassCounterDisplay">
           🌱 Degens rehabilitated today: <span id="grassCountNum">1,428</span>
         </div>
-
         <button class="grass-back-btn" onclick="closeWebModal()">TAKE ME BACK TO THE CHARTS 📉</button>
       </div>
     </div>
   </div>
 
-  <script>
-    window.addEventListener('load', () => {
-      const scene = document.getElementById('scene');
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('doors') === 'open') {
-        scene.classList.add('open');
-      }
-    });
+  <div class="toast" id="toast"></div>
 
-    let isLightsOff = false;
+  <script>
+    let isLightsOff = localStorage.getItem('ruggedLights') === 'off';
+    let clickCount = parseInt(localStorage.getItem('ruggedClicks') || '0', 10);
     let speechBubbleTimer = null;
+    let autoTickerInterval = null;
+    let deskMsgIndex = 0;
+
+    const deskMessages = [
+      "Initializing hopium feed...",
+      "> Alpha leak: the next 100x is already in your bags. You just don't know it yet.",
+      "> Reminder: if it pumps on a Sunday, sell on Monday. Or don't. NFA.",
+      "> Scanning mempool... 47 new tokens launched in the last 4 minutes. All will go to zero.",
+      "> Your portfolio is currently down 87%. Congrats, you're still early.",
+      "> Whale alert: someone just bought 0.0001 ETH of your coin. This is not financial advice.",
+      "> Tip: the best time to buy was yesterday. The second best time is after you already sold.",
+      "> System: paper hands detected in sector 7. Deploying cope protocol.",
+      "> News: another L2 just launched. Your gas fees remain unchanged.",
+      "> Final alpha: touch grass. Then come back and buy the dip."
+    ];
+
+    const panicMessages = [
+      "🧾 ORDER EXECUTED: Sold your entire bag at the absolute bottom (−99.8%). Thank you for providing exit liquidity to the whales.",
+      "📉 LIQUIDATION CASCADE: Your leverage was 125x. Position size: your life savings. Status: REKT.",
+      "💀 EXIT LIQUIDITY CONFIRMED. Whales send their regards. See you next cycle.",
+      "🚨 MARKET SELL COMPLETE. Average entry: top. Exit: bottom. Classic."
+    ];
+
+    const bootLines = [
+      "Initializing space command...",
+      "Loading degen protocols...",
+      "Mounting hopium drive...",
+      "Calibrating neon lights...",
+      "Checking for paper hands...",
+      "Bar is open."
+    ];
+
+    function runBoot() {
+      const fill = document.getElementById('bootFill');
+      const status = document.getElementById('bootStatus');
+      let progress = 0;
+      let line = 0;
+
+      const tick = setInterval(() => {
+        progress += Math.random() * 18 + 8;
+        if (progress > 100) progress = 100;
+        fill.style.width = progress + '%';
+
+        if (line < bootLines.length && progress > (line + 1) * (100 / bootLines.length)) {
+          status.textContent = bootLines[line];
+          line++;
+        }
+
+        if (progress >= 100) {
+          clearInterval(tick);
+          status.textContent = bootLines[bootLines.length - 1];
+          setTimeout(() => {
+            document.getElementById('bootScreen').classList.add('hide');
+            if (isLightsOff) {
+              document.getElementById('scene').classList.add('lights-off');
+            }
+            updateScoreDisplay();
+            if (new URLSearchParams(location.search).get('doors') === 'open') {
+              openDoors(true);
+            }
+          }, 400);
+        }
+      }, 120);
+    }
+
+    function spawnParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 14; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDelay = (Math.random() * 8) + 's';
+        p.style.animationDuration = (6 + Math.random() * 5) + 's';
+        p.style.background = ['#00ff66', '#00ffcc', '#ffe600', '#ff007a'][Math.floor(Math.random() * 4)];
+        p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+        container.appendChild(p);
+      }
+    }
+
+    function openDoors(skipHints) {
+      const scene = document.getElementById('scene');
+      if (scene.classList.contains('open')) return;
+      scene.classList.add('open');
+      bumpClicks(3);
+      showToast('Welcome to the Rugged Bar. Click everything.');
+      if (!skipHints) {
+        setTimeout(showHotspotHints, 900);
+      }
+    }
+
+    function showHotspotHints() {
+      document.querySelectorAll('.hotspot').forEach((el, i) => {
+        setTimeout(() => {
+          const hint = document.createElement('div');
+          hint.className = 'hotspot-hint';
+          el.appendChild(hint);
+          setTimeout(() => hint.remove(), 2600);
+        }, i * 180);
+      });
+    }
 
     function toggleLights() {
       isLightsOff = !isLightsOff;
+      localStorage.setItem('ruggedLights', isLightsOff ? 'off' : 'on');
       const scene = document.getElementById('scene');
-      const btn = document.getElementById('lightsToggleBtn');
       const bubble = document.getElementById('rektBubble');
 
       if (isLightsOff) {
         scene.classList.add('lights-off');
-        btn.innerText = '💡 LIGHTS';
-        
         bubble.classList.add('show');
         if (speechBubbleTimer) clearTimeout(speechBubbleTimer);
-        speechBubbleTimer = setTimeout(() => {
-          bubble.classList.remove('show');
-        }, 4000);
+        speechBubbleTimer = setTimeout(() => bubble.classList.remove('show'), 4200);
+        showToast('Lights off. Paper hands thrive in darkness.');
       } else {
         scene.classList.remove('lights-off');
-        btn.innerText = '💡 LIGHTS';
         bubble.classList.remove('show');
+        showToast('Lights on. Cope levels restored.');
       }
+      bumpClicks(1);
     }
 
     function triggerPanic() {
       const scene = document.getElementById('scene');
       scene.classList.add('panic-active');
+      const msg = panicMessages[Math.floor(Math.random() * panicMessages.length)];
+      document.getElementById('panicMessageText').textContent = msg;
       document.getElementById('panicModal').style.display = 'flex';
+      bumpClicks(5);
     }
 
     function dismissPanic() {
-      const scene = document.getElementById('scene');
-      scene.classList.remove('panic-active');
+      document.getElementById('scene').classList.remove('panic-active');
       document.getElementById('panicModal').style.display = 'none';
-    }
-
-    function openDoors() {
-      document.getElementById('scene').classList.add('open');
-    }
-
-    function openTouchGrassModal() {
-      const modal = document.getElementById('webModal');
-      const iframe = document.getElementById('webIframe');
-      const openseaCard = document.getElementById('openseaCardModal');
-      const deskContainer = document.getElementById('deskModalContainer');
-      const grassContainer = document.getElementById('grassCardModal');
-      const content = document.getElementById('webModalContent');
-
-      let currentCount = parseInt(localStorage.getItem('grassTouches') || '1428');
-      currentCount++;
-      localStorage.setItem('grassTouches', currentCount);
-      document.getElementById('grassCountNum').innerText = currentCount.toLocaleString();
-
-      modal.style.display = 'flex';
-      content.className = 'modal-content grass-style';
-      iframe.style.display = 'none';
-      iframe.src = '';
-      openseaCard.style.display = 'none';
-      deskContainer.style.display = 'none';
-      grassContainer.style.display = 'block';
-    }
-
-    const deskMessages = [
-      "BARTENDER: 'Bro, I swear bottom is in, my cousin's barber told me.'",
-      "AUDIT: Token score: 0/100. Liquidity pooled straight into the dev's vacation fund.",
-      "ALPHA LEAK: Buying high, selling low, and blaming the multi-sig team by Tuesday.",
-      "BARTENDER: 'Have another shot of hopium, the macro chart looks fine.'",
-      "AUDIT: Smart contract check: 100% guaranteed stealth tax applied.",
-      "ALPHA LEAK: Next green candle is sponsored by your last remaining savings.",
-      "BARTENDER: 'Relax man, liquidity is just resting in another wallet.'",
-      "AUDIT: Mint function detected: Dev can mint a trillion tokens while you sleep.",
-      "ALPHA LEAK: The whales are accumulating... your exit liquidity.",
-      "BARTENDER: 'Paper hands get flushed, diamond hands get rugged. Such is life.'",
-      "AUDIT: Honeypot analysis: You can buy all you want, but selling requires a blood sacrifice.",
-      "ALPHA LEAK: Just inverse whatever your brain tells you to do at 3 AM.",
-      "BARTENDER: 'Stop looking at the 1-minute chart and look at the ceiling vent instead. Way more bullish.'",
-      "AUDIT: Ownership not renounced. The dev has the keys to your financial future.",
-      "WHALE ALERT: A sleeping giant just transferred 50,000,000 tokens to a dead address. Total panic ensues.",
-      "GAS WARS: Current network fee is 450 Gwei. You just paid $40 in gas to swap a $15 meme coin.",
-      "DISCORD MOD: 'Please stop opening support tickets about your hacked wallet, have you tried turning your private keys off and on again?'",
-      "TECHNICAL ANALYSIS: We are currently forming an inverse toilet-bowl head-and-shoulders fractal pattern pointing straight to zero.",
-      "ALPHA LEAK: Your favorite influencer just quietly dumped their bags while tweeting bullish rocket emojis.",
-      "BARTENDER: 'If the chart looks like a dying heartbeat, that just means high volatility incoming!'"
-    ];
-    let currentDeskIndex = 0;
-    let autoTickerTimer = null;
-    let isAutoTickerRunning = false;
-
-    function cycleDeskMessage() {
-      currentDeskIndex = (currentDeskIndex + 1) % deskMessages.length;
-      document.getElementById('deskMessageDisplay').innerText = deskMessages[currentDeskIndex];
-    }
-
-    function toggleAutoTicker() {
-      isAutoTickerRunning = !isAutoTickerRunning;
-      const btn = document.getElementById('tickerToggleBtn');
-      if (isAutoTickerRunning) {
-        btn.innerText = '⚡ AUTO TICKER: ON';
-        btn.classList.add('active');
-        autoTickerTimer = setInterval(cycleDeskMessage, 4500);
-      } else {
-        btn.innerText = '⚡ AUTO TICKER: OFF';
-        btn.classList.remove('active');
-        clearInterval(autoTickerTimer);
-      }
-    }
-
-    function runTokenScan() {
-      let inputVal = document.getElementById('tokenScannerInput').value.trim();
-      if (!inputVal) inputVal = "$RANDOM";
-      if (!inputVal.startsWith('$')) inputVal = '$' + inputVal.toUpperCase();
-
-      const risks = [
-        `SCAN (${inputVal}): Liquidity locked in a kitchen blender. Rug probability: 99.4%.`,
-        `SCAN (${inputVal}): Verified 100% pure scam. Dev team spotted buying luxury yachts in Ohio.`,
-        `SCAN (${inputVal}): Honeypot status: CONFIRMED. You can buy, but your tokens live here forever.`,
-        `SCAN (${inputVal}): Audit score: 4/100. Looks extremely bullish, proceed directly to zero.`,
-        `SCAN (${inputVal}): Tax rate: 99% buy / 99% sell. The ultimate tax farm!`
-      ];
-      let randomAudit = risks[Math.floor(Math.random() * risks.length)];
-      document.getElementById('deskMessageDisplay').innerText = randomAudit;
+      showToast('Bought higher. As is tradition.');
     }
 
     function openWebModal(type) {
       const modal = document.getElementById('webModal');
       const iframe = document.getElementById('webIframe');
-      const openseaCard = document.getElementById('openseaCardModal');
-      const deskContainer = document.getElementById('deskModalContainer');
-      const grassContainer = document.getElementById('grassCardModal');
-      const content = document.getElementById('webModalContent');
+      const desk = document.getElementById('deskModalContainer');
+      const opensea = document.getElementById('openseaCardModal');
+      const grass = document.getElementById('grassCardModal');
+
+      iframe.style.display = 'none';
+      iframe.src = '';
+      desk.style.display = 'none';
+      opensea.style.display = 'none';
+      grass.style.display = 'none';
+
+      if (type === 'dex') {
+        desk.style.display = 'block';
+        document.getElementById('deskMessageDisplay').textContent =
+          '> $APE live feed\n> Price action: sideways with occasional rugs.\n> Sentiment: extremely online.\n> Recommendation: NFA. Always was.';
+        deskMsgIndex = 0;
+      } else if (type === 'desk') {
+        desk.style.display = 'block';
+        document.getElementById('deskMessageDisplay').textContent = deskMessages[0];
+        deskMsgIndex = 0;
+      } else if (type === 'opensea') {
+        opensea.style.display = 'block';
+      }
 
       modal.style.display = 'flex';
-      
-      if (type === 'dex') {
-        content.className = 'modal-content';
-        iframe.style.display = 'block';
-        openseaCard.style.display = 'none';
-        deskContainer.style.display = 'none';
-        grassContainer.style.display = 'none';
-        iframe.src = 'https://dexscreener.com/apechain?embed=1&theme=dark';
-      } else if (type === 'desk') {
-        content.className = 'modal-content desk-style';
-        iframe.style.display = 'none';
-        iframe.src = '';
-        openseaCard.style.display = 'none';
-        grassContainer.style.display = 'none';
-        deskContainer.style.display = 'block';
-        document.getElementById('deskMessageDisplay').innerText = deskMessages[currentDeskIndex];
-      } else if (type === 'opensea') {
-        content.className = 'modal-content opensea-style';
-        iframe.style.display = 'none';
-        iframe.src = '';
-        deskContainer.style.display = 'none';
-        grassContainer.style.display = 'none';
-        openseaCard.style.display = 'block';
-      }
+      bumpClicks(2);
+    }
+
+    function openTouchGrassModal() {
+      const modal = document.getElementById('webModal');
+      document.getElementById('webIframe').style.display = 'none';
+      document.getElementById('deskModalContainer').style.display = 'none';
+      document.getElementById('openseaCardModal').style.display = 'none';
+      document.getElementById('grassCardModal').style.display = 'block';
+
+      const numEl = document.getElementById('grassCountNum');
+      let n = parseInt(numEl.textContent.replace(/,/g, ''), 10) || 1428;
+      n += Math.floor(Math.random() * 3) + 1;
+      numEl.textContent = n.toLocaleString();
+
+      modal.style.display = 'flex';
+      bumpClicks(1);
     }
 
     function closeWebModal() {
-      if (isAutoTickerRunning) {
-        toggleAutoTicker();
-      }
       document.getElementById('webModal').style.display = 'none';
       document.getElementById('webIframe').src = '';
-    }
-
-    async function updateApePrice() {
-      try {
-        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=apecoin&vs_currencies=usd');
-        const data = await res.json();
-        if (data.apecoin && data.apecoin.usd) {
-          document.getElementById('signApePrice').innerText = '$' + data.apecoin.usd.toFixed(2);
-        }
-      } catch (e) {
-        document.getElementById('signApePrice').innerText = '$0.14';
+      if (autoTickerInterval) {
+        clearInterval(autoTickerInterval);
+        autoTickerInterval = null;
+        document.getElementById('tickerToggleBtn').textContent = '⚡ AUTO TICKER: OFF';
       }
     }
-    updateApePrice();
-    setInterval(updateApePrice, 30000);
-  </script>
 
+    function cycleDeskMessage() {
+      deskMsgIndex = (deskMsgIndex + 1) % deskMessages.length;
+      const el = document.getElementById('deskMessageDisplay');
+      el.style.opacity = '0.4';
+      setTimeout(() => {
+        el.textContent = deskMessages[deskMsgIndex];
+        el.style.opacity = '1';
+      }, 120);
+      bumpClicks(1);
+    }
+
+    function toggleAutoTicker() {
+      const btn = document.getElementById('tickerToggleBtn');
+      if (autoTickerInterval) {
+        clearInterval(autoTickerInterval);
+        autoTickerInterval = null;
+        btn.textContent = '⚡ AUTO TICKER: OFF';
+      } else {
+        autoTickerInterval = setInterval(cycleDeskMessage, 3200);
+        btn.textContent = '⚡ AUTO TICKER: ON';
+        cycleDeskMessage();
+      }
+    }
+
+    function runTokenScan() {
+      const input = document.getElementById('tokenScannerInput');
+      const name = (input.value || 'UNKNOWN').toUpperCase().replace(/[^A-Z0-9$]/g, '') || 'UNKNOWN';
+      const results = [
+        `> Audit complete for ${name}.\n> Contract: unverified.\n> Liquidity: locked for 3 minutes.\n> Dev wallet: 47%.\n> Verdict: 🚨 HIGH RISK / PROBABLY FINE`,
+        `> Scanning ${name}...\n> Honeypot check: passed (maybe).\n> Buy tax: 12%. Sell tax: 49%.\n> Verdict: classic exit liquidity simulator.`,
+        `> ${name} analysis:\n> Twitter: 12 followers, all bots.\n> Roadmap: "to the moon".\n> Verdict: 💀 REKT PENDING`,
+        `> ${name} looks clean.\n> (This is a lie.)\n> NFA. DYOR. Have fun.`
+      ];
+      document.getElementById('deskMessageDisplay').textContent =
+        results[Math.floor(Math.random() * results.length)];
+      bumpClicks(2);
+    }
+
+    function bumpClicks(n = 1) {
+      clickCount += n;
+      localStorage.setItem('ruggedClicks', clickCount);
+      updateScoreDisplay();
+    }
+
+    function updateScoreDisplay() {
+      const el = document.getElementById('degenScore');
+      if (!el) return;
+      let rank = 'LOW';
+      if (clickCount > 80) rank = 'LEGENDARY';
+      else if (clickCount > 40) rank = 'HIGH';
+      else if (clickCount > 15) rank = 'MEDIUM';
+      el.textContent = `CLICKS: ${clickCount} · ALPHA: ${rank}`;
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    function updateApePrice() {
+      const base = 0.12 + Math.random() * 0.08;
+      const price = (base + (Math.random() - 0.5) * 0.02).toFixed(3);
+      const el = document.getElementById('signApePrice');
+      if (el) el.textContent = '$' + price;
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeWebModal();
+        dismissPanic();
+      }
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (!document.getElementById('scene').classList.contains('open')) {
+          e.preventDefault();
+          openDoors();
+        }
+      }
+      if (e.key === 'l' || e.key === 'L') toggleLights();
+    });
+
+    document.getElementById('webModal').addEventListener('click', (e) => {
+      if (e.target.id === 'webModal') closeWebModal();
+    });
+    document.getElementById('panicModal').addEventListener('click', (e) => {
+      if (e.target.id === 'panicModal') dismissPanic();
+    });
+
+    window.addEventListener('load', () => {
+      runBoot();
+      spawnParticles();
+      updateApePrice();
+      setInterval(updateApePrice, 12000);
+    });
+  </script>
 </body>
 </html>
