@@ -42,7 +42,7 @@
       position: fixed;
       inset: 0;
       overflow: hidden;
-      perspective: 1400px;
+      perspective: 1200px; /* 3D Camera depth */
       background: #000;
     }
 
@@ -53,8 +53,11 @@
       height: 177.78vw;
       max-height: 100vh;
       max-width: 56.25vh;
-      transform: translate(-50%, -50%);
-      overflow: hidden;
+      /* Scaled up slightly to hide edges when tilting */
+      transform: translate(-50%, -50%) scale(1.08);
+      transform-style: preserve-3d;
+      transition: transform 0.1s var(--ease-out);
+      overflow: visible;
       background: #000;
       box-shadow: 0 0 80px rgba(0, 255, 102, 0.08);
     }
@@ -69,8 +72,9 @@
       background: url('clubhouse.JPG') no-repeat center center / cover;
       z-index: 1;
       opacity: 0;
-      transition: transform 2.8s var(--ease-out), filter 0.6s ease, opacity 0.8s ease;
-      will-change: transform, filter;
+      transform: translateZ(-20px); /* Pushed into the background */
+      transition: filter 0.6s ease, opacity 0.8s ease;
+      will-change: filter;
     }
     .viewport.bar-active .clubhouse-bg { opacity: 1; }
 
@@ -91,11 +95,11 @@
       animation: staticGlitch 0.12s infinite;
     }
     @keyframes staticGlitch {
-      0%   { transform: translate(0,0) scale(1.04); }
-      25%  { transform: translate(-4px,3px) scale(1.04); }
-      50%  { transform: translate(3px,-2px) scale(1.04); }
-      75%  { transform: translate(-2px,-4px) scale(1.04); }
-      100% { transform: translate(0,0) scale(1.04); }
+      0%   { transform: translateZ(-20px) scale(1.04); }
+      25%  { transform: translateZ(-20px) translate(-4px,3px) scale(1.04); }
+      50%  { transform: translateZ(-20px) translate(3px,-2px) scale(1.04); }
+      75%  { transform: translateZ(-20px) translate(-2px,-4px) scale(1.04); }
+      100% { transform: translateZ(-20px) scale(1.04); }
     }
 
     .crt-overlay {
@@ -108,6 +112,7 @@
       background-size: 100% 3px, 3px 100%;
       opacity: 0.55;
       mix-blend-mode: overlay;
+      transform: translateZ(30px); /* Pulled forward towards user */
       animation: crtFlicker 6s infinite;
     }
     @keyframes crtFlicker {
@@ -120,9 +125,9 @@
       z-index: 7;
       pointer-events: none;
       background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%);
+      transform: translateZ(40px);
     }
 
-    /* 🔥 HOTSPOT LAYER FIXED 🔥 */
     .hotspot {
       position: absolute;
       z-index: 10;
@@ -132,6 +137,7 @@
       background: transparent;
       text-decoration: none;
       border-radius: 8px;
+      transform: translateZ(10px); /* Floating slightly off the wall */
       transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
     }
     .viewport.open .hotspot { display: block; }
@@ -150,7 +156,7 @@
     .hotspot:active::after {
       opacity: 1;
     }
-    .hotspot:hover { transform: scale(1.02); }
+    .hotspot:hover { transform: translateZ(15px) scale(1.02); }
 
     .arcade-hotspot { top: 50%; left: 51.5%; width: 15%; height: 8%; }
     .arcade-hotspot:hover { background: rgba(255, 230, 0, 0.18); }
@@ -195,7 +201,6 @@
       100% { opacity: 0; transform: scale(1.25); box-shadow: 0 0 0 16px transparent; }
     }
 
-    /* 🔥 ROCKET FLOAT ADDED 🔥 */
     .rocket-table-link {
       position: absolute;
       top: 61.5%; left: 64.2%;
@@ -206,6 +211,7 @@
       border: none;
       text-decoration: none;
       cursor: pointer;
+      transform: translateZ(15px);
       transition: background 0.3s ease;
     }
     .viewport.open .rocket-table-link { 
@@ -213,8 +219,8 @@
       animation: rocketFloat 4s ease-in-out infinite;
     }
     @keyframes rocketFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+      0%, 100% { transform: translateZ(15px) translateY(0); }
+      50% { transform: translateZ(15px) translateY(-4px); }
     }
     .rocket-table-link:hover {
       background: rgba(255, 0, 122, 0.28);
@@ -226,7 +232,7 @@
       position: absolute;
       top: 22.5%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateZ(40px);
       width: 94%;
       max-width: 440px;
       display: flex;
@@ -326,7 +332,6 @@
       position: absolute;
       top: 30.5%;
       left: 50%;
-      transform: translateX(-50%) scale(0.85);
       background: rgba(0, 0, 0, 0.95);
       border: 2px solid var(--neon-pink);
       border-radius: 10px;
@@ -340,12 +345,13 @@
       box-shadow: 0 0 24px rgba(255, 0, 122, 0.55);
       opacity: 0;
       pointer-events: none;
+      transform: translateX(-50%) translateZ(50px) scale(0.85);
       transition: all 0.35s var(--ease-bounce);
       max-width: 90%;
     }
     .rekt-speech-bubble.show {
       opacity: 1;
-      transform: translateX(-50%) scale(1);
+      transform: translateX(-50%) translateZ(50px) scale(1);
     }
 
     .doors-container {
@@ -356,13 +362,13 @@
       perspective: 1600px;
       pointer-events: none;
       opacity: 0;
+      transform: translateZ(80px); /* Closest element to the user */
       transition: opacity 0.35s ease;
     }
     .viewport.bar-active .doors-container {
       opacity: 1;
       pointer-events: auto;
     }
-    /* 🔥 MOBILE FIX: DISBALE DOOR POINTER EVENTS WHEN OPEN 🔥 */
     .viewport.open .doors-container {
       pointer-events: none;
     }
@@ -385,11 +391,10 @@
       transition: transform 2.6s var(--ease-out);
       position: relative;
       box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
-      /* Must re-enable pointer events just for the door itself before it opens */
       pointer-events: auto; 
     }
     .viewport.open .door {
-      pointer-events: none; /* Turn off once open */
+      pointer-events: none; 
     }
 
     .door-right {
@@ -444,19 +449,19 @@
       position: absolute;
       bottom: 14%;
       left: 50%;
-      transform: translateX(-50%);
       z-index: 6;
       display: flex;
       flex-direction: column;
       gap: 12px;
       width: 86%;
       max-width: 340px;
+      transform: translateX(-50%) translateZ(90px);
       transition: opacity 0.5s ease, transform 0.5s ease;
     }
     .viewport.open .front-buttons-container {
       opacity: 0;
       pointer-events: none;
-      transform: translateX(-50%) translateY(30px);
+      transform: translateX(-50%) translateY(30px) translateZ(90px);
     }
 
     .degen-action-btn {
@@ -469,7 +474,6 @@
       border: 2px solid transparent;
     }
     .degen-action-btn:hover { transform: scale(1.035); }
-    /* 🔥 BETTER TACTILE FEEDBACK 🔥 */
     .degen-action-btn:active { transform: scale(0.95); }
 
     .btn-main-text {
@@ -519,7 +523,7 @@
       position: absolute;
       bottom: 7.5%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateZ(40px);
       z-index: 5;
       background: rgba(0,0,0,0.8);
       border: 1px solid var(--neon-yellow);
@@ -544,7 +548,7 @@
       position: absolute;
       bottom: 3.2%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateZ(40px);
       z-index: 5;
       font-family: var(--font);
       font-size: 0.6rem;
@@ -562,7 +566,7 @@
       position: absolute;
       bottom: 4%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateZ(40px);
       z-index: 5;
       font-family: var(--font);
       font-size: 0.68rem;
@@ -947,6 +951,7 @@
       z-index: 2;
       pointer-events: none;
       overflow: hidden;
+      transform: translateZ(60px); /* Particles float furthest in front */
     }
     .particle {
       position: absolute;
@@ -1374,6 +1379,40 @@
       const el = document.getElementById('signApePrice');
       if (el) el.textContent = '$' + price;
     }
+
+    // --- 3D PARALLAX EFFECT TRACKING ---
+    document.addEventListener('mousemove', (e) => {
+      const scene = document.getElementById('scene');
+      if (!scene.classList.contains('open')) return; // Only tilt when doors are open
+
+      const container = document.querySelector('.scene-container');
+      const xAxis = (window.innerWidth / 2 - e.pageX) / 45; // Calculate left/right rotation
+      const yAxis = (window.innerHeight / 2 - e.pageY) / 45; // Calculate up/down rotation
+
+      container.style.transform = `translate(-50%, -50%) scale(1.08) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+    });
+
+    document.addEventListener('mouseleave', () => {
+      const container = document.querySelector('.scene-container');
+      container.style.transform = `translate(-50%, -50%) scale(1.08) rotateY(0deg) rotateX(0deg)`;
+    });
+
+    // Mobile device tilt (gyroscope) tracking
+    window.addEventListener('deviceorientation', (e) => {
+      const scene = document.getElementById('scene');
+      if (!scene.classList.contains('open') || !e.gamma || !e.beta) return;
+
+      const container = document.querySelector('.scene-container');
+      let xAxis = e.gamma / 2.5; 
+      let yAxis = (e.beta - 45) / 2.5; // Offset by 45 degrees for standard holding angle
+
+      // Clamp max rotation to prevent the room from flipping entirely
+      xAxis = Math.max(-12, Math.min(12, xAxis));
+      yAxis = Math.max(-12, Math.min(12, yAxis));
+
+      container.style.transform = `translate(-50%, -50%) scale(1.08) rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
+    });
+    // -----------------------------------
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
