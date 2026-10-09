@@ -108,6 +108,11 @@
       background-size: 100% 3px, 3px 100%;
       opacity: 0.55;
       mix-blend-mode: overlay;
+      animation: crtFlicker 6s infinite;
+    }
+    @keyframes crtFlicker {
+      0%, 4%, 8%, 100% { opacity: 0.55; }
+      2%, 6% { opacity: 0.45; }
     }
 
     .vignette {
@@ -117,9 +122,10 @@
       background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%);
     }
 
+    /* 🔥 HOTSPOT LAYER FIXED 🔥 */
     .hotspot {
       position: absolute;
-      z-index: 3;
+      z-index: 10;
       cursor: pointer;
       display: none;
       border: none;
@@ -148,30 +154,30 @@
 
     .arcade-hotspot { top: 50%; left: 51.5%; width: 15%; height: 8%; }
     .arcade-hotspot:hover { background: rgba(255, 230, 0, 0.18); }
-    .arcade-hotspot:hover::after { border-color: var(--neon-yellow); box-shadow: 0 0 18px rgba(255,230,0,0.45); }
+    .arcade-hotspot:hover::after { border-color: var(--neon-yellow); box-shadow: 0 0 20px rgba(255,230,0,0.55); }
 
     .pool-hotspot { top: 55.5%; left: 58.5%; width: 26%; height: 6.5%; }
     .pool-hotspot:hover { background: rgba(0, 255, 102, 0.18); }
-    .pool-hotspot:hover::after { border-color: var(--neon-green); box-shadow: 0 0 18px rgba(0,255,102,0.45); }
+    .pool-hotspot:hover::after { border-color: var(--neon-green); box-shadow: 0 0 20px rgba(0,255,102,0.55); }
 
     .laptop-hotspot { top: 45.5%; left: 22.5%; width: 10.5%; height: 6.5%; }
     .laptop-hotspot:hover { background: rgba(0, 255, 102, 0.18); }
-    .laptop-hotspot:hover::after { border-color: var(--neon-green); box-shadow: 0 0 18px rgba(0,255,102,0.45); }
+    .laptop-hotspot:hover::after { border-color: var(--neon-green); box-shadow: 0 0 20px rgba(0,255,102,0.55); }
 
     .sofa-hotspot { top: 60.5%; left: 24%; width: 35%; height: 12%; }
     .sofa-hotspot:hover { background: rgba(88, 101, 242, 0.18); }
-    .sofa-hotspot:hover::after { border-color: var(--neon-blue); box-shadow: 0 0 18px rgba(88,101,242,0.45); }
+    .sofa-hotspot:hover::after { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(88,101,242,0.55); }
 
     .table-hotspot { top: 66%; left: 14%; width: 10%; height: 9%; }
     .table-hotspot:hover { background: rgba(255, 0, 122, 0.22); }
-    .table-hotspot:hover::after { border-color: var(--neon-pink); box-shadow: 0 0 18px rgba(255,0,122,0.45); }
+    .table-hotspot:hover::after { border-color: var(--neon-pink); box-shadow: 0 0 20px rgba(255,0,122,0.55); }
 
     .otter-hotspot {
       top: 81.5%; left: 41.5%; width: 17%; height: 7.5%;
       border-radius: 50%;
     }
     .otter-hotspot:hover { background: rgba(32, 129, 226, 0.28); }
-    .otter-hotspot:hover::after { border-color: #2081e2; box-shadow: 0 0 20px rgba(32,129,226,0.5); border-radius: 50%; }
+    .otter-hotspot:hover::after { border-color: #2081e2; box-shadow: 0 0 24px rgba(32,129,226,0.6); border-radius: 50%; }
 
     .hotspot-hint {
       position: absolute;
@@ -181,19 +187,20 @@
       opacity: 0;
       pointer-events: none;
       animation: hintPulse 2.4s ease-out forwards;
-      z-index: 4;
+      z-index: 1;
     }
     @keyframes hintPulse {
-      0%   { opacity: 0.9; transform: scale(0.92); box-shadow: 0 0 0 0 rgba(0,255,102,0.5); }
-      40%  { opacity: 0.6; }
-      100% { opacity: 0; transform: scale(1.25); box-shadow: 0 0 0 12px transparent; }
+      0%   { opacity: 0.9; transform: scale(0.92); box-shadow: 0 0 0 0 rgba(0,255,102,0.6); }
+      40%  { opacity: 0.6; box-shadow: 0 0 20px rgba(0,255,102,0.3); }
+      100% { opacity: 0; transform: scale(1.25); box-shadow: 0 0 0 16px transparent; }
     }
 
+    /* 🔥 ROCKET FLOAT ADDED 🔥 */
     .rocket-table-link {
       position: absolute;
       top: 61.5%; left: 64.2%;
       width: 3.5%; height: 13.5%;
-      z-index: 4;
+      z-index: 10;
       display: none;
       background: transparent;
       border: none;
@@ -201,11 +208,18 @@
       cursor: pointer;
       transition: background 0.3s ease;
     }
-    .viewport.open .rocket-table-link { display: block; }
+    .viewport.open .rocket-table-link { 
+      display: block; 
+      animation: rocketFloat 4s ease-in-out infinite;
+    }
+    @keyframes rocketFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
     .rocket-table-link:hover {
       background: rgba(255, 0, 122, 0.28);
       border-radius: 4px;
-      box-shadow: 0 0 16px rgba(255,0,122,0.4);
+      box-shadow: 0 0 20px rgba(255,0,122,0.5);
     }
 
     .top-controls-bar {
@@ -348,6 +362,10 @@
       opacity: 1;
       pointer-events: auto;
     }
+    /* 🔥 MOBILE FIX: DISBALE DOOR POINTER EVENTS WHEN OPEN 🔥 */
+    .viewport.open .doors-container {
+      pointer-events: none;
+    }
 
     .door {
       width: 50%;
@@ -367,7 +385,13 @@
       transition: transform 2.6s var(--ease-out);
       position: relative;
       box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+      /* Must re-enable pointer events just for the door itself before it opens */
+      pointer-events: auto; 
     }
+    .viewport.open .door {
+      pointer-events: none; /* Turn off once open */
+    }
+
     .door-right {
       transform-origin: right center;
       background-image:
@@ -392,6 +416,7 @@
       box-shadow: 0 0 8px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.4);
       cursor: pointer;
       transition: box-shadow 0.2s ease;
+      pointer-events: auto;
     }
     .door-left .handle { right: 18px; }
     .door-right .handle { left: 18px; }
@@ -444,7 +469,8 @@
       border: 2px solid transparent;
     }
     .degen-action-btn:hover { transform: scale(1.035); }
-    .degen-action-btn:active { transform: scale(0.98); }
+    /* 🔥 BETTER TACTILE FEEDBACK 🔥 */
+    .degen-action-btn:active { transform: scale(0.95); }
 
     .btn-main-text {
       font-family: var(--font);
