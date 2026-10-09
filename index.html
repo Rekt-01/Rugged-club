@@ -42,7 +42,7 @@
       position: fixed;
       inset: 0;
       overflow: hidden;
-      perspective: 1200px; /* 3D Camera depth */
+      perspective: 1200px;
       background: #000;
     }
 
@@ -53,7 +53,6 @@
       height: 177.78vw;
       max-height: 100vh;
       max-width: 56.25vh;
-      /* Scaled up slightly to hide edges when tilting */
       transform: translate(-50%, -50%) scale(1.08);
       transform-style: preserve-3d;
       transition: transform 0.1s var(--ease-out);
@@ -69,10 +68,11 @@
     .clubhouse-bg {
       position: absolute;
       inset: 0;
+      /* Ensure this matches your exact filename casing in GitHub (clubhouse.JPG) */
       background: url('clubhouse.JPG') no-repeat center center / cover;
       z-index: 1;
       opacity: 0;
-      transform: translateZ(-20px); /* Pushed into the background */
+      transform: translateZ(-20px);
       transition: filter 0.6s ease, opacity 0.8s ease;
       will-change: filter;
     }
@@ -112,7 +112,7 @@
       background-size: 100% 3px, 3px 100%;
       opacity: 0.55;
       mix-blend-mode: overlay;
-      transform: translateZ(30px); /* Pulled forward towards user */
+      transform: translateZ(30px);
       animation: crtFlicker 6s infinite;
     }
     @keyframes crtFlicker {
@@ -137,7 +137,7 @@
       background: transparent;
       text-decoration: none;
       border-radius: 8px;
-      transform: translateZ(10px); /* Floating slightly off the wall */
+      transform: translateZ(10px);
       transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
     }
     .viewport.open .hotspot { display: block; }
@@ -362,7 +362,7 @@
       perspective: 1600px;
       pointer-events: none;
       opacity: 0;
-      transform: translateZ(80px); /* Closest element to the user */
+      transform: translateZ(80px);
       transition: opacity 0.35s ease;
     }
     .viewport.bar-active .doors-container {
@@ -951,7 +951,7 @@
       z-index: 2;
       pointer-events: none;
       overflow: hidden;
-      transform: translateZ(60px); /* Particles float furthest in front */
+      transform: translateZ(60px);
     }
     .particle {
       position: absolute;
@@ -1116,7 +1116,10 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    let isLightsOff = localStorage.getItem('ruggedLights') === 'off';
+    // FORCED LIGHTS ON BY DEFAULT (clears any old dark mode cache)
+    localStorage.removeItem('ruggedLights');
+    let isLightsOff = false;
+
     let clickCount = parseInt(localStorage.getItem('ruggedClicks') || '0', 10);
     let speechBubbleTimer = null;
     let autoTickerInterval = null;
@@ -1172,9 +1175,6 @@
           status.textContent = bootLines[bootLines.length - 1];
           setTimeout(() => {
             document.getElementById('bootScreen').classList.add('hide');
-            if (isLightsOff) {
-              document.getElementById('scene').classList.add('lights-off');
-            }
             updateScoreDisplay();
             if (new URLSearchParams(location.search).get('doors') === 'open') {
               openDoors(true);
@@ -1222,7 +1222,6 @@
 
     function toggleLights() {
       isLightsOff = !isLightsOff;
-      localStorage.setItem('ruggedLights', isLightsOff ? 'off' : 'on');
       const scene = document.getElementById('scene');
       const bubble = document.getElementById('rektBubble');
 
@@ -1380,15 +1379,12 @@
       if (el) el.textContent = '$' + price;
     }
 
-    // --- 3D PARALLAX EFFECT TRACKING ---
     document.addEventListener('mousemove', (e) => {
       const scene = document.getElementById('scene');
-      if (!scene.classList.contains('open')) return; // Only tilt when doors are open
-
+      if (!scene.classList.contains('open')) return;
       const container = document.querySelector('.scene-container');
-      const xAxis = (window.innerWidth / 2 - e.pageX) / 45; // Calculate left/right rotation
-      const yAxis = (window.innerHeight / 2 - e.pageY) / 45; // Calculate up/down rotation
-
+      const xAxis = (window.innerWidth / 2 - e.pageX) / 45;
+      const yAxis = (window.innerHeight / 2 - e.pageY) / 45;
       container.style.transform = `translate(-50%, -50%) scale(1.08) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
     });
 
@@ -1397,22 +1393,16 @@
       container.style.transform = `translate(-50%, -50%) scale(1.08) rotateY(0deg) rotateX(0deg)`;
     });
 
-    // Mobile device tilt (gyroscope) tracking
     window.addEventListener('deviceorientation', (e) => {
       const scene = document.getElementById('scene');
       if (!scene.classList.contains('open') || !e.gamma || !e.beta) return;
-
       const container = document.querySelector('.scene-container');
       let xAxis = e.gamma / 2.5; 
-      let yAxis = (e.beta - 45) / 2.5; // Offset by 45 degrees for standard holding angle
-
-      // Clamp max rotation to prevent the room from flipping entirely
+      let yAxis = (e.beta - 45) / 2.5;
       xAxis = Math.max(-12, Math.min(12, xAxis));
       yAxis = Math.max(-12, Math.min(12, yAxis));
-
       container.style.transform = `translate(-50%, -50%) scale(1.08) rotateY(${xAxis}deg) rotateX(${-yAxis}deg)`;
     });
-    // -----------------------------------
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
