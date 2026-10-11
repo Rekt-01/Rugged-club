@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rugged Orphans - Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #0b0b0e;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        /* Cursive typewriter container */
+        .typing-text {
+            font-family: 'Caveat', cursive;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            color: #ff3366;
+            margin-bottom: 40px;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 3px solid #ff3366;
+            width: 0;
+            animation: typing 3.5s steps(30, end) forwards, blink 0.75s step-end infinite;
+            text-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+        }
+        /* Enter button styling */
+        .enter-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            opacity: 0;
+            animation: fadeIn 1s ease 3.8s forwards;
+        }
+        .enter-btn:hover {
+            background-color: #ffffff;
+            color: #0b0b0e;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        /* Animations */
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        @keyframes blink {
+            from, to { border-color: transparent; }
+            50% { border-color: #ff3366; }
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="typing-text">Welcome to Rugged Orphans</div>
+        <a href="main.html" class="enter-btn">Click Here</a>
+    </div>
+
+</body>
+</html>
