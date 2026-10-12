@@ -30,7 +30,7 @@
             max-width: 100vw;
         }
         
-        /* Cursive typewriter container - adjusted for small mobile screens */
+        /* Cursive typewriter container */
         .typing-text {
             font-family: 'Caveat', cursive;
             font-size: clamp(1.5rem, 6vw, 4.5rem);
@@ -42,6 +42,7 @@
             width: 0;
             margin-left: auto;
             margin-right: auto;
+            /* Takes 3.5s total to type */
             animation: typing 3.5s steps(30, end) forwards, blink 0.75s step-end infinite;
             text-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
         }
@@ -61,7 +62,6 @@
             text-decoration: none;
             display: inline-block;
             opacity: 0;
-            /* Fades in right as typing finishes */
             animation: fadeIn 1s ease 3.5s forwards; 
         }
         .enter-btn:hover {
@@ -70,21 +70,19 @@
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
-        /* --- TRICKSTER NFT PEEK-A-BOO STYLES --- */
+        /* --- DEGEN NFT PEEK-A-BOO STYLES --- */
         .nft-peek-container {
             position: fixed;
-            bottom: 0; /* Anchored to the very bottom */
+            bottom: 0; 
             right: 5%;
-            /* Huge sizing: scales perfectly between mobile (min 160px) and PC (max 350px) */
             width: clamp(160px, 45vw, 350px); 
             z-index: 9999;
             cursor: pointer;
             user-select: none;
-            /* Starts completely hidden below the screen */
-            transform: translateY(120%); 
-            /* Starts exactly at 3.5s when typing finishes */
-            animation: tricksterPeek 14s infinite cubic-bezier(0.25, 1, 0.5, 1) 3.5s; 
-            -webkit-tap-highlight-color: transparent; /* Removes blue tap box on mobile */
+            transform: translateY(120%); /* Hidden */
+            /* Starts at 0.1s (exactly when the 'W' is printed), ends forwards (stays on screen) */
+            animation: tricksterEntrance 3.4s cubic-bezier(0.25, 1, 0.5, 1) 0.1s forwards; 
+            -webkit-tap-highlight-color: transparent; 
         }
 
         .nft-peek-image {
@@ -93,6 +91,8 @@
             display: block;
             image-rendering: pixelated; 
             filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.8));
+            /* Adds a slight idle breathing animation AFTER he settles on screen */
+            animation: idleBob 3s infinite ease-in-out 3.5s;
         }
 
         .nft-speech-bubble {
@@ -103,9 +103,9 @@
             background: #ffffff;
             color: #111111;
             font-family: 'Inter', sans-serif;
-            font-size: clamp(12px, 3.5vw, 16px);
+            font-size: clamp(11px, 3vw, 15px);
             font-weight: 700;
-            padding: 8px 16px;
+            padding: 10px 16px;
             border-radius: 12px;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
             white-space: nowrap;
@@ -127,38 +127,43 @@
             width: 0;
         }
 
-        /* The Trickster Animation Sequence */
-        @keyframes tricksterPeek {
+        /* The Trickster Entrance Sequence */
+        @keyframes tricksterEntrance {
             0%   { transform: translateY(120%); } /* Hidden */
-            3%   { transform: translateY(65%); }  /* Just the eyes peek... */
-            6%   { transform: translateY(65%); }  /* Staring... */
-            8%   { transform: translateY(5%) rotate(-4deg); } /* BOOM! 95% visible */
-            10%  { transform: translateY(5%) rotate(4deg); }  /* Wiggle */
-            12%  { transform: translateY(5%) rotate(-2deg); } /* Wiggle */
-            14%  { transform: translateY(120%); } /* FAKE OUT! Ducks down fast */
-            16%  { transform: translateY(0%) rotate(6deg) scale(1.05); } /* Pops back up instantly, 100% visible! */
-            20%  { transform: translateY(0%) rotate(0deg) scale(1.05); } /* Stares at you */
-            24%  { transform: translateY(120%); } /* Slinks back down into the abyss */
-            100% { transform: translateY(120%); } /* Wait for the next round */
+            15%  { transform: translateY(65%); }  /* Eyes peek... */
+            30%  { transform: translateY(65%); }  /* Staring... */
+            45%  { transform: translateY(5%) rotate(-4deg); } /* Jump scare */
+            55%  { transform: translateY(5%) rotate(4deg); }  /* Wiggle */
+            65%  { transform: translateY(5%) rotate(-2deg); } /* Wiggle */
+            75%  { transform: translateY(120%); } /* FAKE OUT! Ducks down fast */
+            85%  { transform: translateY(0%) rotate(6deg) scale(1.05); } /* BAM! */
+            100% { transform: translateY(0%) rotate(0deg) scale(1); } /* Settles forever */
         }
 
-        /* PC Hover states pop the bubble */
-        .nft-peek-container:hover .nft-speech-bubble {
-            transform: translateX(-50%) scale(1);
+        /* Idle Breathing */
+        @keyframes idleBob {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(8px); }
         }
 
-        /* Active click styling - stays up for mobile/PC clicks */
-        .nft-peek-container.active {
-            transform: translateY(0%) scale(1.1) !important;
-            animation-play-state: paused !important;
-        }
-        .nft-peek-container.active .nft-speech-bubble {
+        /* Bubble logic: triggers via JS class */
+        .nft-peek-container.talking .nft-speech-bubble {
             transform: translateX(-50%) scale(1);
+        }
+        
+        /* Bubble colors on click vs auto-talk */
+        .nft-peek-container.talking.angry .nft-speech-bubble {
             background: #ff3366;
             color: #ffffff;
         }
-        .nft-peek-container.active .nft-speech-bubble::after {
+        .nft-peek-container.talking.angry .nft-speech-bubble::after {
             border-color: #ff3366 transparent;
+        }
+
+        /* Bounce animation for manual clicks */
+        .nft-peek-container.bouncing {
+            transform: translateY(-20px) scale(1.05) !important;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         /* Text Animations */
@@ -174,7 +179,7 @@
         <a href="main.html" class="enter-btn">APE IN</a>
     </div>
 
-    <!-- Trickster Orphan Popup -->
+    <!-- Degen Orphan Popup -->
     <div id="peeking-nft" class="nft-peek-container">
         <div class="nft-speech-bubble" id="speech-bubble">gm! 👀</div>
         <img src="IMG_5633.png" alt="Peeking NFT" class="nft-peek-image" />
@@ -183,39 +188,77 @@
     <script>
         const nft = document.getElementById('peeking-nft');
         const bubble = document.getElementById('speech-bubble');
-        let clickTimeout;
+        
+        let hideTimeout;
 
+        // Peak degen schizo thoughts
         const quotes = [
-            "You gonna APE IN or just stare? 🦍",
-            "My dev left me...",
-            "I sold the bottom! 📉",
-            "Stop poking me!",
-            "Liquidity locked... I think.",
-            "Wen Binance listing? 🚀",
-            "I survived the bear market for this?",
-            "Sir, this is a Wendy's.",
-            "Are we rich yet? 👀"
+            "Dev just bought a Lambo with our liquidity 😭",
+            "Contract renounced? Yeah right.",
+            "Who the hell is selling?!",
+            "Is it a soft rug or a hard rug?",
+            "Deployer just minted 10T more tokens 🚩",
+            "It's just a 'marketing wallet' bro, chill.",
+            "I survived the bear market for this?!",
+            "Wait... where did the liquidity pool go?",
+            "Ape first, read contract never 🦍",
+            "Another day, another honeypot 🍯",
+            "My dev left me... again.",
+            "Are we the bad actors? 👀",
+            "Just one more presale bro, I swear.",
+            "SBF took my college fund.",
+            "Team tokens are vested... right?",
+            "It’s a feature, not a drainer 💀"
         ];
 
-        let quoteIndex = 0;
+        function sayRandomQuote(isClick = false) {
+            // Pick a random degen quote
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            bubble.textContent = randomQuote;
+            
+            // Show bubble
+            nft.classList.add('talking');
+            
+            if (isClick) {
+                nft.classList.add('angry'); // Make it pink if clicked
+            } else {
+                nft.classList.remove('angry'); // Keep white if auto
+            }
 
+            clearTimeout(hideTimeout);
+            
+            // Hide the bubble after 3.5 seconds
+            hideTimeout = setTimeout(() => {
+                nft.classList.remove('talking');
+                nft.classList.remove('angry');
+            }, 3500);
+        }
+
+        // --- AUTO TALKING LOOP ---
+        // Wait 3.5 seconds for his entrance animation to finish, then start the loop
+        setTimeout(() => {
+            // Says the first thing right after he settles
+            sayRandomQuote();
+            
+            // Randomly spits out a new degen thought every 6 seconds forever
+            setInterval(() => {
+                sayRandomQuote();
+            }, 6000);
+            
+        }, 3600);
+
+        // --- CLICK INTERACTION ---
         nft.addEventListener('click', () => {
-            // Cycle the quotes
-            quoteIndex = (quoteIndex + 1) % quotes.length;
-            bubble.textContent = quotes[quoteIndex];
+            sayRandomQuote(true); // True makes the bubble pink for clicks
             
-            // Reset animation to jump him up
-            nft.classList.remove('active');
-            void nft.offsetWidth; // Force a CSS reflow
-            nft.classList.add('active');
+            // Do a quick manual bounce
+            nft.classList.remove('bouncing');
+            void nft.offsetWidth; // Reflow trick
+            nft.classList.add('bouncing');
             
-            // Clear previous timeouts if clicked multiple times rapidly
-            clearTimeout(clickTimeout);
-            
-            // Keeps him frozen on screen for 4 seconds so mobile users can read it!
-            clickTimeout = setTimeout(() => {
-                nft.classList.remove('active');
-            }, 4000); 
+            setTimeout(() => {
+                nft.classList.remove('bouncing');
+            }, 300); // Settles back down quickly
         });
     </script>
 
