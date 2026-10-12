@@ -11,7 +11,6 @@
             margin: 0;
             padding: 0;
         }
-        
         body {
             background-color: #0b0b0e;
             color: #ffffff;
@@ -24,258 +23,200 @@
             overflow: hidden;
             position: relative;
         }
-
         .container {
             text-align: center;
             padding: 20px;
             z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            max-width: 100vw;
         }
-
-        .typing-wrapper {
-            display: inline-block;
-            margin-bottom: 40px;
-        }
-
+        
+        /* Cursive typewriter container - adjusted for small mobile screens */
         .typing-text {
             font-family: 'Caveat', cursive;
-            font-size: clamp(2.5rem, 6vw, 5.5rem);
+            font-size: clamp(1.5rem, 6vw, 4.5rem);
             color: #ff3366;
+            margin-bottom: 40px;
             white-space: nowrap;
             overflow: hidden;
-            border-right: 4px solid #ff3366;
+            border-right: 3px solid #ff3366;
             width: 0;
-            animation: typing 3.5s steps(30, end) forwards, blink 0.8s step-end infinite;
-            text-shadow: 0 0 20px rgba(255, 51, 102, 0.5), 0 0 40px rgba(255, 51, 102, 0.2);
-            padding-right: 5px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: typing 3.5s steps(30, end) forwards, blink 0.75s step-end infinite;
+            text-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
         }
-
+        
+        /* Enter button styling */
         .enter-btn {
             background: transparent;
             color: #ffffff;
             border: 2px solid #ffffff;
-            padding: 15px 40px;
-            font-size: 1.1rem;
+            padding: 12px 30px;
+            font-size: 1rem;
             font-weight: 700;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
             opacity: 0;
-            border-radius: 4px;
-            animation: fadeIn 1s ease 4s forwards;
-            position: relative;
-            overflow: hidden;
+            /* Fades in right as typing finishes */
+            animation: fadeIn 1s ease 3.5s forwards; 
         }
-
         .enter-btn:hover {
             background-color: #ffffff;
             color: #0b0b0e;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
-            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
+        /* --- TRICKSTER NFT PEEK-A-BOO STYLES --- */
         .nft-peek-container {
             position: fixed;
-            bottom: 0; 
+            bottom: 0; /* Anchored to the very bottom */
             right: 5%;
-            /* Make him HUGE compared to before */
-            width: clamp(200px, 30vw, 350px); 
+            /* Huge sizing: scales perfectly between mobile (min 160px) and PC (max 350px) */
+            width: clamp(160px, 45vw, 350px); 
             z-index: 9999;
             cursor: pointer;
-            /* Default state is pushed down 100% of his height (fully hidden) */
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             user-select: none;
-            /* 12 second loop, starts after intro finishes */
-            animation: peekRoutine 12s infinite ease-in-out 4.5s; 
-            transform-origin: bottom center;
+            /* Starts completely hidden below the screen */
+            transform: translateY(120%); 
+            /* Starts exactly at 3.5s when typing finishes */
+            animation: tricksterPeek 14s infinite cubic-bezier(0.25, 1, 0.5, 1) 3.5s; 
+            -webkit-tap-highlight-color: transparent; /* Removes blue tap box on mobile */
         }
 
         .nft-peek-image {
             width: 100%;
             height: auto;
             display: block;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
             image-rendering: pixelated; 
-            filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.9));
+            filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.8));
         }
 
         .nft-speech-bubble {
             position: absolute;
-            top: -70px;
+            top: -55px;
             left: 50%;
             transform: translateX(-50%) scale(0);
             background: #ffffff;
             color: #111111;
             font-family: 'Inter', sans-serif;
-            font-size: 16px; /* Bigger text */
+            font-size: clamp(12px, 3.5vw, 16px);
             font-weight: 700;
-            padding: 12px 20px;
+            padding: 8px 16px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
             white-space: nowrap;
             pointer-events: none;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-origin: bottom center;
-            border: 3px solid #ffffff;
-            z-index: 10000;
         }
 
         .nft-speech-bubble::after {
             content: '';
             position: absolute;
-            bottom: -10px;
+            bottom: -8px;
             left: 50%;
             transform: translateX(-50%);
-            border-width: 10px 10px 0;
+            border-width: 8px 8px 0;
             border-style: solid;
             border-color: #ffffff transparent;
             display: block;
             width: 0;
         }
 
-        /* Pause the animation and pop him up a bit on hover */
-        .nft-peek-container:hover {
-            transform: translateY(5%) scale(1.02) !important;
-            animation-play-state: paused; 
+        /* The Trickster Animation Sequence */
+        @keyframes tricksterPeek {
+            0%   { transform: translateY(120%); } /* Hidden */
+            3%   { transform: translateY(65%); }  /* Just the eyes peek... */
+            6%   { transform: translateY(65%); }  /* Staring... */
+            8%   { transform: translateY(5%) rotate(-4deg); } /* BOOM! 95% visible */
+            10%  { transform: translateY(5%) rotate(4deg); }  /* Wiggle */
+            12%  { transform: translateY(5%) rotate(-2deg); } /* Wiggle */
+            14%  { transform: translateY(120%); } /* FAKE OUT! Ducks down fast */
+            16%  { transform: translateY(0%) rotate(6deg) scale(1.05); } /* Pops back up instantly, 100% visible! */
+            20%  { transform: translateY(0%) rotate(0deg) scale(1.05); } /* Stares at you */
+            24%  { transform: translateY(120%); } /* Slinks back down into the abyss */
+            100% { transform: translateY(120%); } /* Wait for the next round */
         }
 
-        /* When clicked, he jumps all the way up and gets even bigger */
-        .nft-peek-container.active {
-            transform: translateY(0%) scale(1.08) !important;
-            animation-play-state: paused; 
-        }
-
-        /* Show bubble on hover or click */
-        .nft-peek-container:hover .nft-speech-bubble,
-        .nft-peek-container.active .nft-speech-bubble {
+        /* PC Hover states pop the bubble */
+        .nft-peek-container:hover .nft-speech-bubble {
             transform: translateX(-50%) scale(1);
         }
 
-        /* Active click styling for the bubble (Pink!) */
+        /* Active click styling - stays up for mobile/PC clicks */
+        .nft-peek-container.active {
+            transform: translateY(0%) scale(1.1) !important;
+            animation-play-state: paused !important;
+        }
         .nft-peek-container.active .nft-speech-bubble {
+            transform: translateX(-50%) scale(1);
             background: #ff3366;
             color: #ffffff;
-            border-color: #ff3366;
-            box-shadow: 0 0 30px rgba(255, 51, 102, 0.5);
-            transform: translateX(-50%) scale(1.1); /* Pop bubble larger */
         }
-        
         .nft-peek-container.active .nft-speech-bubble::after {
             border-color: #ff3366 transparent;
         }
 
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-        
-        @keyframes blink {
-            from, to { border-color: transparent; }
-            50% { border-color: #ff3366; }
-        }
-        
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-        
-        /* The Exaggerated, Bouncy, Long-lasting Peek Routine */
-        @keyframes peekRoutine {
-            /* Hiding phase */
-            0%, 45% { transform: translateY(100%); } 
-            
-            /* Shoot up incredibly fast and overshoot (BOING!) */
-            48% { transform: translateY(-5%); } 
-            
-            /* Settle down to about 90% visible (10% pushed down) */
-            52% { transform: translateY(10%); } 
-            
-            /* Look left, look right, wiggle */
-            58% { transform: translateY(10%) rotate(8deg); } 
-            65% { transform: translateY(10%) rotate(-8deg); } 
-            72% { transform: translateY(10%) rotate(4deg); } 
-            
-            /* Stare directly forward for a long time */
-            80%, 92% { transform: translateY(10%) rotate(0deg); } 
-            
-            /* Duck back down fast */
-            95%, 100% { transform: translateY(100%); } 
-        }
+        /* Text Animations */
+        @keyframes typing { from { width: 0; } to { width: 100%; } }
+        @keyframes blink { from, to { border-color: transparent; } 50% { border-color: #ff3366; } }
+        @keyframes fadeIn { to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="typing-wrapper">
-            <div class="typing-text">Welcome to Rugged Orphans</div>
-        </div>
+        <div class="typing-text">Welcome to Rugged Orphans</div>
         <a href="main.html" class="enter-btn">APE IN</a>
     </div>
 
-    <!-- Peeking Orphan Popup -->
+    <!-- Trickster Orphan Popup -->
     <div id="peeking-nft" class="nft-peek-container">
         <div class="nft-speech-bubble" id="speech-bubble">gm! 👀</div>
-        <img src="IMG_5633.png" alt="Peeking NFT" class="nft-peek-image" onerror="this.src='https://placehold.co/350x350/0b0b0e/ff3366?text=NFT'"/>
+        <img src="IMG_5633.png" alt="Peeking NFT" class="nft-peek-image" />
     </div>
 
     <script>
         const nft = document.getElementById('peeking-nft');
         const bubble = document.getElementById('speech-bubble');
+        let clickTimeout;
 
-        // Expanded list of funny, self-deprecating crypto/NFT jokes
-        const jokes = [
-            "My dev bought a Lambo and left me here.",
-            "Will code for exit liquidity.",
-            "I bought the top. Now I live at the bottom.",
-            "I was promised the metaverse, now I live in a div.",
-            "Wait, are you the new dev? Save me!",
-            "I survive entirely on hopium and Discord pings.",
-            "Wen utility? Honestly, I don't even know what that is.",
-            "Floor price? We're currently digging the basement.",
-            "I'm not rugged, I'm just on a 'long-term roadmap hiatus'.",
-            "Please don't right-click save me. It hurts.",
-            "My mom says my traits are very rare.",
-            "Can someone point me to the liquidity pool? I'm thirsty.",
-            "I've been 'building in the bear market' for 3 years.",
-            "JPEG? I prefer the term 'illiquid asset'."
+        const quotes = [
+            "You gonna APE IN or just stare? 🦍",
+            "My dev left me...",
+            "I sold the bottom! 📉",
+            "Stop poking me!",
+            "Liquidity locked... I think.",
+            "Wen Binance listing? 🚀",
+            "I survived the bear market for this?",
+            "Sir, this is a Wendy's.",
+            "Are we rich yet? 👀"
         ];
 
-        let jokeIndex = 0;
+        let quoteIndex = 0;
 
-        // Shuffle the jokes so they are different every time
-        for (let i = jokes.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [jokes[i], jokes[j]] = [jokes[j], jokes[i]];
-        }
-
-        // Handle the click interaction
         nft.addEventListener('click', () => {
-            // Cycle joke
-            jokeIndex = (jokeIndex + 1) % jokes.length;
-            bubble.textContent = jokes[jokeIndex];
+            // Cycle the quotes
+            quoteIndex = (quoteIndex + 1) % quotes.length;
+            bubble.textContent = quotes[quoteIndex];
             
-            // Force reflow to restart CSS animation state
+            // Reset animation to jump him up
             nft.classList.remove('active');
-            void nft.offsetWidth; 
-            
-            // Add active state to make him jump up HUGE
+            void nft.offsetWidth; // Force a CSS reflow
             nft.classList.add('active');
             
-            // Stay up for 4 seconds so the user can read the joke!
-            setTimeout(() => {
+            // Clear previous timeouts if clicked multiple times rapidly
+            clearTimeout(clickTimeout);
+            
+            // Keeps him frozen on screen for 4 seconds so mobile users can read it!
+            clickTimeout = setTimeout(() => {
                 nft.classList.remove('active');
             }, 4000); 
         });
-
-        // Set first joke on load
-        bubble.textContent = jokes[0];
     </script>
 
 </body>
