@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rugged Orphans - Welcome</title>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -42,7 +42,6 @@
             width: 0;
             margin-left: auto;
             margin-right: auto;
-            /* Takes 3.5s total to type */
             animation: typing 3.5s steps(30, end) forwards, blink 0.75s step-end infinite;
             text-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
         }
@@ -79,8 +78,7 @@
             z-index: 9999;
             cursor: pointer;
             user-select: none;
-            transform: translateY(120%); /* Hidden */
-            /* Starts at 0.1s (exactly when the 'W' is printed), ends forwards (stays on screen) */
+            transform: translateY(120%); 
             animation: tricksterEntrance 3.4s cubic-bezier(0.25, 1, 0.5, 1) 0.1s forwards; 
             -webkit-tap-highlight-color: transparent; 
         }
@@ -91,27 +89,28 @@
             display: block;
             image-rendering: pixelated; 
             filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.8));
-            /* Adds a slight idle breathing animation AFTER he settles on screen */
             animation: idleBob 3s infinite ease-in-out 3.5s;
         }
 
+        /* Speech Bubble */
         .nft-speech-bubble {
             position: absolute;
-            top: -55px;
+            top: -65px;
             left: 50%;
             transform: translateX(-50%) scale(0);
             background: #ffffff;
             color: #111111;
             font-family: 'Inter', sans-serif;
-            font-size: clamp(11px, 3vw, 15px);
+            font-size: clamp(11px, 3vw, 14px);
             font-weight: 700;
-            padding: 10px 16px;
+            padding: 8px 14px;
             border-radius: 12px;
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
             white-space: nowrap;
             pointer-events: none;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-origin: bottom center;
+            z-index: 10;
         }
 
         .nft-speech-bubble::after {
@@ -127,31 +126,32 @@
             width: 0;
         }
 
-        /* The Trickster Entrance Sequence */
-        @keyframes tricksterEntrance {
-            0%   { transform: translateY(120%); } /* Hidden */
-            15%  { transform: translateY(65%); }  /* Eyes peek... */
-            30%  { transform: translateY(65%); }  /* Staring... */
-            45%  { transform: translateY(5%) rotate(-4deg); } /* Jump scare */
-            55%  { transform: translateY(5%) rotate(4deg); }  /* Wiggle */
-            65%  { transform: translateY(5%) rotate(-2deg); } /* Wiggle */
-            75%  { transform: translateY(120%); } /* FAKE OUT! Ducks down fast */
-            85%  { transform: translateY(0%) rotate(6deg) scale(1.05); } /* BAM! */
-            100% { transform: translateY(0%) rotate(0deg) scale(1); } /* Settles forever */
+        /* --- SURPRISE FEATURE: THE LIVE DEGEN TERMINAL TICKER --- */
+        .degen-tracker {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%) translateY(30px) scale(0);
+            background: rgba(11, 11, 14, 0.9);
+            border: 1px solid #ff3366;
+            color: #00ff66;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(9px, 2vw, 11px);
+            padding: 4px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            box-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            z-index: 9;
         }
 
-        /* Idle Breathing */
-        @keyframes idleBob {
-            0%, 100% { transform: translateY(0); }
-            50%      { transform: translateY(8px); }
+        /* Trigger states for bubble and tracker */
+        .nft-peek-container.talking .nft-speech-bubble,
+        .nft-peek-container.talking .degen-tracker {
+            transform: translateX(-50%) scale(1) translateY(0);
         }
 
-        /* Bubble logic: triggers via JS class */
-        .nft-peek-container.talking .nft-speech-bubble {
-            transform: translateX(-50%) scale(1);
-        }
-        
-        /* Bubble colors on click vs auto-talk */
         .nft-peek-container.talking.angry .nft-speech-bubble {
             background: #ff3366;
             color: #ffffff;
@@ -159,14 +159,34 @@
         .nft-peek-container.talking.angry .nft-speech-bubble::after {
             border-color: #ff3366 transparent;
         }
+        .nft-peek-container.talking.angry .degen-tracker {
+            color: #ff3366;
+            border-color: #00ff66;
+        }
 
-        /* Bounce animation for manual clicks */
+        /* Entrance Animation */
+        @keyframes tricksterEntrance {
+            0%   { transform: translateY(120%); } 
+            15%  { transform: translateY(65%); }  
+            30%  { transform: translateY(65%); }  
+            45%  { transform: translateY(5%) rotate(-4deg); } 
+            55%  { transform: translateY(5%) rotate(4deg); }  
+            65%  { transform: translateY(5%) rotate(-2deg); } 
+            75%  { transform: translateY(120%); } 
+            85%  { transform: translateY(0%) rotate(6deg) scale(1.05); } 
+            100% { transform: translateY(0%) rotate(0deg) scale(1); } 
+        }
+
+        @keyframes idleBob {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(8px); }
+        }
+
         .nft-peek-container.bouncing {
             transform: translateY(-20px) scale(1.05) !important;
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* Text Animations */
         @keyframes typing { from { width: 0; } to { width: 100%; } }
         @keyframes blink { from, to { border-color: transparent; } 50% { border-color: #ff3366; } }
         @keyframes fadeIn { to { opacity: 1; } }
@@ -179,86 +199,91 @@
         <a href="main.html" class="enter-btn">APE IN</a>
     </div>
 
-    <!-- Degen Orphan Popup -->
+    <!-- Degen Orphan Popup with Live Ticker Feature -->
     <div id="peeking-nft" class="nft-peek-container">
         <div class="nft-speech-bubble" id="speech-bubble">gm! 👀</div>
+        <div class="degen-tracker" id="degen-tracker">FLOOR: 0.0000 ETH | PAIN: 100%</div>
         <img src="IMG_5633.png" alt="Peeking NFT" class="nft-peek-image" />
     </div>
 
     <script>
         const nft = document.getElementById('peeking-nft');
         const bubble = document.getElementById('speech-bubble');
+        const tracker = document.getElementById('degen-tracker');
         
         let hideTimeout;
 
-        // Peak degen schizo thoughts
+        // Elite NFT Degen Slang Quotes
         const quotes = [
-            "Dev just bought a Lambo with our liquidity 😭",
-            "Contract renounced? Yeah right.",
-            "Who the hell is selling?!",
-            "Is it a soft rug or a hard rug?",
-            "Deployer just minted 10T more tokens 🚩",
-            "It's just a 'marketing wallet' bro, chill.",
-            "I survived the bear market for this?!",
-            "Wait... where did the liquidity pool go?",
-            "Ape first, read contract never 🦍",
-            "Another day, another honeypot 🍯",
-            "My dev left me... again.",
-            "Are we the bad actors? 👀",
-            "Just one more presale bro, I swear.",
-            "SBF took my college fund.",
-            "Team tokens are vested... right?",
-            "It’s a feature, not a drainer 💀"
+            "Dev just vanished with the multisig keys 💀",
+            "Metadata wasn't even revealed yet... pain.",
+            "Minted 50, gas cost my kidney, 99% tax honeypot 📉",
+            "Bro said 'long-term utility' and blocked me",
+            "Blur bidders are haunting my sleep paralysis",
+            "My portfolio is a registered federal crime scene",
+            "Floor is absolute zero, but my hopium is infinite",
+            "Where's the metadata?! It's a blank grey square!",
+            "Even OpenSea thinks my bags are a joke",
+            "Locked in the liquidity pool like a POW 🪖",
+            "Just one more presale bro, I swear I'll make it back",
+            "Team tokens vesting? More like resting in peace",
+            "SBF took my college fund to buy League skins",
+            "Is this a soft rug or a hard rug? Asking for a friend"
+        ];
+
+        // Live Ticker Stats to cycle with the quotes
+        const trackerStats = [
+            "FLOOR: 0.0000 ETH | STATUS: COOKED",
+            "GAS: 69,420 GWEI | AGONY: MAXIMUM",
+            "HOLDERS: 3 (Me, Dev, Dev's Mom)",
+            "LIQUIDITY: RUGGED 🦀",
+            "COPIUM RESERVES: CRITICAL ⚠️",
+            "DEV WALLET: DUMPING ACTIVE 🚨",
+            "PAPER HANDS: DETECTED 🧻"
         ];
 
         function sayRandomQuote(isClick = false) {
-            // Pick a random degen quote
             const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-            bubble.textContent = randomQuote;
+            const randomStat = trackerStats[Math.floor(Math.random() * trackerStats.length)];
             
-            // Show bubble
+            bubble.textContent = randomQuote;
+            tracker.textContent = randomStat;
+            
             nft.classList.add('talking');
             
             if (isClick) {
-                nft.classList.add('angry'); // Make it pink if clicked
+                nft.classList.add('angry');
             } else {
-                nft.classList.remove('angry'); // Keep white if auto
+                nft.classList.remove('angry');
             }
 
             clearTimeout(hideTimeout);
             
-            // Hide the bubble after 3.5 seconds
             hideTimeout = setTimeout(() => {
                 nft.classList.remove('talking');
                 nft.classList.remove('angry');
             }, 3500);
         }
 
-        // --- AUTO TALKING LOOP ---
-        // Wait 3.5 seconds for his entrance animation to finish, then start the loop
+        // Start auto-talking loop right after entrance
         setTimeout(() => {
-            // Says the first thing right after he settles
             sayRandomQuote();
-            
-            // Randomly spits out a new degen thought every 6 seconds forever
             setInterval(() => {
                 sayRandomQuote();
             }, 6000);
-            
         }, 3600);
 
-        // --- CLICK INTERACTION ---
+        // Click interaction
         nft.addEventListener('click', () => {
-            sayRandomQuote(true); // True makes the bubble pink for clicks
+            sayRandomQuote(true);
             
-            // Do a quick manual bounce
             nft.classList.remove('bouncing');
-            void nft.offsetWidth; // Reflow trick
+            void nft.offsetWidth; 
             nft.classList.add('bouncing');
             
             setTimeout(() => {
                 nft.classList.remove('bouncing');
-            }, 300); // Settles back down quickly
+            }, 300);
         });
     </script>
 
