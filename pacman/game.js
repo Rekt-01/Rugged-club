@@ -1,6 +1,6 @@
-// Main Game Engine: Audio Synth, Pointer Controls, Physics, Stages & Renderer
+// Complete Working Platformer Engine with Bulletproof Controls
 (function() {
-  /* --- 1. WEB AUDIO SYNTH --- */
+  /* --- 1. AUDIO SYNTH --- */
   let audioCtx = null;
   let soundMuted = false;
 
@@ -18,35 +18,35 @@
       if (type === 'jump') {
         osc.type = 'square';
         osc.frequency.setValueAtTime(190, now);
-        osc.frequency.exponentialRampToValueAtTime(520, now + 0.13);
+        osc.frequency.exponentialRampToValueAtTime(520, now + 0.12);
         gain.gain.setValueAtTime(0.08, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.13);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
         osc.start(now);
-        osc.stop(now + 0.13);
+        osc.stop(now + 0.12);
       } else if (type === 'sword') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(420, now);
-        osc.frequency.exponentialRampToValueAtTime(110, now + 0.11);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 0.1);
         gain.gain.setValueAtTime(0.1, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.11);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
         osc.start(now);
-        osc.stop(now + 0.11);
+        osc.stop(now + 0.1);
       } else if (type === 'gem') {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(587, now);
         osc.frequency.setValueAtTime(880, now + 0.06);
-        gain.gain.setValueAtTime(0.11, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
         osc.start(now);
-        osc.stop(now + 0.2);
+        osc.stop(now + 0.18);
       } else if (type === 'hit') {
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(150, now);
-        osc.frequency.linearRampToValueAtTime(55, now + 0.22);
+        osc.frequency.linearRampToValueAtTime(55, now + 0.2);
         gain.gain.setValueAtTime(0.12, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
         osc.start(now);
-        osc.stop(now + 0.22);
+        osc.stop(now + 0.2);
       } else if (type === 'win') {
         [523, 659, 784, 1046].forEach((f, idx) => {
           const o = audioCtx.createOscillator();
@@ -55,21 +55,24 @@
           o.connect(g);
           g.connect(audioCtx.destination);
           o.frequency.setValueAtTime(f, now + idx * 0.07);
-          g.gain.setValueAtTime(0.09, now + idx * 0.07);
-          g.gain.linearRampToValueAtTime(0.005, now + idx * 0.07 + 0.18);
+          gain.gain.setValueAtTime(0.08, now + idx * 0.07);
+          gain.gain.linearRampToValueAtTime(0.005, now + idx * 0.07 + 0.16);
           o.start(now + idx * 0.07);
-          o.stop(now + idx * 0.07 + 0.18);
+          o.stop(now + idx * 0.07 + 0.16);
         });
       }
     } catch (e) {}
   };
 
-  document.getElementById('btn-sound').addEventListener('click', (e) => {
-    soundMuted = !soundMuted;
-    e.target.textContent = soundMuted ? '🔇' : '🔊';
-  });
+  const soundBtn = document.getElementById('btn-sound');
+  if (soundBtn) {
+    soundBtn.addEventListener('click', (e) => {
+      soundMuted = !soundMuted;
+      e.target.textContent = soundMuted ? '🔇' : '🔊';
+    });
+  }
 
-  /* --- 2. CANVAS VIEWPORT SIZING --- */
+  /* --- 2. CANVAS & SIZING --- */
   const canvas = document.getElementById('game-canvas');
   const ctx = canvas.getContext('2d');
   const viewport = document.getElementById('viewport');
@@ -79,6 +82,7 @@
   let renderScale = 1;
 
   function resizeGameCanvas() {
+    if (!viewport || !canvas) return;
     const rect = viewport.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = rect.width * dpr;
@@ -90,11 +94,12 @@
   window.addEventListener('resize', resizeGameCanvas);
   resizeGameCanvas();
 
-  /* --- 3. INPUT HANDLERS & POINTER CONTROLS --- */
+  /* --- 3. CONTROLS (DIRECT TOUCH + POINTER + KEYBOARD) --- */
   const input = { left: false, right: false, jump: false };
   let jumpTriggered = false;
   let attackTriggered = false;
 
+  // Keyboard
   window.addEventListener('keydown', (e) => {
     if (['ArrowLeft', 'KeyA'].includes(e.code)) input.left = true;
     if (['ArrowRight', 'KeyD'].includes(e.code)) input.right = true;
@@ -103,7 +108,9 @@
       input.jump = true;
       e.preventDefault();
     }
-    if (['KeyX', 'KeyK', 'KeyF', 'Enter'].includes(e.code)) attackTriggered = true;
+    if (['KeyX', 'KeyK', 'KeyF', 'Enter'].includes(e.code)) {
+      attackTriggered = true;
+    }
   });
 
   window.addEventListener('keyup', (e) => {
@@ -112,38 +119,51 @@
     if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) input.jump = false;
   });
 
-  function bindControl(id, onDown, onUp) {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    btn.addEventListener('pointerdown', (e) => {
+  // Touch & Pointer Binder
+  function setupButton(id, onDown, onUp) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const start = (e) => {
       e.preventDefault();
-      btn.classList.add('active');
+      e.stopPropagation();
+      el.classList.add('active');
       onDown();
-    });
-    const release = (e) => {
+    };
+
+    const stop = (e) => {
       e.preventDefault();
-      btn.classList.remove('active');
+      e.stopPropagation();
+      el.classList.remove('active');
       if (onUp) onUp();
     };
-    btn.addEventListener('pointerup', release);
-    btn.addEventListener('pointercancel', release);
-    btn.addEventListener('pointerleave', release);
+
+    // Support both Touch Events (iOS Safari) and Pointer Events
+    el.addEventListener('touchstart', start, { passive: false });
+    el.addEventListener('touchend', stop, { passive: false });
+    el.addEventListener('touchcancel', stop, { passive: false });
+
+    el.addEventListener('pointerdown', start);
+    el.addEventListener('pointerup', stop);
+    el.addEventListener('pointercancel', stop);
+    el.addEventListener('pointerleave', stop);
   }
 
-  bindControl('btn-left', () => (input.left = true), () => (input.left = false));
-  bindControl('btn-right', () => (input.right = true), () => (input.right = false));
-  bindControl('btn-jump', () => {
+  setupButton('btn-left', () => (input.left = true), () => (input.left = false));
+  setupButton('btn-right', () => (input.right = true), () => (input.right = false));
+  setupButton('btn-jump', () => {
     if (!input.jump) jumpTriggered = true;
     input.jump = true;
   }, () => (input.jump = false));
-  bindControl('btn-attack', () => (attackTriggered = true));
+  setupButton('btn-attack', () => (attackTriggered = true));
 
-  // Layout switcher: Split -> All Right -> All Left
+  // Layout switcher
   const deck = document.querySelector('.touch-deck');
   const layoutBtn = document.getElementById('btn-layout');
   let currentLayout = 0;
   if (layoutBtn && deck) {
-    layoutBtn.addEventListener('click', () => {
+    layoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       currentLayout = (currentLayout + 1) % 3;
       deck.classList.remove('all-right', 'all-left');
       if (currentLayout === 1) {
@@ -309,12 +329,16 @@
   }
 
   function syncHUD() {
-    document.getElementById('ui-stage').textContent = `Stage ${stageIdx + 1}/3`;
-    document.getElementById('ui-hearts').textContent = '❤️'.repeat(Math.max(0, hero.hp)) || '💔';
-    document.getElementById('ui-score').textContent = score;
+    const sEl = document.getElementById('ui-stage');
+    const hEl = document.getElementById('ui-hearts');
+    const scEl = document.getElementById('ui-score');
+    if (sEl) sEl.textContent = `Stage ${stageIdx + 1}/3`;
+    if (hEl) hEl.textContent = '❤️'.repeat(Math.max(0, hero.hp)) || '💔';
+    if (scEl) scEl.textContent = score;
   }
 
-  document.getElementById('btn-reset').addEventListener('click', () => loadStage(stageIdx));
+  const resetBtn = document.getElementById('btn-reset');
+  if (resetBtn) resetBtn.addEventListener('click', () => loadStage(stageIdx));
 
   function burst(x, y, color, count = 12) {
     for (let i = 0; i < count; i++) {
@@ -340,13 +364,13 @@
     hero.hp--;
     hero.invuln = 65;
     hero.vy = -7.5;
-    window.playTone('hit');
+    if (window.playTone) window.playTone('hit');
     burst(hero.x + hero.w / 2, hero.y + hero.h / 2, '#ef4444', 14);
     syncHUD();
     if (hero.hp <= 0) loadStage(stageIdx);
   }
 
-  /* --- 5. PHYSICS & STATE LOOP --- */
+  /* --- 5. PHYSICS LOOP --- */
   function updateGame() {
     animTick++;
     if (bannerTimer > 0) bannerTimer--;
@@ -363,7 +387,7 @@
 
     if (attackTriggered) {
       hero.slashTimer = 14;
-      window.playTone('sword');
+      if (window.playTone) window.playTone('sword');
       attackTriggered = false;
     }
 
@@ -374,6 +398,7 @@
       h: 36
     } : null;
 
+    // Moving platforms
     for (const p of stage.platforms) {
       if (p.vx) {
         p.x += p.vx;
@@ -385,6 +410,7 @@
       }
     }
 
+    // Horizontal speed
     const accel = hero.onGround ? 0.65 : 0.45;
     const maxVx = 4.6;
     if (input.left) {
@@ -398,6 +424,7 @@
       if (Math.abs(hero.vx) < 0.08) hero.vx = 0;
     }
 
+    // Jump handling
     if (hero.onGround) {
       hero.coyote = 7;
       hero.jumps = 2;
@@ -411,12 +438,12 @@
         hero.onGround = false;
         hero.coyote = 0;
         hero.jumps = 1;
-        window.playTone('jump');
+        if (window.playTone) window.playTone('jump');
         burst(hero.x + hero.w / 2, hero.y + hero.h, '#cbd5e1', 6);
       } else if (hero.jumps > 0) {
         hero.vy = -9.6;
         hero.jumps--;
-        window.playTone('jump');
+        if (window.playTone) window.playTone('jump');
         burst(hero.x + hero.w / 2, hero.y + hero.h, '#38bdf8', 8);
       }
       jumpTriggered = false;
@@ -425,6 +452,7 @@
     if (!input.jump && hero.vy < -4) hero.vy *= 0.85;
     hero.vy = Math.min(hero.vy + 0.48, 12);
 
+    // Apply X movement
     hero.x += hero.vx;
     if (hero.x < 0) { hero.x = 0; hero.vx = 0; }
     for (const p of stage.platforms) {
@@ -435,6 +463,7 @@
       }
     }
 
+    // Apply Y movement
     const prevBot = hero.y + hero.h;
     hero.y += hero.vy;
     hero.onGround = false;
@@ -458,6 +487,7 @@
       return;
     }
 
+    // Springs
     for (const s of stage.springs) {
       if (s.anim > 0) s.anim--;
       if (overlap(hero, s)) {
@@ -465,22 +495,24 @@
         hero.onGround = false;
         hero.jumps = 1;
         s.anim = 10;
-        window.playTone('jump');
+        if (window.playTone) window.playTone('jump');
         burst(s.x + s.w / 2, s.y, '#f43f5e', 10);
       }
     }
 
+    // Gems
     for (const g of stage.gems) {
       g.bob += 0.08;
       if (!g.taken && overlap(hero, { x: g.x - 10, y: g.y - 10, w: 20, h: 20 })) {
         g.taken = true;
         score += 100;
-        window.playTone('gem');
+        if (window.playTone) window.playTone('gem');
         burst(g.x, g.y, '#38bdf8', 12);
         syncHUD();
       }
     }
 
+    // Enemies
     for (const e of stage.enemies) {
       if (!e.alive) continue;
       e.x += e.vx;
@@ -489,7 +521,7 @@
       if (swordBox && overlap(swordBox, e)) {
         e.alive = false;
         score += 200;
-        window.playTone('gem');
+        if (window.playTone) window.playTone('gem');
         burst(e.x + e.w / 2, e.y + e.h / 2, '#f97316', 15);
         syncHUD();
         continue;
@@ -500,7 +532,7 @@
           e.alive = false;
           hero.vy = -9.2;
           score += 200;
-          window.playTone('sword');
+          if (window.playTone) window.playTone('sword');
           burst(e.x + e.w / 2, e.y + e.h / 2, '#f97316', 15);
           syncHUD();
         } else {
@@ -509,17 +541,20 @@
       }
     }
 
+    // Spikes
     for (const sp of stage.spikes) {
       if (overlap(hero, sp)) damageHero();
     }
 
+    // Portal
     if (stage.portal && overlap(hero, stage.portal)) {
-      window.playTone('win');
+      if (window.playTone) window.playTone('win');
       score += 400;
       loadStage(stageIdx + 1);
       return;
     }
 
+    // Boss Battle
     if (stage.hasBoss && stage.boss && stage.boss.hp > 0) {
       const b = stage.boss;
       if (b.hurtTimer > 0) b.hurtTimer--;
@@ -546,10 +581,10 @@
         b.hurtTimer = 40;
         hero.vy = -9.5;
         hero.vx = hero.x < b.x ? -5 : 5;
-        window.playTone('sword');
+        if (window.playTone) window.playTone('sword');
         burst(b.x + b.w / 2, b.y + b.h / 2, '#a855f7', 22);
         if (b.hp <= 0) {
-          window.playTone('win');
+          if (window.playTone) window.playTone('win');
           score += 1000;
           stage.princess.freed = true;
           burst(stage.princess.x + 15, stage.princess.y + 20, '#facc15', 30);
@@ -560,14 +595,16 @@
       }
     }
 
+    // Princess
     if (stage.princess && stage.princess.freed && victoryTimer === 0) {
       if (overlap(hero, stage.princess)) {
-        window.playTone('win');
+        if (window.playTone) window.playTone('win');
         victoryTimer = 180;
         burst(stage.princess.x + 15, stage.princess.y, '#f472b6', 35);
       }
     }
 
+    // Particles
     for (let i = particles.length - 1; i >= 0; i--) {
       const pt = particles[i];
       pt.x += pt.vx;
@@ -750,6 +787,10 @@
         if (hero.facing === -1) ctx.scale(-1, 1);
         ctx.drawImage(currentSprite, -hero.w / 2 - 3, -hero.h / 2 - 2, hero.w + 6, hero.h + 2);
         ctx.restore();
+      } else {
+        // Fallback placeholder rectangle if sprites haven't initialized
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(hero.x, hero.y, hero.w, hero.h);
       }
 
       if (hero.slashTimer > 0) {
