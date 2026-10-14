@@ -1,1 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Kingdom Rescue</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+<div id="app">
+  <!-- 3D Three.js Splash Screen -->
+  <div id="splash-screen">
+    <div id="three-container"></div>
+
+    <div class="splash-ui">
+      <div class="splash-header">
+        <div class="badge">Three.js 3D Pixel Hero Edition</div>
+        <div class="splash-title">KINGDOM RESCUE</div>
+        <div class="character-labels">
+          <div class="char-tag" style="color:#38bdf8">😎 USA Cap Hero</div>
+          <div class="char-tag" style="color:#f472b6">👑 Princess Aurelia</div>
+          <div class="char-tag" style="color:#ef4444">😈 Lord Malakor</div>
+        </div>
+      </div>
+
+      <div class="splash-card">
+        <p class="story-text">
+          <strong>THE MISSION:</strong> The evil warlord <strong>Malakor</strong> has kidnapped <strong>Princess Aurelia</strong> and locked her in a dark magic cage! Run, double-jump, and slash through 3 stages to defeat Malakor and rescue the Princess!
+        </p>
+        <div class="controls-grid">
+          <div class="ctrl-item"><span>◀ ▶ / A,D:</span> Move</div>
+          <div class="ctrl-item"><span>▲ / Space:</span> Double Jump</div>
+          <div class="ctrl-item"><span>⚔️ / X,K:</span> Sword Slash</div>
+          <div class="ctrl-item"><span>⇄ Layout:</span> Switch Touch Side</div>
+        </div>
+        <button class="start-btn" id="btn-start-game">🕶️ START RESCUE MISSION</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top HUD Bar -->
+  <div class="top-hud">
+    <div class="hud-stats">
+      <div class="hud-pill" id="ui-stage" style="color:#fde047">Stage 1/3</div>
+      <div class="hud-pill" id="ui-hearts" style="color:#f87171">❤️❤️❤️</div>
+      <div class="hud-pill" style="color:#38bdf8">💎 <span id="ui-score">0</span></div>
+    </div>
+    <div class="hud-actions">
+      <button class="mini-btn" id="btn-layout">⇄ Layout</button>
+      <button class="mini-btn" id="btn-story">3D Intro</button>
+      <button class="mini-btn" id="btn-sound">🔊</button>
+      <button class="mini-btn" id="btn-reset">↻</button>
+    </div>
+  </div>
+
+  <!-- Gameplay Canvas -->
+  <div id="viewport">
+    <canvas id="game-canvas"></canvas>
+  </div>
+
+  <!-- Bottom Mobile Touch Controls -->
+  <div class="touch-deck">
+    <div class="deck-group">
+      <div class="ctrl-btn" id="btn-left">◀<small>LEFT</small></div>
+      <div class="ctrl-btn" id="btn-right">▶<small>RIGHT</small></div>
+    </div>
+    <div class="deck-group">
+      <div class="ctrl-btn attack" id="btn-attack">⚔️<small>SWORD</small></div>
+      <div class="ctrl-btn jump" id="btn-jump">▲<small>JUMP</small></div>
+    </div>
+  </div>
+</div>
+
+<script src="heroSprite.js"></script>
+<script src="splash.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
 
