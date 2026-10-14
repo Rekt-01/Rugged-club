@@ -873,7 +873,7 @@
     }
     .retro-cam-frame::after {
       content: '';
-      position: absolute inset: 0;
+      position: absolute; inset: 0;
       background:
         linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%),
         linear-gradient(90deg, rgba(255,0,0,0.05), rgba(0,255,0,0.02), rgba(0,0,255,0.05));
@@ -1041,7 +1041,7 @@
       splash.style.opacity = '0';
       setTimeout(() => {
         splash.style.display = 'none';
-      }, 500); // Matches the 0.5s transition time
+      }, 500);
     });
   </script>
 
@@ -1059,7 +1059,8 @@
       <div class="crt-overlay"></div>
       <div class="vignette"></div>
 
-      <a href="pacman.html" class="hotspot arcade-hotspot" title="Pac-Man Arcade" data-label="ARCADE"></a>
+      <!-- ARCADE HOTSPOT NOW POINTS DIRECTLY TO YOUR GAME FOLDER -->
+      <a href="./pacman/" class="hotspot arcade-hotspot" title="Pac-Man Arcade" data-label="ARCADE"></a>
       <a href="pool.html" class="hotspot pool-hotspot" title="Pool Table" data-label="POOL"></a>
       <div class="hotspot laptop-hotspot" onclick="openWebModal('dex')" title="Charts" data-label="CHARTS"></div>
       <div class="hotspot table-hotspot" onclick="openWebModal('desk')" title="Degen Terminal" data-label="TERMINAL"></div>
@@ -1166,7 +1167,6 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    // FORCED LIGHTS ON BY DEFAULT (clears any old dark mode cache)
     localStorage.removeItem('ruggedLights');
     let isLightsOff = false;
 
