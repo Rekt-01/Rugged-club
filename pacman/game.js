@@ -1,5 +1,19 @@
-// Complete Working Platformer Engine with Bulletproof Controls
+// Main Game Engine with Bulletproof iOS Multi-Touch Tracking and Pixel Sprites
 (function() {
+  // Polyfill roundRect for older mobile browsers
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+      const radius = Array.isArray(r) ? r[0] : (r || 0);
+      this.beginPath();
+      this.moveTo(x + radius, y);
+      this.arcTo(x + w, y, x + w, y + h, radius);
+      this.arcTo(x + w, y + h, x, y + h, radius);
+      this.arcTo(x, y + h, x, y, radius);
+      this.arcTo(x, y, x + w, y, radius);
+      this.closePath();
+    };
+  }
+
   /* --- 1. AUDIO SYNTH --- */
   let audioCtx = null;
   let soundMuted = false;
@@ -55,8 +69,8 @@
           o.connect(g);
           g.connect(audioCtx.destination);
           o.frequency.setValueAtTime(f, now + idx * 0.07);
-          gain.gain.setValueAtTime(0.08, now + idx * 0.07);
-          gain.gain.linearRampToValueAtTime(0.005, now + idx * 0.07 + 0.16);
+          g.gain.setValueAtTime(0.08, now + idx * 0.07);
+          g.gain.linearRampToValueAtTime(0.005, now + idx * 0.07 + 0.16);
           o.start(now + idx * 0.07);
           o.stop(now + idx * 0.07 + 0.16);
         });
@@ -85,21 +99,20 @@
     if (!viewport || !canvas) return;
     const rect = viewport.getBoundingClientRect();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    renderScale = (rect.height * dpr) / VIEW_H;
-    VIEW_W = (rect.width * dpr) / renderScale;
+    canvas.width = Math.max(1, rect.width * dpr);
+    canvas.height = Math.max(1, rect.height * dpr);
+    renderScale = canvas.height / VIEW_H;
+    VIEW_W = canvas.width / renderScale;
     if (window.updateThreeCameraAspect) window.updateThreeCameraAspect();
   }
   window.addEventListener('resize', resizeGameCanvas);
   resizeGameCanvas();
 
-  /* --- 3. CONTROLS (DIRECT TOUCH + POINTER + KEYBOARD) --- */
-  const input = { left: false, right: false, jump: false };
+  /* --- 3. BULLETPROOF iOS TOUCH + KEYBOARD CONTROLS --- */
+  const input = { left: false, right: false, jump: false, attack: false };
   let jumpTriggered = false;
   let attackTriggered = false;
 
-  // Keyboard
   window.addEventListener('keydown', (e) => {
     if (['ArrowLeft', 'KeyA'].includes(e.code)) input.left = true;
     if (['ArrowRight', 'KeyD'].includes(e.code)) input.right = true;
@@ -119,40 +132,79 @@
     if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) input.jump = false;
   });
 
-  function setupButton(id, onDown, onUp) {
-    const el = document.getElementById(id);
-    if (!el) return;
+  const btnLeft = document.getElementById('btn-left');
+  const btnRight = document.getElementById('btn-right');
+  const btnJump = document.getElementById('btn-jump');
+  const btnAttack = document.getElementById('btn-attack');
+  const deck = document.getElementById('touch-deck') || document.querySelector('.touch-deck');
 
-    const start = (e) => {
-      if (e.cancelable) e.preventDefault();
-      el.classList.add('active');
-      onDown();
-    };
-
-    const stop = (e) => {
-      if (e.cancelable) e.preventDefault();
-      el.classList.remove('active');
-      if (onUp) onUp();
-    };
-
-    el.addEventListener('touchstart', start, { passive: false });
-    el.addEventListener('touchend', stop, { passive: false });
-    el.addEventListener('touchcancel', stop, { passive: false });
-    el.addEventListener('mousedown', start);
-    el.addEventListener('mouseup', stop);
+  function isTouchInside(touch, el) {
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    return (
+      touch.clientX >= r.left - 10 &&
+      touch.clientX <= r.right + 10 &&
+      touch.clientY >= r.top - 10 &&
+      touch.clientY <= r.bottom + 10
+    );
   }
 
+  function syncTouches(e) {
+    if (e.cancelable) e.preventDefault();
 
-  setupButton('btn-left', () => (input.left = true), () => (input.left = false));
-  setupButton('btn-right', () => (input.right = true), () => (input.right = false));
-  setupButton('btn-jump', () => {
-    if (!input.jump) jumpTriggered = true;
-    input.jump = true;
-  }, () => (input.jump = false));
-  setupButton('btn-attack', () => (attackTriggered = true));
+    let l = false, r = false, j = false, a = false;
+    const touches = e.touches;
 
-  // Layout switcher
-  const deck = document.querySelector('.touch-deck');
+    for (let i = 0; i < touches.length; i++) {
+      const t = touches[i];
+      if (isTouchInside(t, btnLeft)) l = true;
+      if (isTouchInside(t, btnRight)) r = true;
+      if (isTouchInside(t, btnJump)) j = true;
+      if (isTouchInside(t, btnAttack)) a = true;
+    }
+
+    if (j && !input.jump) jumpTriggered = true;
+    if (a && !input.attack) attackTriggered = true;
+
+    input.left = l;
+    input.right = r;
+    input.jump = j;
+    input.attack = a;
+
+    if (btnLeft) btnLeft.classList.toggle('active', l);
+    if (btnRight) btnRight.classList.toggle('active', r);
+    if (btnJump) btnJump.classList.toggle('active', j);
+    if (btnAttack) btnAttack.classList.toggle('active', a);
+  }
+
+  if (deck) {
+    deck.addEventListener('touchstart', syncTouches, { passive: false });
+    deck.addEventListener('touchmove', syncTouches, { passive: false });
+    deck.addEventListener('touchend', syncTouches, { passive: false });
+    deck.addEventListener('touchcancel', syncTouches, { passive: false });
+  }
+
+  function bindMouse(el, key) {
+    if (!el) return;
+    el.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      if (key === 'jump' && !input.jump) jumpTriggered = true;
+      if (key === 'attack') attackTriggered = true;
+      input[key] = true;
+      el.classList.add('active');
+    });
+    const up = () => {
+      input[key] = false;
+      el.classList.remove('active');
+    };
+    el.addEventListener('mouseup', up);
+    el.addEventListener('mouseleave', up);
+  }
+  bindMouse(btnLeft, 'left');
+  bindMouse(btnRight, 'right');
+  bindMouse(btnJump, 'jump');
+  bindMouse(btnAttack, 'attack');
+
   const layoutBtn = document.getElementById('btn-layout');
   let currentLayout = 0;
   if (layoutBtn && deck) {
@@ -176,7 +228,7 @@
   const STAGES = [
     {
       name: "Stage 1: Castle Outskirts",
-      bannerSub: "Malakor fled east with Princess Aurelia! Chase him down!",
+      bannerSub: "Zombies have infested the outer walls! Clear the path!",
       skyTop: "#0f172a", skyBot: "#1e3a5f",
       groundColor: "#15803d", topColor: "#4ade80",
       platforms: [
@@ -197,15 +249,15 @@
         { x: 1565, y: 240 }
       ],
       enemies: [
-        { x: 560, y: 348, w: 30, h: 32, minX: 530, maxX: 680, vx: 1.5 },
-        { x: 1440, y: 348, w: 30, h: 32, minX: 1380, maxX: 1700, vx: 1.9 }
+        { x: 560, y: 348, w: 32, h: 36, minX: 530, maxX: 680, vx: 1.5 },
+        { x: 1440, y: 348, w: 32, h: 36, minX: 1380, maxX: 1700, vx: 1.9 }
       ],
       portal: { x: 1780, y: 305, w: 46, h: 75 },
       hasBoss: false
     },
     {
-      name: "Stage 2: Obsidian Cavern",
-      bannerSub: "Cross the underground fortress to reach Malakor's Keep!",
+      name: "Stage 2: Obsidian Catacombs",
+      bannerSub: "Navigate the underground zombie catacombs!",
       skyTop: "#1e1b4b", skyBot: "#4c1d95",
       groundColor: "#4338ca", topColor: "#818cf8",
       platforms: [
@@ -227,15 +279,15 @@
         { x: 1760, y: 310 }
       ],
       enemies: [
-        { x: 590, y: 213, w: 30, h: 32, minX: 575, maxX: 690, vx: 1.5 },
-        { x: 1540, y: 333, w: 30, h: 32, minX: 1510, maxX: 1630, vx: 1.8 }
+        { x: 590, y: 213, w: 32, h: 36, minX: 575, maxX: 690, vx: 1.5 },
+        { x: 1540, y: 333, w: 32, h: 36, minX: 1510, maxX: 1630, vx: 1.8 }
       ],
       portal: { x: 1880, y: 290, w: 46, h: 75 },
       hasBoss: false
     },
     {
-      name: "Stage 3: Malakor's Keep",
-      bannerSub: "Defeat Dark Lord Malakor (3 Hits) to free Princess Aurelia!",
+      name: "Stage 3: Zombie Lair",
+      bannerSub: "Defeat the Zombie Boss (3 Hits) to rescue Princess Aurelia!",
       skyTop: "#2a0a18", skyBot: "#450a0a",
       groundColor: "#7f1d1d", topColor: "#f87171",
       platforms: [
@@ -253,17 +305,17 @@
         { x: 325, y: 245 }, { x: 615, y: 205 }, { x: 885, y: 245 }
       ],
       enemies: [
-        { x: 350, y: 348, w: 30, h: 32, minX: 250, maxX: 520, vx: 1.8 }
+        { x: 350, y: 344, w: 32, h: 36, minX: 250, maxX: 520, vx: 1.8 }
       ],
       portal: null,
       hasBoss: true,
       boss: {
-        x: 780, y: 316, w: 48, h: 64,
+        x: 780, y: 310, w: 52, h: 70,
         vx: -2.3, minX: 480, maxX: 960,
         hp: 3, maxHp: 3, hurtTimer: 0, jumpTimer: 90, vy: 0
       },
       princess: {
-        x: 1120, y: 332, w: 30, h: 48, freed: false
+        x: 1120, y: 332, w: 32, h: 48, freed: false
       }
     }
   ];
@@ -366,6 +418,7 @@
 
   /* --- 5. PHYSICS LOOP --- */
   function updateGame() {
+    if (window.splashActive) return;
     animTick++;
     if (bannerTimer > 0) bannerTimer--;
     if (hero.invuln > 0) hero.invuln--;
@@ -392,7 +445,6 @@
       h: 36
     } : null;
 
-    // Moving platforms
     for (const p of stage.platforms) {
       if (p.vx) {
         p.x += p.vx;
@@ -404,9 +456,8 @@
       }
     }
 
-    // Horizontal speed
-    const accel = hero.onGround ? 0.65 : 0.45;
-    const maxVx = 4.6;
+    const accel = hero.onGround ? 0.7 : 0.48;
+    const maxVx = 4.8;
     if (input.left) {
       hero.vx = Math.max(hero.vx - accel, -maxVx);
       hero.facing = -1;
@@ -418,7 +469,6 @@
       if (Math.abs(hero.vx) < 0.08) hero.vx = 0;
     }
 
-    // Jump handling
     if (hero.onGround) {
       hero.coyote = 7;
       hero.jumps = 2;
@@ -446,7 +496,6 @@
     if (!input.jump && hero.vy < -4) hero.vy *= 0.85;
     hero.vy = Math.min(hero.vy + 0.48, 12);
 
-    // Apply X movement
     hero.x += hero.vx;
     if (hero.x < 0) { hero.x = 0; hero.vx = 0; }
     for (const p of stage.platforms) {
@@ -457,7 +506,6 @@
       }
     }
 
-    // Apply Y movement
     const prevBot = hero.y + hero.h;
     hero.y += hero.vy;
     hero.onGround = false;
@@ -481,7 +529,6 @@
       return;
     }
 
-    // Springs
     for (const s of stage.springs) {
       if (s.anim > 0) s.anim--;
       if (overlap(hero, s)) {
@@ -494,7 +541,6 @@
       }
     }
 
-    // Gems
     for (const g of stage.gems) {
       g.bob += 0.08;
       if (!g.taken && overlap(hero, { x: g.x - 10, y: g.y - 10, w: 20, h: 20 })) {
@@ -506,7 +552,6 @@
       }
     }
 
-    // Enemies
     for (const e of stage.enemies) {
       if (!e.alive) continue;
       e.x += e.vx;
@@ -535,12 +580,10 @@
       }
     }
 
-    // Spikes
     for (const sp of stage.spikes) {
       if (overlap(hero, sp)) damageHero();
     }
 
-    // Portal
     if (stage.portal && overlap(hero, stage.portal)) {
       if (window.playTone) window.playTone('win');
       score += 400;
@@ -548,7 +591,6 @@
       return;
     }
 
-    // Boss Battle
     if (stage.hasBoss && stage.boss && stage.boss.hp > 0) {
       const b = stage.boss;
       if (b.hurtTimer > 0) b.hurtTimer--;
@@ -556,14 +598,14 @@
       if (b.x < b.minX || b.x + b.w > b.maxX) b.vx *= -1;
 
       b.jumpTimer--;
-      if (b.jumpTimer <= 0 && b.y >= 316) {
+      if (b.jumpTimer <= 0 && b.y >= 310) {
         b.vy = -10.5;
         b.jumpTimer = 85;
       }
       b.y += b.vy;
       b.vy += 0.42;
-      if (b.y >= 316) {
-        b.y = 316;
+      if (b.y >= 310) {
+        b.y = 310;
         b.vy = 0;
       }
 
@@ -576,7 +618,7 @@
         hero.vy = -9.5;
         hero.vx = hero.x < b.x ? -5 : 5;
         if (window.playTone) window.playTone('sword');
-        burst(b.x + b.w / 2, b.y + b.h / 2, '#a855f7', 22);
+        burst(b.x + b.w / 2, b.y + b.h / 2, '#65a30d', 22);
         if (b.hp <= 0) {
           if (window.playTone) window.playTone('win');
           score += 1000;
@@ -589,7 +631,6 @@
       }
     }
 
-    // Princess
     if (stage.princess && stage.princess.freed && victoryTimer === 0) {
       if (overlap(hero, stage.princess)) {
         if (window.playTone) window.playTone('win');
@@ -598,7 +639,6 @@
       }
     }
 
-    // Particles
     for (let i = particles.length - 1; i >= 0; i--) {
       const pt = particles[i];
       pt.x += pt.vx;
@@ -639,18 +679,15 @@
 
     for (const p of stage.platforms) {
       ctx.fillStyle = stage.groundColor;
-      ctx.beginPath();
       ctx.roundRect(p.x, p.y, p.w, p.h, 6);
       ctx.fill();
       ctx.fillStyle = stage.topColor;
-      ctx.beginPath();
-      ctx.roundRect(p.x, p.y, p.w, 6, [6, 6, 0, 0]);
+      ctx.roundRect(p.x, p.y, p.w, 6, 4);
       ctx.fill();
     }
 
     for (const s of stage.springs) {
       ctx.fillStyle = "#f43f5e";
-      ctx.beginPath();
       ctx.roundRect(s.x, s.y - (s.anim > 0 ? 4 : 0), s.w, s.h, 4);
       ctx.fill();
     }
@@ -681,81 +718,64 @@
       ctx.fill();
     }
 
+    // Draw Zombie Minions
     for (const e of stage.enemies) {
       if (!e.alive) continue;
-      ctx.fillStyle = "#ea580c";
-      ctx.beginPath();
-      ctx.roundRect(e.x, e.y, e.w, e.h, 6);
-      ctx.fill();
-      ctx.fillStyle = "#fef08a";
-      const ex = e.vx > 0 ? 5 : -2;
-      ctx.fillRect(e.x + 6 + ex, e.y + 8, 5, 5);
-      ctx.fillRect(e.x + 17 + ex, e.y + 8, 5, 5);
+      if (window.spriteCache && window.spriteCache.zombie) {
+        ctx.save();
+        ctx.translate(e.x + e.w / 2, e.y + e.h / 2);
+        if (e.vx < 0) ctx.scale(-1, 1);
+        ctx.drawImage(window.spriteCache.zombie, -e.w / 2 - 4, -e.h / 2 - 4, e.w + 8, e.h + 6);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = "#65a30d";
+        ctx.roundRect(e.x, e.y, e.w, e.h, 6);
+        ctx.fill();
+      }
     }
 
     if (stage.portal) {
       const po = stage.portal;
       ctx.fillStyle = "rgba(56, 189, 248, 0.25)";
-      ctx.beginPath();
       ctx.roundRect(po.x - 4, po.y - 4, po.w + 8, po.h + 8, 22);
       ctx.fill();
       ctx.strokeStyle = "#38bdf8";
       ctx.lineWidth = 4;
-      ctx.beginPath();
       ctx.roundRect(po.x, po.y, po.w, po.h, 18);
       ctx.stroke();
     }
 
+    // Draw Giant Zombie Boss
     if (stage.hasBoss && stage.boss && stage.boss.hp > 0) {
       const b = stage.boss;
-      if (b.hurtTimer % 4 < 2) {
-        ctx.fillStyle = "#991b1b";
-        ctx.fillRect(b.x - 6, b.y + 10, b.w + 12, b.h - 10);
-        ctx.fillStyle = "#312e81";
-        ctx.beginPath();
-        ctx.roundRect(b.x, b.y, b.w, b.h, 8);
-        ctx.fill();
-        ctx.fillStyle = "#ef4444";
-        ctx.beginPath();
-        ctx.moveTo(b.x + 4, b.y);
-        ctx.lineTo(b.x - 6, b.y - 16);
-        ctx.lineTo(b.x + 16, b.y);
-        ctx.moveTo(b.x + b.w - 4, b.y);
-        ctx.lineTo(b.x + b.w + 6, b.y - 16);
-        ctx.lineTo(b.x + b.w - 16, b.y);
-        ctx.fill();
-        ctx.fillStyle = "#ff0000";
-        ctx.fillRect(b.x + 10, b.y + 14, 8, 5);
-        ctx.fillRect(b.x + 28, b.y + 14, 8, 5);
+      if (b.hurtTimer % 4 < 2 && window.spriteCache && window.spriteCache.zombie) {
+        ctx.save();
+        ctx.translate(b.x + b.w / 2, b.y + b.h / 2);
+        if (b.vx < 0) ctx.scale(-1, 1);
+        ctx.drawImage(window.spriteCache.zombie, -b.w / 2 - 6, -b.h / 2 - 6, b.w + 12, b.h + 8);
+        ctx.restore();
       }
       ctx.fillStyle = "#0f172a";
       ctx.fillRect(b.x - 6, b.y - 28, 60, 8);
-      ctx.fillStyle = "#ef4444";
+      ctx.fillStyle = "#65a30d";
       ctx.fillRect(b.x - 5, b.y - 27, (58 * b.hp) / b.maxHp, 6);
     }
 
+    // Draw Pixel Princess
     if (stage.princess) {
       const pr = stage.princess;
-      ctx.fillStyle = "#f472b6";
-      ctx.beginPath();
-      ctx.moveTo(pr.x + 15, pr.y + 14);
-      ctx.lineTo(pr.x + 30, pr.y + pr.h);
-      ctx.lineTo(pr.x, pr.y + pr.h);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = "#fde68a";
-      ctx.fillRect(pr.x + 6, pr.y, 18, 16);
-      ctx.fillStyle = "#facc15";
-      ctx.fillRect(pr.x + 8, pr.y - 6, 14, 6);
+      if (window.spriteCache && window.spriteCache.princess) {
+        ctx.drawImage(window.spriteCache.princess, pr.x - 4, pr.y - 4, pr.w + 8, pr.h + 4);
+      }
 
       if (!pr.freed) {
-        ctx.strokeStyle = "#a855f7";
+        ctx.strokeStyle = "#94a3b8";
         ctx.lineWidth = 3;
-        ctx.strokeRect(pr.x - 8, pr.y - 12, pr.w + 16, pr.h + 12);
+        ctx.strokeRect(pr.x - 8, pr.y - 10, pr.w + 16, pr.h + 10);
         ctx.fillStyle = "#f8fafc";
         ctx.font = "bold 11px system-ui";
         ctx.textAlign = "center";
-        ctx.fillText("HELP!", pr.x + 15, pr.y - 18);
+        ctx.fillText("HELP!", pr.x + 15, pr.y - 16);
       } else {
         ctx.fillStyle = "#fde047";
         ctx.font = "bold 12px system-ui";
@@ -782,7 +802,6 @@
         ctx.drawImage(currentSprite, -hero.w / 2 - 3, -hero.h / 2 - 2, hero.w + 6, hero.h + 2);
         ctx.restore();
       } else {
-        // Fallback placeholder rectangle if sprites haven't initialized
         ctx.fillStyle = '#38bdf8';
         ctx.fillRect(hero.x, hero.y, hero.w, hero.h);
       }
@@ -790,7 +809,6 @@
       if (hero.slashTimer > 0) {
         ctx.fillStyle = "#38bdf8";
         const sx = hero.facing === 1 ? hero.x + hero.w : hero.x - 38;
-        ctx.beginPath();
         ctx.roundRect(sx, hero.y + 18, 38, 10, 4);
         ctx.fill();
         ctx.fillStyle = "#ffffff";
@@ -826,7 +844,7 @@
       ctx.fillText("🎉 PRINCESS AURELIA RESCUED! 🎉", VIEW_W / 2, VIEW_H / 2 - 6);
       ctx.fillStyle = "#38bdf8";
       ctx.font = "bold 15px system-ui, sans-serif";
-      ctx.fillText("You defeated Lord Malakor and saved the Kingdom!", VIEW_W / 2, VIEW_H / 2 + 22);
+      ctx.fillText("You defeated the Zombie Boss and saved the Kingdom!", VIEW_W / 2, VIEW_H / 2 + 22);
     }
 
     ctx.restore();
