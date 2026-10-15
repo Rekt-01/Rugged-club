@@ -119,35 +119,29 @@
     if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) input.jump = false;
   });
 
-  // Touch & Pointer Binder
   function setupButton(id, onDown, onUp) {
     const el = document.getElementById(id);
     if (!el) return;
 
     const start = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+      if (e.cancelable) e.preventDefault();
       el.classList.add('active');
       onDown();
     };
 
     const stop = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+      if (e.cancelable) e.preventDefault();
       el.classList.remove('active');
       if (onUp) onUp();
     };
 
-    // Support both Touch Events (iOS Safari) and Pointer Events
     el.addEventListener('touchstart', start, { passive: false });
     el.addEventListener('touchend', stop, { passive: false });
     el.addEventListener('touchcancel', stop, { passive: false });
-
-    el.addEventListener('pointerdown', start);
-    el.addEventListener('pointerup', stop);
-    el.addEventListener('pointercancel', stop);
-    el.addEventListener('pointerleave', stop);
+    el.addEventListener('mousedown', start);
+    el.addEventListener('mouseup', stop);
   }
+
 
   setupButton('btn-left', () => (input.left = true), () => (input.left = false));
   setupButton('btn-right', () => (input.right = true), () => (input.right = false));
